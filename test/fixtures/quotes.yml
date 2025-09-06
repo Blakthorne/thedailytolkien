@@ -1,0 +1,21 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  text: MyString
+  book: MyString
+  chapter: MyString
+  context: MyString
+  character: MyString
+  days_displayed: 1
+  last_date_displayed: 1
+  first_date_displayed: 1
+
+two:
+  text: MyString
+  book: MyString
+  chapter: MyString
+  context: MyString
+  character: MyString
+  days_displayed: 1
+  last_date_displayed: 1
+  first_date_displayed: 1

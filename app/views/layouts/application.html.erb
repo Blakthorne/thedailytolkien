@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= content_for(:title) || "The Daily Tolkien" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes"><link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+
+    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
+    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
+
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+
+    <%# Includes all stylesheet files in app/assets/stylesheets %>
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+
+    <style>
+      /* Footer Styles */
+      .footer {
+        width: 100%;
+        height: 70px;
+        padding: 0;
+        border-top: 1px solid rgba(139, 115, 85, 0.3); /* Very subtle border */
+        background: rgba(245, 240, 232, 0.8); /* More opaque since not overlaying */
+        backdrop-filter: blur(10px); /* Enhanced blur for better appearance */
+      }
+
+      .footer-content {
+        max-width: 1200px;
+        margin: auto;
+        padding: 0 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+        height: 100%;
+      }
+
+      .footer-content p {
+        color: #3d2c1d; /* Dark brown text */
+        font-size: 0.9rem !important;
+        margin: 0;
+        opacity: 0.8; /* Slightly transparent for subtle blending */
+      }
+
+      .footer-nav {
+        display: flex;
+        gap: 2rem;
+      }
+
+      .footer-link {
+        color: #3d2c1d; /* Dark brown text */
+        text-decoration: none;
+        font-size: 0.9rem !important;
+        font-weight: 500;
+        transition: color 0.2s ease;
+      }
+
+      .footer-link:hover {
+        color: #8b7355; /* Muted brown on hover */
+      }
+
+    </style>
+  </head>
+
+  <body>
+
+    <div class="page-content">
+      <header class="app-header">
+      <% if controller_path.start_with?('devise/') %>
+        <div class="header-content">
+          <h1><%= link_to "The Daily Tolkien", root_path, class: "header-title-link" %></h1>
+        </div>
+      <% else %>
+        <div class="header-content">
+          <h1><%= link_to "The Daily Tolkien", root_path, class: "header-title-link" %></h1>
+          <div class="auth-links">
+            <% if user_signed_in? %>
+              <span class="user-info">Welcome, <%= current_user.name || current_user.email %></span>
+              <%= form_with(url: destroy_user_session_path, method: :delete, data: { turbo: false }) do |f| %>
+                <%= f.submit "Logout", class: "auth-link logout-link" %>
+              <% end %>
+            <% else %>
+              <%= link_to "Login", new_user_session_path, class: "auth-link login-link" %>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </header>
+
+    <%= yield %>
+    </div>
+
+    <style>
+      /* Global Reset and Base Styles */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html {
+        font-size: 16px; /* Set consistent base font size */
+      }
+
+      body {
+        font-family: 'Source Sans Pro', sans-serif;
+        background-color: #f5f0e8; /* Parchment base color */
+        background-image: url(<%= asset_path 'scholarly-background-v4.svg' %>);
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        color: #3d2c1d; /* Dark brown text for parchment */
+        min-height: 100vh;
+        line-height: 1.6;
+        position: relative;
+        overflow-x: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .page-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+
+      body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(245, 240, 232, 0.1); /* Very subtle parchment overlay */
+        z-index: -1;
+      }
+
+      /* App Header Styles */
+      .app-header {
+        background: rgba(245, 240, 232, 0.1); /* More transparent parchment */
+        backdrop-filter: blur(1px); /* Reduced blur for better blending */
+        padding: 1.5rem 2rem;
+        border-bottom: 2px solid #8b7355; /* Darker parchment border */
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .auth-links {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .user-info {
+        font-size: 0.9rem;
+        color: #3d2c1d;
+        font-weight: 500;
+        opacity: 0.8; /* Match footer opacity */
+        font-family: 'Source Sans Pro', sans-serif; /* Ensure consistent font */
+      }
+
+      .auth-link {
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        opacity: 0.8; /* Match footer opacity */
+        font-family: 'Source Sans Pro', sans-serif; /* Ensure consistent font */
+      }
+
+      .login-link {
+        background: rgba(139, 115, 85, 0.1);
+        color: #3d2c1d;
+        border: 1px solid #8b7355;
+      }
+
+      .login-link:hover {
+        background: rgba(139, 115, 85, 0.2);
+        color: #3d2c1d;
+        opacity: 1; /* Full opacity on hover */
+      }
+
+      .logout-link {
+        background: rgba(61, 44, 29, 0.1);
+        color: #3d2c1d;
+        border: 1px solid #3d2c1d;
+        cursor: pointer;
+      }
+
+      .logout-link:hover {
+        background: rgba(61, 44, 29, 0.2);
+        color: #3d2c1d;
+        opacity: 1; /* Full opacity on hover */
+      }
+
+      .app-header h1 {
+        font-size: 1.75rem !important;
+        color: #3d2c1d; /* Dark brown text */
+        margin: 0;
+        letter-spacing: -0.025em;
+      }
+
+      .header-title-link {
+        font-family: 'Crimson Text', serif;
+        color: inherit !important;
+        text-decoration: none !important;
+        transition: color 0.2s ease;
+      }
+
+      .header-title-link:hover {
+        color: #8b7355 !important; /* Muted brown on hover */
+      }
+
+      /* Header Styles */
+      .header {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        padding: 2.5rem 2rem;
+        text-align: center;
+        position: relative;
+        border-bottom: 1px solid #334155;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        z-index: 100;
+      }
+
+      .header .nav-link {
+        position: absolute;
+        top: 1rem;
+        left: 2rem;
+        color: #64748b;
+        text-decoration: none;
+        font-size: 0.9rem !important;
+        font-weight: 500;
+        padding: 0.5rem 1rem;
+        border: 1px solid #334155;
+        border-radius: 0.375rem;
+        background: rgba(30, 41, 59, 0.8);
+        backdrop-filter: blur(10px);
+        transition: all 0.2s ease;
+      }
+
+      .header .nav-link:hover {
+        color: #e2e8f0;
+        border-color: #475569;
+        background: rgba(51, 65, 85, 0.8);
+      }
+
+      .header h1 {
+        font-size: 2.25rem !important;
+        font-weight: 700;
+        color: #f1f5f9;
+        margin-bottom: 0.5rem;
+        letter-spacing: -0.025em;
+      }
+
+      .header p {
+        color: #94a3b8;
+        font-size: 1rem !important;
+        margin: 0;
+        font-weight: 400;
+      }
+
+      /* Ensure body has top padding to account for header */
+      body {
+        padding-top: 0 !important;
+      }
+
+      @media (max-width: 768px) {
+        .app-header {
+          padding: 1rem 1rem;
+        }
+
+        .header-content {
+          flex-direction: column;
+          gap: 1rem;
+        }
+
+        .auth-links {
+          justify-content: center;
+        }
+
+        .app-header h1 {
+          font-size: 1.5rem !important;
+        }
+
+        .header {
+          padding: 2rem 1rem;
+        }
+
+        .header .nav-link {
+          position: static;
+          margin-bottom: 1rem;
+          display: inline-block;
+        }
+
+        .header h1 {
+          font-size: 1.875rem !important;
+        }
+
+        .footer-content {
+          flex-direction: column;
+          text-align: center;
+          justify-content: center;
+          gap: 0;
+          height: 100%;
+          padding: 0;
+        }
+
+        .footer-nav {
+          justify-content: center;
+        }
+      }
+    </style>
+
+    <footer class="footer">
+      <div class="footer-content">
+        <p>&copy; <%= Date.current.year %> David Polar. All rights reserved.</p>
+        <nav class="footer-nav">
+          <a href="/" class="footer-link">Home</a>
+          <a href="/philosophy" class="footer-link">Philosophy</a>
+        </nav>
+      </div>
+    </footer>
+  </body>
+</html>

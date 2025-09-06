@@ -1,0 +1,174 @@
+<style>
+  
+  /* Main content styles */
+  .main-content {
+    width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+  }
+
+  .quote-card {
+    background: rgba(245, 240, 232, 0.1); /* Semi-transparent parchment */
+    backdrop-filter: blur(2px);
+    border-radius: 12px;
+    padding: 3rem 2rem;
+    margin-bottom: 2rem;
+    border: 2px solid #8b7355; /* Darker parchment border */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    position: relative;
+    width: 100%;
+  }
+
+  .quote-text {
+    font-family: 'Crimson Text', serif;
+    font-size: 1.75rem;
+    line-height: 1.6;
+    color: #3d2c1d; /* Dark brown text */
+    text-align: center;
+    margin-bottom: 2rem;
+    font-weight: 400;
+    position: relative;
+    padding: 0 1rem;
+    letter-spacing: 0.01em;
+  }
+  
+  .quote-text::before {
+    left: 0;
+    top: -10px;
+  }
+
+  .quote-text::after {
+    right: 0;
+    bottom: -40px;
+  }
+
+  .metadata-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+
+  .metadata-item {
+    background: rgba(212, 196, 168, 0.5); /* Semi-transparent aged parchment */
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 3px solid #8b7355; /* Darker parchment border */
+    transition: all 0.2s ease;
+  }
+
+  .metadata-item:hover {
+    background: rgba(212, 196, 168, 0.9);
+  }
+
+  .metadata-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #8b7355; /* Muted brown for labels */
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: block;
+  }
+
+  .metadata-value {
+    font-family: 'Crimson Text', serif;
+    font-size: 1rem;
+    color: #3d2c1d; /* Dark brown text */
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    line-height: 1.3;
+  }
+
+  .no-quote {
+    text-align: center;
+    padding: 3rem 2rem;
+    background: rgba(30, 41, 59, 0.8);
+    backdrop-filter: blur(20px);
+    border-radius: 12px;
+    border: 1px solid #475569;
+    color: #94a3b8;
+    font-size: 1.1rem;
+    font-style: italic;
+  }
+
+  @media (max-width: 768px) {
+    .main-content {
+      padding: 0 1rem;
+      width: 100%;
+    }
+
+    .quote-card {
+      padding: 2rem 1.5rem;
+    }
+
+    .quote-text {
+      font-size: 1.4rem;
+      padding: 0 0.5rem;
+    }
+
+    .quote-text::before,
+    .quote-text::after {
+      font-size: 2rem;
+    }
+
+    .metadata-section {
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .header h1 {
+      font-size: 1.75rem;
+    }
+
+    .quote-text {
+      font-size: 1.2rem;
+    }
+
+    .quote-card {
+      padding: 1.5rem 1rem;
+    }
+  }
+</style>
+
+<main class="main-content">
+  <% if @quote %>
+    <div class="quote-card">
+
+      <blockquote class="quote-text">
+        <%= @quote.text %>
+      </blockquote>
+
+      <div class="metadata-section">
+        <% if @quote.book.present? %>
+          <div class="metadata-item">
+            <span class="metadata-label">Book</span>
+            <span class="metadata-value"><%= @quote.book %></span>
+          </div>
+        <% end %>
+        <% if @quote.chapter.present? %>
+          <div class="metadata-item">
+            <span class="metadata-label">Chapter</span>
+            <span class="metadata-value"><%= @quote.chapter %></span>
+          </div>
+        <% end %>
+        <% if @quote.character.present? %>
+          <div class="metadata-item">
+            <span class="metadata-label">Character</span>
+            <span class="metadata-value"><%= @quote.character %></span>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% else %>
+    <div class="no-quote">
+      <p>No quotes available at the moment. Please check back later.</p>
+    </div>
+  <% end %>
+</main>
