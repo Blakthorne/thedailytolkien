@@ -23,7 +23,6 @@ gem "bcrypt", "~> 3.1.7"
 # Authentication
 gem "devise"
 gem "omniauth-google-oauth2"
-gem "omniauth-facebook"
 gem "omniauth-rails_csrf_protection"
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
