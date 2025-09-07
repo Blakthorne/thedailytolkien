@@ -1,0 +1,179 @@
+<% content_for(:breadcrumb) do %>
+  <%= link_to "Dashboard", admin_root_path %> > <strong>Analytics</strong>
+<% end %>
+
+<h1>Analytics & Reports</h1>
+
+<!-- Overview Stats -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 3rem;">
+  <!-- Quotes Stats -->
+  <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2rem; border-radius: 12px;">
+    <h3 style="margin: 0 0 1rem 0; display: flex; align-items: center; gap: 0.5rem;">
+      📚 Quotes Overview
+    </h3>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+      <div>
+        <p style="margin: 0; font-size: 2rem; font-weight: bold;"><%= @analytics[:quotes][:total] %></p>
+        <small style="opacity: 0.9;">Total Quotes</small>
+      </div>
+      <div>
+        <p style="margin: 0; font-size: 1.2rem; font-weight: bold;"><%= @analytics[:quotes][:this_week] %></p>
+        <small style="opacity: 0.9;">This Week</small>
+      </div>
+      <div>
+        <p style="margin: 0; font-size: 1.2rem; font-weight: bold;"><%= @analytics[:quotes][:this_month] %></p>
+        <small style="opacity: 0.9;">This Month</small>
+      </div>
+      <div>
+        <p style="margin: 0; font-size: 1.2rem; font-weight: bold;"><%= @analytics[:quotes][:average_length] %></p>
+        <small style="opacity: 0.9;">Avg Length</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Users Stats -->
+  <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 2rem; border-radius: 12px;">
+    <h3 style="margin: 0 0 1rem 0; display: flex; align-items: center; gap: 0.5rem;">
+      👥 Users Overview
+    </h3>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+      <div>
+        <p style="margin: 0; font-size: 2rem; font-weight: bold;"><%= @analytics[:users][:total] %></p>
+        <small style="opacity: 0.9;">Total Users</small>
+      </div>
+      <div>
+        <p style="margin: 0; font-size: 1.2rem; font-weight: bold;"><%= @analytics[:users][:this_week] %></p>
+        <small style="opacity: 0.9;">This Week</small>
+      </div>
+      <div>
+        <p style="margin: 0; font-size: 1.2rem; font-weight: bold;"><%= @analytics[:users][:admins] %></p>
+        <small style="opacity: 0.9;">Admins</small>
+      </div>
+      <div>
+        <p style="margin: 0; font-size: 1.2rem; font-weight: bold;"><%= @analytics[:users][:commentors] %></p>
+        <small style="opacity: 0.9;">Commentors</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Activity Stats -->
+  <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 2rem; border-radius: 12px;">
+    <h3 style="margin: 0 0 1rem 0; display: flex; align-items: center; gap: 0.5rem;">
+      📊 Activity Overview
+    </h3>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+      <div>
+        <p style="margin: 0; font-size: 2rem; font-weight: bold;"><%= @analytics[:activity][:total_activities] %></p>
+        <small style="opacity: 0.9;">Total Actions</small>
+      </div>
+      <div>
+        <p style="margin: 0; font-size: 1.2rem; font-weight: bold;"><%= @analytics[:activity][:last_24h] %></p>
+        <small style="opacity: 0.9;">Last 24h</small>
+      </div>
+      <div>
+        <p style="margin: 0; font-size: 1.2rem; font-weight: bold;"><%= @analytics[:activity][:last_week] %></p>
+        <small style="opacity: 0.9;">This Week</small>
+      </div>
+      <div>
+        <p style="margin: 0; font-size: 1.2rem; font-weight: bold;"><%= @analytics[:activity][:recent_admin_actions] %></p>
+        <small style="opacity: 0.9;">Admin Actions</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Detailed Analytics -->
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 3rem;">
+  <!-- Quotes by Book -->
+  <div style="background: white; border-radius: 12px; padding: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+    <h3 style="margin: 0 0 1.5rem 0; color: #2d3748;">Quotes by Book</h3>
+    <% @analytics[:quotes][:by_book].sort_by { |k, v| -v }.each do |book, count| %>
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid #e2e8f0;">
+        <span style="font-weight: 500; color: #4a5568;"><%= truncate(book, length: 30) %></span>
+        <span style="background: #edf2f7; color: #2d3748; padding: 0.25rem 0.75rem; border-radius: 16px; font-weight: bold;">
+          <%= count %>
+        </span>
+      </div>
+    <% end %>
+    <% if @analytics[:quotes][:by_book].empty? %>
+      <p style="text-align: center; color: #a0aec0; padding: 2rem;">No quotes found</p>
+    <% end %>
+  </div>
+
+  <!-- Top Admin Actions -->
+  <div style="background: white; border-radius: 12px; padding: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+    <h3 style="margin: 0 0 1.5rem 0; color: #2d3748;">Top Admin Actions</h3>
+    <% @analytics[:activity][:by_action].each do |action, count| %>
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid #e2e8f0;">
+        <span style="font-weight: 500; color: #4a5568;"><%= action.humanize %></span>
+        <span style="background: #e6fffa; color: #234e52; padding: 0.25rem 0.75rem; border-radius: 16px; font-weight: bold;">
+          <%= count %>
+        </span>
+      </div>
+    <% end %>
+    <% if @analytics[:activity][:by_action].empty? %>
+      <p style="text-align: center; color: #a0aec0; padding: 2rem;">No activity recorded</p>
+    <% end %>
+  </div>
+</div>
+
+<!-- Activity Chart (Simple Version) -->
+<div style="background: white; border-radius: 12px; padding: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 3rem;">
+  <h3 style="margin: 0 0 1.5rem 0; color: #2d3748;">Activity Over Last 30 Days</h3>
+  
+  <div style="display: grid; grid-template-columns: repeat(30, 1fr); gap: 2px; height: 200px; align-items: end;">
+    <% max_value = [@chart_data[:quotes].max, @chart_data[:users].max, @chart_data[:activities].max].compact.max %>
+    <% max_value = 1 if max_value == 0 %>
+    
+    <% @chart_data[:dates].each_with_index do |date, index| %>
+      <div style="display: flex; flex-direction: column; align-items: center; height: 100%;">
+        <!-- Activities (blue) -->
+        <div style="width: 100%; background: #4299e1; margin-bottom: 1px; 
+                    height: <%= (@chart_data[:activities][index].to_f / max_value * 60).round %>px;
+                    title: '<%= Date.parse(date).strftime('%b %d') %>: <%= @chart_data[:activities][index] %> activities';">
+        </div>
+        
+        <!-- Users (green) -->
+        <div style="width: 100%; background: #48bb78; margin-bottom: 1px; 
+                    height: <%= (@chart_data[:users][index].to_f / max_value * 60).round %>px;
+                    title: '<%= Date.parse(date).strftime('%b %d') %>: <%= @chart_data[:users][index] %> users';">
+        </div>
+        
+        <!-- Quotes (purple) -->
+        <div style="width: 100%; background: #9f7aea; 
+                    height: <%= (@chart_data[:quotes][index].to_f / max_value * 60).round %>px;
+                    title: '<%= Date.parse(date).strftime('%b %d') %>: <%= @chart_data[:quotes][index] %> quotes';">
+        </div>
+      </div>
+    <% end %>
+  </div>
+  
+  <!-- Legend -->
+  <div style="display: flex; justify-content: center; gap: 2rem; margin-top: 1rem;">
+    <div style="display: flex; align-items: center; gap: 0.5rem;">
+      <div style="width: 16px; height: 16px; background: #9f7aea; border-radius: 2px;"></div>
+      <span style="color: #4a5568; font-size: 0.875rem;">Quotes</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 0.5rem;">
+      <div style="width: 16px; height: 16px; background: #48bb78; border-radius: 2px;"></div>
+      <span style="color: #4a5568; font-size: 0.875rem;">Users</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 0.5rem;">
+      <div style="width: 16px; height: 16px; background: #4299e1; border-radius: 2px;"></div>
+      <span style="color: #4a5568; font-size: 0.875rem;">Activities</span>
+    </div>
+  </div>
+</div>
+
+<!-- Export Actions -->
+<div style="background: #f7fafc; border-radius: 12px; padding: 2rem; border-left: 4px solid #4299e1;">
+  <h4 style="margin: 0 0 1rem 0; color: #2d3748;">Export & Reports</h4>
+  <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+    <%= link_to "Export Quotes CSV", admin_quotes_path(format: :csv), 
+        style: "background: #4299e1; color: white; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: 500;" %>
+    <%= link_to "Export Users CSV", admin_users_path(format: :csv), 
+        style: "background: #48bb78; color: white; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: 500;" %>
+    <%= link_to "View Activity Log", admin_activity_logs_path, 
+        style: "background: #9f7aea; color: white; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: 500;" %>
+  </div>
+</div>

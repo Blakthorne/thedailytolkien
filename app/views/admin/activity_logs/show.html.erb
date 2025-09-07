@@ -1,0 +1,136 @@
+<% content_for(:breadcrumb) do %>
+  <%= link_to "Dashboard", admin_root_path %> > 
+  <%= link_to "Activity Log", admin_activity_logs_path %> > 
+  <strong>Activity #<%= @activity.id %></strong>
+<% end %>
+
+<h1>Activity Details</h1>
+
+<div style="max-width: 800px;">
+  <!-- Activity Overview -->
+  <div style="background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 2rem;">
+    <div style="background: #f8f9fa; padding: 1rem; border-bottom: 1px solid #dee2e6;">
+      <h3 style="margin: 0;">Activity Summary</h3>
+    </div>
+    
+    <div style="padding: 1.5rem;">
+      <div style="display: grid; grid-template-columns: 150px 1fr; gap: 1rem; margin-bottom: 1rem;">
+        <strong>ID:</strong>
+        <span><%= @activity.id %></span>
+      </div>
+      
+      <div style="display: grid; grid-template-columns: 150px 1fr; gap: 1rem; margin-bottom: 1rem;">
+        <strong>User:</strong>
+        <div>
+          <%= @activity.user.email %>
+          <span style="background: <%= @activity.user.admin? ? '#fff3e0' : '#e8f5e8' %>; 
+                     color: <%= @activity.user.admin? ? '#ef6c00' : '#2e7d32' %>; 
+                     padding: 0.25rem 0.5rem; border-radius: 12px; font-size: 0.75rem; margin-left: 0.5rem;">
+            <%= @activity.user.role.humanize %>
+          </span>
+        </div>
+      </div>
+      
+      <div style="display: grid; grid-template-columns: 150px 1fr; gap: 1rem; margin-bottom: 1rem;">
+        <strong>Action:</strong>
+        <span style="background: #e6fffa; color: #234e52; padding: 0.25rem 0.75rem; border-radius: 16px; font-weight: 500;">
+          <%= @activity.action_description %>
+        </span>
+      </div>
+      
+      <div style="display: grid; grid-template-columns: 150px 1fr; gap: 1rem; margin-bottom: 1rem;">
+        <strong>Target:</strong>
+        <% if @activity.target %>
+          <div>
+            <div><strong><%= @activity.target.class.name %></strong></div>
+            <div style="color: #6c757d;"><%= @activity.target_description %></div>
+          </div>
+        <% else %>
+          <span style="color: #6c757d;">No specific target</span>
+        <% end %>
+      </div>
+      
+      <div style="display: grid; grid-template-columns: 150px 1fr; gap: 1rem; margin-bottom: 1rem;">
+        <strong>Timestamp:</strong>
+        <div>
+          <%= @activity.created_at.strftime("%B %d, %Y at %I:%M:%S %p") %>
+          <br><small style="color: #6c757d;"><%= time_ago_in_words(@activity.created_at) %> ago</small>
+        </div>
+      </div>
+      
+      <div style="display: grid; grid-template-columns: 150px 1fr; gap: 1rem; margin-bottom: 1rem;">
+        <strong>IP Address:</strong>
+        <span style="font-family: monospace;"><%= @activity.ip_address || "Not recorded" %></span>
+      </div>
+      
+      <div style="display: grid; grid-template-columns: 150px 1fr; gap: 1rem;">
+        <strong>User Agent:</strong>
+        <span style="font-family: monospace; font-size: 0.875rem; color: #6c757d;">
+          <%= truncate(@activity.user_agent || "Not recorded", length: 80) %>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Details Section -->
+  <% if @activity.details.present? %>
+    <div style="background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 2rem;">
+      <div style="background: #f8f9fa; padding: 1rem; border-bottom: 1px solid #dee2e6;">
+        <h3 style="margin: 0;">Additional Details</h3>
+      </div>
+      
+      <div style="padding: 1.5rem;">
+        <pre style="background: #f8f9fa; padding: 1rem; border-radius: 4px; border: 1px solid #e9ecef; white-space: pre-wrap; font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace; font-size: 0.875rem; color: #495057; margin: 0; overflow-x: auto;"><%= JSON.pretty_generate(@activity.details) %></pre>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Related Activities -->
+  <% if @activity.target %>
+    <% related_activities = ActivityLog.where(target: @activity.target).where.not(id: @activity.id).order(created_at: :desc).limit(5) %>
+    <% if related_activities.any? %>
+      <div style="background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 2rem;">
+        <div style="background: #f8f9fa; padding: 1rem; border-bottom: 1px solid #dee2e6;">
+          <h3 style="margin: 0;">Related Activities</h3>
+        </div>
+        
+        <div style="padding: 1rem;">
+          <% related_activities.each do |activity| %>
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid #e9ecef;">
+              <div>
+                <strong><%= activity.user.email %></strong> <%= activity.action_description %>
+                <br><small style="color: #6c757d;"><%= time_ago_in_words(activity.created_at) %> ago</small>
+              </div>
+              <%= link_to "View", admin_activity_log_path(activity), 
+                  style: "color: #007bff; text-decoration: none; font-size: 0.875rem;" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
+
+  <!-- Actions -->
+  <div style="background: #e8f4fd; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #2196f3;">
+    <h4 style="margin: 0 0 1rem 0; color: #1565c0;">Quick Actions</h4>
+    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+      <%= link_to "Back to Activity Log", admin_activity_logs_path, 
+          style: "background: #6c757d; color: white; padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none;" %>
+      
+      <% if @activity.target %>
+        <% if @activity.target.is_a?(Quote) %>
+          <%= link_to "View Quote", admin_quote_path(@activity.target), 
+              style: "background: #2196f3; color: white; padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none;" %>
+        <% elsif @activity.target.is_a?(User) %>
+          <%= link_to "View User", admin_user_path(@activity.target), 
+              style: "background: #4caf50; color: white; padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none;" %>
+        <% end %>
+      <% end %>
+      
+      <%= link_to "Filter by User", admin_activity_logs_path(user_id: @activity.user.id), 
+          style: "background: #ff9800; color: white; padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none;" %>
+      <%= link_to "Filter by Action", admin_activity_logs_path(action: @activity.action), 
+          style: "background: #9c27b0; color: white; padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none;" %>
+    </div>
+  </div>
+</div>

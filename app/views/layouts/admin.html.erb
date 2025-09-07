@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Admin Dashboard - The Daily Tolkien</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+    
+    <style>
+      .admin-header {
+        background: #2c3e50;
+        color: white;
+        padding: 1rem 0;
+        margin-bottom: 2rem;
+      }
+      
+      .admin-nav {
+        background: #34495e;
+        padding: 0.5rem 0;
+        margin-bottom: 2rem;
+      }
+      
+      .admin-nav a {
+        color: #ecf0f1;
+        text-decoration: none;
+        padding: 0.5rem 1rem;
+        margin-right: 1rem;
+        border-radius: 4px;
+        transition: background-color 0.2s;
+      }
+      
+      .admin-nav a:hover,
+      .admin-nav a.active {
+        background-color: #2c3e50;
+        color: white;
+      }
+      
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1rem;
+      }
+      
+      .alert {
+        padding: 0.75rem 1rem;
+        margin-bottom: 1rem;
+        border: 1px solid transparent;
+        border-radius: 4px;
+      }
+      
+      .alert-success {
+        color: #155724;
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+      }
+      
+      .alert-danger {
+        color: #721c24;
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+      }
+      
+      .alert-warning {
+        color: #856404;
+        background-color: #fff3cd;
+        border-color: #ffeaa7;
+      }
+      
+      .admin-content {
+        min-height: 60vh;
+      }
+      
+      .breadcrumb {
+        background: #f8f9fa;
+        padding: 0.75rem 1rem;
+        margin-bottom: 1rem;
+        border-radius: 4px;
+      }
+      
+      .breadcrumb a {
+        color: #6c757d;
+        text-decoration: none;
+      }
+      
+      .breadcrumb a:hover {
+        color: #495057;
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+
+  <body>
+    <header class="admin-header">
+      <div class="container">
+        <h1>Admin Dashboard</h1>
+        <p>Welcome, <%= current_user.email %> | 
+           <%= link_to "Back to Site", root_path, style: "color: #ecf0f1;" %> |
+           <%= link_to "Logout", destroy_user_session_path, method: :delete, style: "color: #ecf0f1;" %>
+        </p>
+      </div>
+    </header>
+    
+    <nav class="admin-nav">
+      <div class="container">
+        <%= link_to "Dashboard", admin_root_path, class: active_admin_nav_class('admin/dashboard') %>
+        <%= link_to "Quotes", admin_quotes_path, class: active_admin_nav_class('admin/quotes') %>
+        <%= link_to "Users", admin_users_path, class: active_admin_nav_class('admin/users') %>
+        <%= link_to "Analytics", admin_analytics_path, class: active_admin_nav_class('admin/analytics') %>
+        <%= link_to "Activity Log", admin_activity_logs_path, class: active_admin_nav_class('admin/activity_logs') %>
+      </div>
+    </nav>
+
+    <main class="container">
+      <% if content_for?(:breadcrumb) %>
+        <div class="breadcrumb">
+          <%= yield(:breadcrumb) %>
+        </div>
+      <% end %>
+      
+      <% flash.each do |type, message| %>
+        <div class="alert alert-<%= type == 'notice' ? 'success' : type %>">
+          <%= message %>
+        </div>
+      <% end %>
+      
+      <div class="admin-content">
+        <%= yield %>
+      </div>
+    </main>
+    
+    <footer style="margin-top: 3rem; padding: 2rem 0; background: #f8f9fa; text-align: center; color: #6c757d;">
+      <div class="container">
+        <p>&copy; <%= Date.current.year %> The Daily Tolkien - Admin Panel</p>
+      </div>
+    </footer>
+  </body>
+</html>

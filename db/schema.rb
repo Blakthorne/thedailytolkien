@@ -10,7 +10,20 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_05_221527) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_07_035145) do
+  create_table "activity_logs", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.string "action"
+    t.string "target_type"
+    t.integer "target_id"
+    t.text "details"
+    t.string "ip_address"
+    t.text "user_agent"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_activity_logs_on_user_id"
+  end
+
   create_table "quotes", force: :cascade do |t|
     t.string "text"
     t.string "book"
@@ -39,4 +52,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_05_221527) do
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
+
+  add_foreign_key "activity_logs", "users"
 end

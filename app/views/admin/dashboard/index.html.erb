@@ -1,0 +1,122 @@
+<% content_for(:breadcrumb) do %>
+  <strong>Dashboard</strong>
+<% end %>
+
+<h1>Admin Dashboard</h1>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+  <div style="background: #e3f2fd; padding: 1.5rem; border-radius: 8px; text-align: center;">
+    <h3 style="margin: 0; color: #1565c0;">Total Quotes</h3>
+    <p style="font-size: 2rem; font-weight: bold; margin: 0.5rem 0; color: #0d47a1;"><%= @stats[:total_quotes] %></p>
+    <small style="color: #1976d2;"><%= @stats[:recent_quotes] %> added this week</small>
+  </div>
+  
+  <div style="background: #e8f5e8; padding: 1.5rem; border-radius: 8px; text-align: center;">
+    <h3 style="margin: 0; color: #2e7d32;">Total Users</h3>
+    <p style="font-size: 2rem; font-weight: bold; margin: 0.5rem 0; color: #1b5e20;"><%= @stats[:total_users] %></p>
+    <small style="color: #388e3c;"><%= @stats[:recent_users] %> joined this week</small>
+  </div>
+  
+  <div style="background: #fff3e0; padding: 1.5rem; border-radius: 8px; text-align: center;">
+    <h3 style="margin: 0; color: #ef6c00;">Admin Users</h3>
+    <p style="font-size: 2rem; font-weight: bold; margin: 0.5rem 0; color: #e65100;"><%= @stats[:admin_users] %></p>
+    <small style="color: #f57c00;">Total administrators</small>
+  </div>
+  
+  <div style="background: #f3e5f5; padding: 1.5rem; border-radius: 8px; text-align: center;">
+    <h3 style="margin: 0; color: #7b1fa2;">Recent Activity</h3>
+    <p style="font-size: 2rem; font-weight: bold; margin: 0.5rem 0; color: #4a148c;"><%= @stats[:recent_activities] %></p>
+    <small style="color: #8e24aa;">Actions in last 24h</small>
+  </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+  <div>
+    <h2>Recent Quotes</h2>
+    <div style="background: #f8f9fa; border-radius: 8px; padding: 1rem;">
+      <% if @recent_quotes.any? %>
+        <% @recent_quotes.each do |quote| %>
+          <div style="border-bottom: 1px solid #dee2e6; padding: 0.75rem 0;">
+            <p style="margin: 0; font-style: italic;">"<%= truncate(quote.text, length: 100) %>"</p>
+            <small style="color: #6c757d;">
+              — <%= quote.book %><% if quote.chapter %>, Chapter <%= quote.chapter %><% end %>
+              <br>Added <%= time_ago_in_words(quote.created_at) %> ago
+            </small>
+          </div>
+        <% end %>
+        <div style="text-align: center; margin-top: 1rem;">
+          <%= link_to "View All Quotes", admin_quotes_path, style: "color: #007bff; text-decoration: none;" %>
+        </div>
+      <% else %>
+        <p style="text-align: center; color: #6c757d; margin: 2rem 0;">No quotes found</p>
+      <% end %>
+    </div>
+  </div>
+  
+  <div>
+    <h2>Recent Users</h2>
+    <div style="background: #f8f9fa; border-radius: 8px; padding: 1rem;">
+      <% if @recent_users.any? %>
+        <% @recent_users.each do |user| %>
+          <div style="border-bottom: 1px solid #dee2e6; padding: 0.75rem 0;">
+            <p style="margin: 0; font-weight: 500;"><%= user.email %></p>
+            <small style="color: #6c757d;">
+              Role: <span style="background: <%= user.admin? ? '#e3f2fd' : '#e8f5e8' %>; padding: 0.25rem 0.5rem; border-radius: 4px;"><%= user.role.humanize %></span>
+              <br>Joined <%= time_ago_in_words(user.created_at) %> ago
+            </small>
+          </div>
+        <% end %>
+        <div style="text-align: center; margin-top: 1rem;">
+          <%= link_to "View All Users", admin_users_path, style: "color: #007bff; text-decoration: none;" %>
+        </div>
+      <% else %>
+        <p style="text-align: center; color: #6c757d; margin: 2rem 0;">No users found</p>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<div>
+  <h2>Recent Activity</h2>
+  <div style="background: #f8f9fa; border-radius: 8px; padding: 1rem;">
+    <% if @recent_activities.any? %>
+      <% @recent_activities.each do |activity| %>
+        <div style="border-bottom: 1px solid #dee2e6; padding: 0.75rem 0;">
+          <p style="margin: 0;">
+            <strong><%= activity.user.email %></strong> 
+            <%= activity.action_description %>
+            <% if activity.target %>
+              on <%= activity.target.class.name.downcase %> 
+              "<%= truncate(activity.target_description, length: 50) %>"
+            <% end %>
+          </p>
+          <small style="color: #6c757d;">
+            <%= time_ago_in_words(activity.created_at) %> ago
+            <% if activity.ip_address %>
+              • IP: <%= activity.ip_address %>
+            <% end %>
+          </small>
+        </div>
+      <% end %>
+      <div style="text-align: center; margin-top: 1rem;">
+        <%= link_to "View Full Activity Log", admin_activity_logs_path, style: "color: #007bff; text-decoration: none;" %>
+      </div>
+    <% else %>
+      <p style="text-align: center; color: #6c757d; margin: 2rem 0;">No recent activity</p>
+    <% end %>
+  </div>
+</div>
+
+<div style="margin-top: 2rem; padding: 1.5rem; background: #e8f4fd; border-radius: 8px; border-left: 4px solid #2196f3;">
+  <h3 style="margin: 0 0 1rem 0; color: #1565c0;">Quick Actions</h3>
+  <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+    <%= link_to "Add New Quote", new_admin_quote_path, 
+        style: "background: #2196f3; color: white; padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none;" %>
+    <%= link_to "Manage Users", admin_users_path, 
+        style: "background: #4caf50; color: white; padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none;" %>
+    <%= link_to "View Analytics", admin_analytics_path, 
+        style: "background: #ff9800; color: white; padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none;" %>
+    <%= link_to "Export Data", admin_quotes_path(format: :csv), 
+        style: "background: #9c27b0; color: white; padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none;" %>
+  </div>
+</div>

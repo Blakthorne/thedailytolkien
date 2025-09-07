@@ -8,6 +8,9 @@ class User < ApplicationRecord
   # Validations
   validates :role, inclusion: { in: %w[admin commentor] }
 
+  # Enums
+  enum :role, { commentor: "commentor", admin: "admin" }
+
   # Callbacks
   before_validation :set_default_role, on: :create
 
