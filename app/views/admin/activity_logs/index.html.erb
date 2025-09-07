@@ -5,46 +5,44 @@
 <h1>Activity Log</h1>
 
 <!-- Filters -->
-<div style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+<div class="admin-section" style="margin-bottom: 2rem;">
   <%= form_with url: admin_activity_logs_path, method: :get, local: true do |f| %>
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
       <div>
-        <%= f.label :user_id, "Filter by User", style: "display: block; margin-bottom: 0.5rem; font-weight: 500;" %>
+        <%= f.label :user_id, "Filter by User", style: "display: block; margin-bottom: 0.5rem; font-weight: 500; color: #3d2c1d;" %>
         <%= f.select :user_id, 
             options_from_collection_for_select(@users, :id, :email, params[:user_id]),
             { prompt: "All users" },
-            { style: "width: 100%; padding: 0.5rem; border: 1px solid #ced4da; border-radius: 4px;" } %>
+            { style: "width: 100%; padding: 0.5rem; border: 1px solid #8b7355; border-radius: 4px; background: #fefcfa;" } %>
       </div>
       
       <div>
-        <%= f.label :action, "Filter by Action", style: "display: block; margin-bottom: 0.5rem; font-weight: 500;" %>
+        <%= f.label :action, "Filter by Action", style: "display: block; margin-bottom: 0.5rem; font-weight: 500; color: #3d2c1d;" %>
         <%= f.select :action, 
             options_for_select(@actions.map { |action| [action.humanize, action] }, params[:action]),
             { prompt: "All actions" },
-            { style: "width: 100%; padding: 0.5rem; border: 1px solid #ced4da; border-radius: 4px;" } %>
+            { style: "width: 100%; padding: 0.5rem; border: 1px solid #8b7355; border-radius: 4px; background: #fefcfa;" } %>
       </div>
       
       <div>
-        <%= f.label :start_date, "From Date", style: "display: block; margin-bottom: 0.5rem; font-weight: 500;" %>
+        <%= f.label :start_date, "From Date", style: "display: block; margin-bottom: 0.5rem; font-weight: 500; color: #3d2c1d;" %>
         <%= f.date_field :start_date, 
             value: params[:start_date],
-            style: "width: 100%; padding: 0.5rem; border: 1px solid #ced4da; border-radius: 4px;" %>
+            style: "width: 100%; padding: 0.5rem; border: 1px solid #8b7355; border-radius: 4px; background: #fefcfa;" %>
       </div>
       
       <div>
-        <%= f.label :end_date, "To Date", style: "display: block; margin-bottom: 0.5rem; font-weight: 500;" %>
+        <%= f.label :end_date, "To Date", style: "display: block; margin-bottom: 0.5rem; font-weight: 500; color: #3d2c1d;" %>
         <%= f.date_field :end_date, 
             value: params[:end_date],
-            style: "width: 100%; padding: 0.5rem; border: 1px solid #ced4da; border-radius: 4px;" %>
+            style: "width: 100%; padding: 0.5rem; border: 1px solid #8b7355; border-radius: 4px; background: #fefcfa;" %>
       </div>
     </div>
     
     <div style="display: flex; gap: 1rem;">
-      <%= f.submit "Apply Filters", 
-          style: "background: #007bff; color: white; padding: 0.5rem 1rem; border: none; border-radius: 4px; cursor: pointer;" %>
+      <%= f.submit "Apply Filters", class: "admin-nav-link" %>
       <% if params.slice(:user_id, :action, :start_date, :end_date).values.any?(&:present?) %>
-        <%= link_to "Clear Filters", admin_activity_logs_path, 
-            style: "background: #6c757d; color: white; padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none;" %>
+        <%= link_to "Clear Filters", admin_activity_logs_path, class: "admin-nav-link" %>
       <% end %>
     </div>
   <% end %>
@@ -52,53 +50,53 @@
 
 <!-- Activity Stats -->
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
-  <div style="background: #e3f2fd; padding: 1rem; border-radius: 8px; text-align: center;">
-    <h4 style="margin: 0; color: #1565c0;">Total Activities</h4>
-    <p style="font-size: 1.5rem; font-weight: bold; margin: 0.25rem 0; color: #0d47a1;"><%= ActivityLog.count %></p>
+  <div class="admin-stat-card">
+    <h4 style="margin: 0;">Total Activities</h4>
+    <p style="font-size: 1.5rem; font-weight: bold; margin: 0.25rem 0;"><%= ActivityLog.count %></p>
   </div>
   
-  <div style="background: #e8f5e8; padding: 1rem; border-radius: 8px; text-align: center;">
-    <h4 style="margin: 0; color: #2e7d32;">Last 24 Hours</h4>
-    <p style="font-size: 1.5rem; font-weight: bold; margin: 0.25rem 0; color: #1b5e20;"><%= ActivityLog.where('created_at > ?', 24.hours.ago).count %></p>
+  <div class="admin-stat-card">
+    <h4 style="margin: 0;">Last 24 Hours</h4>
+    <p style="font-size: 1.5rem; font-weight: bold; margin: 0.25rem 0;"><%= ActivityLog.where('created_at > ?', 24.hours.ago).count %></p>
   </div>
   
-  <div style="background: #fff3e0; padding: 1rem; border-radius: 8px; text-align: center;">
-    <h4 style="margin: 0; color: #ef6c00;">This Week</h4>
-    <p style="font-size: 1.5rem; font-weight: bold; margin: 0.25rem 0; color: #e65100;"><%= ActivityLog.where('created_at > ?', 1.week.ago).count %></p>
+  <div class="admin-stat-card">
+    <h4 style="margin: 0;">This Week</h4>
+    <p style="font-size: 1.5rem; font-weight: bold; margin: 0.25rem 0;"><%= ActivityLog.where('created_at > ?', 1.week.ago).count %></p>
   </div>
   
-  <div style="background: #f3e5f5; padding: 1rem; border-radius: 8px; text-align: center;">
-    <h4 style="margin: 0; color: #7b1fa2;">Showing</h4>
-    <p style="font-size: 1.5rem; font-weight: bold; margin: 0.25rem 0; color: #4a148c;"><%= @activities.count %></p>
+  <div class="admin-stat-card">
+    <h4 style="margin: 0;">Showing</h4>
+    <p style="font-size: 1.5rem; font-weight: bold; margin: 0.25rem 0;"><%= @activities.count %></p>
   </div>
 </div>
 
 <!-- Activity Log Table -->
-<div style="background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+<div class="admin-section">
   <table style="width: 100%; border-collapse: collapse;">
-    <thead style="background: #f8f9fa;">
+    <thead style="background: #f0ebe4;">
       <tr>
-        <th style="padding: 1rem; text-align: left; border-bottom: 1px solid #dee2e6;">Time</th>
-        <th style="padding: 1rem; text-align: left; border-bottom: 1px solid #dee2e6;">User</th>
-        <th style="padding: 1rem; text-align: left; border-bottom: 1px solid #dee2e6;">Action</th>
-        <th style="padding: 1rem; text-align: left; border-bottom: 1px solid #dee2e6;">Target</th>
-        <th style="padding: 1rem; text-align: left; border-bottom: 1px solid #dee2e6;">IP Address</th>
-        <th style="padding: 1rem; text-align: left; border-bottom: 1px solid #dee2e6;">Details</th>
+        <th style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">Time</th>
+        <th style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">User</th>
+        <th style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">Action</th>
+        <th style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">Target</th>
+        <th style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">IP Address</th>
+        <th style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">Details</th>
       </tr>
     </thead>
     <tbody>
       <% if @activities.any? %>
         <% @activities.each do |activity| %>
-          <tr style="border-bottom: 1px solid #dee2e6;">
+          <tr style="border-bottom: 1px solid #8b7355;">
             <td style="padding: 1rem; white-space: nowrap;">
-              <div style="font-weight: 500; color: #2d3748;"><%= activity.created_at.strftime("%b %d, %Y") %></div>
-              <small style="color: #6c757d;"><%= activity.created_at.strftime("%I:%M %p") %></small>
+              <div style="font-weight: 500; color: #3d2c1d;"><%= activity.created_at.strftime("%b %d, %Y") %></div>
+              <small style="color: #8b7355;"><%= activity.created_at.strftime("%I:%M %p") %></small>
             </td>
             <td style="padding: 1rem;">
-              <div style="font-weight: 500; color: #2d3748;"><%= activity.user.email %></div>
-              <small style="color: #6c757d;">
-                <span style="background: <%= activity.user.admin? ? '#fff3e0' : '#e8f5e8' %>; 
-                           color: <%= activity.user.admin? ? '#ef6c00' : '#2e7d32' %>; 
+              <div style="font-weight: 500; color: #3d2c1d;"><%= activity.user.email %></div>
+              <small style="color: #8b7355;">
+                <span style="background: #f0ebe4; 
+                           color: #3d2c1d; 
                            padding: 0.125rem 0.5rem; border-radius: 12px; font-size: 0.75rem;">
                   <%= activity.user.role.humanize %>
                 </span>

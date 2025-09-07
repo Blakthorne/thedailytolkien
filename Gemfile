@@ -71,3 +71,7 @@ group :test do
 end
 
 gem "redcarpet", "~> 3.6"
+
+# CSV moved out of the default gems in Ruby 3.4+. Add it explicitly so `require "csv"`
+# in controllers works across environments.
+gem "csv"

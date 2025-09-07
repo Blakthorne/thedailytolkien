@@ -7,7 +7,7 @@
 <!-- Overview Stats -->
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 3rem;">
   <!-- Quotes Stats -->
-  <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2rem; border-radius: 12px;">
+  <div class="admin-stat-card" style="background: linear-gradient(135deg, #8b7355 0%, #6b5b4d 100%); color: white; padding: 2rem;">
     <h3 style="margin: 0 0 1rem 0; display: flex; align-items: center; gap: 0.5rem;">
       📚 Quotes Overview
     </h3>
@@ -32,7 +32,7 @@
   </div>
 
   <!-- Users Stats -->
-  <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 2rem; border-radius: 12px;">
+  <div class="admin-stat-card" style="background: linear-gradient(135deg, #8b6914 0%, #6b4f0f 100%); color: white; padding: 2rem;">
     <h3 style="margin: 0 0 1rem 0; display: flex; align-items: center; gap: 0.5rem;">
       👥 Users Overview
     </h3>
@@ -57,7 +57,7 @@
   </div>
 
   <!-- Activity Stats -->
-  <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 2rem; border-radius: 12px;">
+  <div class="admin-stat-card" style="background: linear-gradient(135deg, #8b4513 0%, #6b340f 100%); color: white; padding: 2rem;">
     <h3 style="margin: 0 0 1rem 0; display: flex; align-items: center; gap: 0.5rem;">
       📊 Activity Overview
     </h3>
@@ -85,18 +85,18 @@
 <!-- Detailed Analytics -->
 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 3rem;">
   <!-- Quotes by Book -->
-  <div style="background: white; border-radius: 12px; padding: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-    <h3 style="margin: 0 0 1.5rem 0; color: #2d3748;">Quotes by Book</h3>
+  <div class="admin-section">
+    <h3 style="margin: 0 0 1.5rem 0; color: #3d2c1d;">Quotes by Book</h3>
     <% @analytics[:quotes][:by_book].sort_by { |k, v| -v }.each do |book, count| %>
-      <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid #e2e8f0;">
-        <span style="font-weight: 500; color: #4a5568;"><%= truncate(book, length: 30) %></span>
-        <span style="background: #edf2f7; color: #2d3748; padding: 0.25rem 0.75rem; border-radius: 16px; font-weight: bold;">
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid #8b7355;">
+        <span style="font-weight: 500; color: #3d2c1d;"><%= truncate(book, length: 30) %></span>
+        <span style="background: #f0ebe4; color: #3d2c1d; padding: 0.25rem 0.75rem; border-radius: 16px; font-weight: bold;">
           <%= count %>
         </span>
       </div>
     <% end %>
     <% if @analytics[:quotes][:by_book].empty? %>
-      <p style="text-align: center; color: #a0aec0; padding: 2rem;">No quotes found</p>
+      <p style="text-align: center; color: #8b7355; padding: 2rem;">No quotes found</p>
     <% end %>
   </div>
 

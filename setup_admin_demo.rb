@@ -26,17 +26,17 @@ puts "\nCurrent quotes count: #{Quote.count}"
 if Quote.count < 5
   puts "Creating sample quotes..."
   [
-    { quote: "All we have to decide is what to do with the time that is given us.", 
-      author: "Gandalf", 
+    { quote: "All we have to decide is what to do with the time that is given us.",
+      author: "Gandalf",
       book: "Fellowship of the Ring" },
-    { quote: "Even the smallest person can change the course of the future.", 
-      author: "Galadriel", 
+    { quote: "Even the smallest person can change the course of the future.",
+      author: "Galadriel",
       book: "Fellowship of the Ring" },
-    { quote: "I will not say: do not weep; for not all tears are an evil.", 
-      author: "Gandalf", 
+    { quote: "I will not say: do not weep; for not all tears are an evil.",
+      author: "Gandalf",
       book: "Return of the King" },
-    { quote: "The world is indeed full of peril, and in it there are many dark places.", 
-      author: "Haldir", 
+    { quote: "The world is indeed full of peril, and in it there are many dark places.",
+      author: "Haldir",
       book: "Fellowship of the Ring" }
   ].each do |quote_data|
     Quote.create!(quote_data)

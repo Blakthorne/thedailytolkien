@@ -4,135 +4,362 @@
     <title>Admin Dashboard - The Daily Tolkien</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="robots" content="noindex, nofollow">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
+    
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
     
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
     
     <style>
+      /* Admin-specific styles that harmonize with main app */
+      
+      /* Global Reset and Base Styles - Inherited from main app */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html {
+        font-size: 16px;
+      }
+
+      body {
+        font-family: 'Source Sans Pro', sans-serif;
+        background-color: #f5f0e8; /* Same parchment base color */
+        background-image: url(<%= asset_path 'scholarly-background-v4.svg' %>);
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        color: #3d2c1d; /* Same dark brown text */
+        min-height: 100vh;
+        line-height: 1.6;
+        position: relative;
+        overflow-x: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+
+      body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(245, 240, 232, 0.1);
+        z-index: -1;
+      }
+
+      .page-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+      
+      /* Admin Header - Following main app pattern */
       .admin-header {
-        background: #2c3e50;
-        color: white;
-        padding: 1rem 0;
-        margin-bottom: 2rem;
+        background: rgba(245, 240, 232, 0.15); /* Slightly more opaque for admin distinction */
+        backdrop-filter: blur(2px);
+        padding: 1.5rem 2rem;
+        border-bottom: 2px solid #8b7355;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       }
       
-      .admin-nav {
-        background: #34495e;
-        padding: 0.5rem 0;
-        margin-bottom: 2rem;
+      .admin-header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        max-width: 1200px;
+        margin: 0 auto;
       }
       
-      .admin-nav a {
-        color: #ecf0f1;
+      .admin-header h1 {
+        font-family: 'Crimson Text', serif;
+        font-size: 1.75rem !important;
+        color: #3d2c1d;
+        margin: 0;
+        letter-spacing: -0.025em;
+      }
+      
+      .admin-header-links {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+      
+      .admin-header-link {
+        color: #3d2c1d;
         text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 500;
+        opacity: 0.8;
+        transition: all 0.2s ease;
+      }
+      
+      .admin-header-link:hover {
+        opacity: 1;
+        color: #8b7355;
+      }
+      
+      /* Admin Navigation - Using auth-link pattern */
+      .admin-nav {
+        background: rgba(245, 240, 232, 0.1);
+        backdrop-filter: blur(1px);
+        padding: 1rem 2rem;
+        margin-bottom: 2rem;
+        border-bottom: 1px solid rgba(139, 115, 85, 0.2);
+      }
+      
+      .admin-nav-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+      }
+      
+      .admin-nav-link {
         padding: 0.5rem 1rem;
-        margin-right: 1rem;
-        border-radius: 4px;
-        transition: background-color 0.2s;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        opacity: 0.8;
+        font-family: 'Source Sans Pro', sans-serif;
+        background: rgba(139, 115, 85, 0.1);
+        color: #3d2c1d;
+        border: 1px solid #8b7355;
       }
       
-      .admin-nav a:hover,
-      .admin-nav a.active {
-        background-color: #2c3e50;
-        color: white;
+      .admin-nav-link:hover,
+      .admin-nav-link.active {
+        background: rgba(139, 115, 85, 0.2);
+        color: #3d2c1d;
+        opacity: 1;
       }
       
+      /* Container */
       .container {
         max-width: 1200px;
         margin: 0 auto;
-        padding: 0 1rem;
+        padding: 0 2rem;
       }
       
+      /* Alert styles using parchment colors */
       .alert {
         padding: 0.75rem 1rem;
         margin-bottom: 1rem;
         border: 1px solid transparent;
-        border-radius: 4px;
+        border-radius: 6px;
+        font-family: 'Source Sans Pro', sans-serif;
       }
       
       .alert-success {
-        color: #155724;
-        background-color: #d4edda;
-        border-color: #c3e6cb;
+        color: #2d5016;
+        background-color: rgba(139, 115, 85, 0.1);
+        border-color: #8b7355;
       }
       
       .alert-danger {
         color: #721c24;
-        background-color: #f8d7da;
-        border-color: #f5c6cb;
+        background-color: rgba(114, 28, 36, 0.1);
+        border-color: #8b4513;
       }
       
       .alert-warning {
-        color: #856404;
-        background-color: #fff3cd;
-        border-color: #ffeaa7;
+        color: #6b4423;
+        background-color: rgba(139, 115, 85, 0.15);
+        border-color: #8b7355;
       }
       
+      /* Admin content area */
       .admin-content {
         min-height: 60vh;
+        flex: 1;
       }
       
+      /* Breadcrumb using parchment theme */
       .breadcrumb {
-        background: #f8f9fa;
+        background: rgba(139, 115, 85, 0.1);
         padding: 0.75rem 1rem;
         margin-bottom: 1rem;
-        border-radius: 4px;
+        border-radius: 6px;
+        border: 1px solid rgba(139, 115, 85, 0.2);
+        font-family: 'Source Sans Pro', sans-serif;
       }
       
       .breadcrumb a {
-        color: #6c757d;
+        color: #8b7355;
         text-decoration: none;
       }
       
       .breadcrumb a:hover {
-        color: #495057;
+        color: #3d2c1d;
         text-decoration: underline;
+      }
+
+      /* Admin-specific component styles */
+      .admin-stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+      }
+
+      .admin-stat-card {
+        background: rgba(245, 240, 232, 0.3);
+        backdrop-filter: blur(5px);
+        padding: 1.5rem;
+        border-radius: 8px;
+        text-align: center;
+        border: 1px solid rgba(139, 115, 85, 0.2);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .admin-stat-card h3 {
+        margin: 0;
+        color: #3d2c1d;
+        font-family: 'Crimson Text', serif;
+        font-size: 1.1rem;
+      }
+
+      .admin-stat-card .stat-number {
+        font-size: 2rem;
+        font-weight: bold;
+        margin: 0.5rem 0;
+        color: #8b7355;
+        font-family: 'Source Sans Pro', sans-serif;
+      }
+
+      .admin-stat-card .stat-detail {
+        color: #3d2c1d;
+        opacity: 0.8;
+        font-size: 0.9rem;
+      }
+
+      .admin-content-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-bottom: 2rem;
+      }
+
+      .admin-section {
+        background: rgba(245, 240, 232, 0.2);
+        backdrop-filter: blur(5px);
+        border-radius: 8px;
+        padding: 1rem;
+        border: 1px solid rgba(139, 115, 85, 0.2);
+      }
+
+      .admin-section h2 {
+        font-family: 'Crimson Text', serif;
+        color: #3d2c1d;
+        margin-bottom: 1rem;
+        font-size: 1.5rem;
+      }
+
+      .admin-item {
+        border-bottom: 1px solid rgba(139, 115, 85, 0.2);
+        padding: 0.75rem 0;
+      }
+
+      .admin-item:last-child {
+        border-bottom: none;
+      }
+
+      .admin-link {
+        color: #8b7355;
+        text-decoration: none;
+        font-weight: 500;
+      }
+
+      .admin-link:hover {
+        color: #3d2c1d;
+        text-decoration: underline;
+      }
+
+      /* Mobile responsiveness */
+      @media (max-width: 768px) {
+        .admin-header, .admin-nav {
+          padding: 1rem 1rem;
+        }
+
+        .admin-header-content {
+          flex-direction: column;
+          gap: 1rem;
+        }
+
+        .admin-nav-content {
+          justify-content: center;
+        }
+
+        .container {
+          padding: 0 1rem;
+        }
+
+        .admin-content-grid {
+          grid-template-columns: 1fr;
+        }
       }
     </style>
   </head>
 
   <body>
-    <header class="admin-header">
-      <div class="container">
-        <h1>Admin Dashboard</h1>
-        <p>Welcome, <%= current_user.email %> | 
-           <%= link_to "Back to Site", root_path, style: "color: #ecf0f1;" %> |
-           <%= link_to "Logout", destroy_user_session_path, method: :delete, style: "color: #ecf0f1;" %>
-        </p>
-      </div>
-    </header>
-    
-    <nav class="admin-nav">
-      <div class="container">
-        <%= link_to "Dashboard", admin_root_path, class: active_admin_nav_class('admin/dashboard') %>
-        <%= link_to "Quotes", admin_quotes_path, class: active_admin_nav_class('admin/quotes') %>
-        <%= link_to "Users", admin_users_path, class: active_admin_nav_class('admin/users') %>
-        <%= link_to "Analytics", admin_analytics_path, class: active_admin_nav_class('admin/analytics') %>
-        <%= link_to "Activity Log", admin_activity_logs_path, class: active_admin_nav_class('admin/activity_logs') %>
-      </div>
-    </nav>
+    <div class="page-content">
+      <header class="admin-header">
+        <div class="admin-header-content">
+          <h1>Admin Dashboard</h1>
+          <div class="admin-header-links">
+            <span class="admin-header-link">Welcome, <%= current_user.email %></span>
+            <span class="admin-header-link">|</span>
+            <%= link_to "Back to Site", root_path, class: "admin-header-link" %>
+            <span class="admin-header-link">|</span>
+            <%= link_to "Logout", destroy_user_session_path, method: :delete, class: "admin-header-link" %>
+          </div>
+        </div>
+      </header>
+      
+      <nav class="admin-nav">
+        <div class="admin-nav-content">
+          <%= link_to "Dashboard", admin_root_path, class: "admin-nav-link #{'active' if controller_path == 'admin/dashboard'}" %>
+          <%= link_to "Quotes", admin_quotes_path, class: "admin-nav-link #{'active' if controller_path == 'admin/quotes'}" %>
+          <%= link_to "Users", admin_users_path, class: "admin-nav-link #{'active' if controller_path == 'admin/users'}" %>
+          <%= link_to "Analytics", admin_analytics_path, class: "admin-nav-link #{'active' if controller_path == 'admin/analytics'}" %>
+          <%= link_to "Activity Log", admin_activity_logs_path, class: "admin-nav-link #{'active' if controller_path == 'admin/activity_logs'}" %>
+        </div>
+      </nav>
 
-    <main class="container">
-      <% if content_for?(:breadcrumb) %>
-        <div class="breadcrumb">
-          <%= yield(:breadcrumb) %>
+      <main class="container">
+        <% if content_for?(:breadcrumb) %>
+          <div class="breadcrumb">
+            <%= yield(:breadcrumb) %>
+          </div>
+        <% end %>
+        
+        <% flash.each do |type, message| %>
+          <div class="alert alert-<%= type == 'notice' ? 'success' : type %>">
+            <%= message %>
+          </div>
+        <% end %>
+        
+        <div class="admin-content">
+          <%= yield %>
         </div>
-      <% end %>
-      
-      <% flash.each do |type, message| %>
-        <div class="alert alert-<%= type == 'notice' ? 'success' : type %>">
-          <%= message %>
-        </div>
-      <% end %>
-      
-      <div class="admin-content">
-        <%= yield %>
-      </div>
-    </main>
+      </main>
+    </div>
     
-    <footer style="margin-top: 3rem; padding: 2rem 0; background: #f8f9fa; text-align: center; color: #6c757d;">
+    <footer style="margin-top: 3rem; padding: 2rem 0; background: rgba(245, 240, 232, 0.8); backdrop-filter: blur(10px); border-top: 1px solid rgba(139, 115, 85, 0.3); text-align: center; color: #3d2c1d;">
       <div class="container">
         <p>&copy; <%= Date.current.year %> The Daily Tolkien - Admin Panel</p>
       </div>
