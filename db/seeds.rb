@@ -379,26 +379,30 @@ quotes.each do |quote_attrs|
   end
 end
 
-# Create admin user
-if User.find_by(email: 'admin@thedailytolkien.com').nil?
-  User.create!(
-    name: 'Admin User',
-    email: 'admin@thedailytolkien.com',
-    password: 'password123',
-    password_confirmation: 'password123',
-    role: 'admin'
-  )
-  puts "Admin user created: admin@thedailytolkien.com / password123"
-end
+# Skip user creation in test environment to avoid unique constraint violations
+# in parallel test execution. Tests should use fixtures for test data.
+unless Rails.env.test?
+  # Create admin user
+  if User.find_by(email: 'admin@thedailytolkien.com').nil?
+    User.create!(
+      name: 'Admin User',
+      email: 'admin@thedailytolkien.com',
+      password: 'password123',
+      password_confirmation: 'password123',
+      role: 'admin'
+    )
+    puts "Admin user created: admin@thedailytolkien.com / password123"
+  end
 
-# Create sample commentor user
-if User.find_by(email: 'user@thedailytolkien.com').nil?
-  User.create!(
-    name: 'Sample User',
-    email: 'user@thedailytolkien.com',
-    password: 'password123',
-    password_confirmation: 'password123',
-    role: 'commentor'
-  )
-  puts "Sample user created: user@thedailytolkien.com / password123"
+  # Create sample commentor user
+  if User.find_by(email: 'user@thedailytolkien.com').nil?
+    User.create!(
+      name: 'Sample User',
+      email: 'user@thedailytolkien.com',
+      password: 'password123',
+      password_confirmation: 'password123',
+      role: 'commentor'
+    )
+    puts "Sample user created: user@thedailytolkien.com / password123"
+  end
 end
