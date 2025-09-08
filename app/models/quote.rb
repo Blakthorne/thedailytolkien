@@ -11,9 +11,12 @@ class Quote < ApplicationRecord
   validates :text, presence: true
   validates :book, presence: true
 
-  # days_displayed must be a non-negative integer, tracking how many times
-  # this quote has been shown to users.
-  validates :days_displayed, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
+    # days_displayed must be a non-negative integer, tracking how many times
+    # this quote has been shown to users.
+    validates :days_displayed, numericality: { only_integer: true, greater_than_or_equal_to: 0 }, allow_nil: true
+
+    # Ensure sane defaults before validations run
+    before_validation :set_default_counters
 
   # last_date_displayed and first_date_displayed are optional integers representing
   # Unix timestamps. They track when the quote was last and first displayed.
@@ -25,3 +28,9 @@ class Quote < ApplicationRecord
   # additional metadata about the quote's origin and content.
   # No validations are needed here as they can be nil.
 end
+    private
+
+    # Sets default values for counter fields so validations don't fail when omitted.
+    def set_default_counters
+      self.days_displayed = 0 if days_displayed.nil?
+    end

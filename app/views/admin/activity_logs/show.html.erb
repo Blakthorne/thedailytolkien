@@ -111,26 +111,26 @@
   <% end %>
 
   <!-- Actions -->
-  <div style="background: #e8f4fd; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #2196f3;">
-    <h4 style="margin: 0 0 1rem 0; color: #1565c0;">Quick Actions</h4>
+  <div style="background: #f0ebe4; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #8b7355;">
+    <h4 style="margin: 0 0 1rem 0; color: #3d2c1d;">Quick Actions</h4>
     <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
       <%= link_to "Back to Activity Log", admin_activity_logs_path, 
-          style: "background: #6c757d; color: white; padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none;" %>
+          style: "background: #8b7355; color: #fefcfa; padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none; border: 1px solid #3d2c1d;" %>
       
       <% if @activity.target %>
         <% if @activity.target.is_a?(Quote) %>
           <%= link_to "View Quote", admin_quote_path(@activity.target), 
-              style: "background: #2196f3; color: white; padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none;" %>
+              style: "background: #8b7355; color: #fefcfa; padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none; border: 1px solid #3d2c1d;" %>
         <% elsif @activity.target.is_a?(User) %>
           <%= link_to "View User", admin_user_path(@activity.target), 
-              style: "background: #4caf50; color: white; padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none;" %>
+              style: "background: #8b7355; color: #fefcfa; padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none; border: 1px solid #3d2c1d;" %>
         <% end %>
       <% end %>
       
       <%= link_to "Filter by User", admin_activity_logs_path(user_id: @activity.user.id), 
-          style: "background: #ff9800; color: white; padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none;" %>
+          style: "background: #8b7355; color: #fefcfa; padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none; border: 1px solid #3d2c1d;" %>
       <%= link_to "Filter by Action", admin_activity_logs_path(action: @activity.action), 
-          style: "background: #9c27b0; color: white; padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none;" %>
+          style: "background: #8b7355; color: #fefcfa; padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none; border: 1px solid #3d2c1d;" %>
     </div>
   </div>
 </div>

@@ -325,7 +325,7 @@
             <span class="admin-header-link">|</span>
             <%= link_to "Back to Site", root_path, class: "admin-header-link" %>
             <span class="admin-header-link">|</span>
-            <%= link_to "Logout", destroy_user_session_path, method: :delete, class: "admin-header-link" %>
+            <%= button_to "Logout", destroy_user_session_path, method: :delete, form: { style: "display:inline" }, form_class: "inline", class: "admin-header-link", formnovalidate: true %>
           </div>
         </div>
       </header>

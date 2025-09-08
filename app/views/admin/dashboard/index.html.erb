@@ -101,12 +101,16 @@
   <% end %>
 </div>
 
-<div class="admin-section" style="margin-top: 2rem;">
-  <h2>Quick Actions</h2>
+<div class="admin-section" style="margin-top: 2rem; background: #f0ebe4; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #8b7355;">
+  <h2 style="margin: 0 0 1rem 0; color: #3d2c1d;">Quick Actions</h2>
   <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-    <%= link_to "Add New Quote", new_admin_quote_path, class: "admin-nav-link" %>
-    <%= link_to "Manage Users", admin_users_path, class: "admin-nav-link" %>
-    <%= link_to "View Analytics", admin_analytics_path, class: "admin-nav-link" %>
-    <%= link_to "Export Data", admin_quotes_path(format: :csv), class: "admin-nav-link" %>
+    <%= link_to "Add New Quote", new_admin_quote_path, 
+        style: "background: #8b7355; color: #fefcfa; padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none; border: 1px solid #3d2c1d;" %>
+    <%= link_to "Manage Users", admin_users_path, 
+        style: "background: #8b7355; color: #fefcfa; padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none; border: 1px solid #3d2c1d;" %>
+    <%= link_to "View Analytics", admin_analytics_path, 
+        style: "background: #8b7355; color: #fefcfa; padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none; border: 1px solid #3d2c1d;" %>
+    <%= link_to "Export Data", admin_quotes_path(format: :csv), 
+        style: "background: #8b7355; color: #fefcfa; padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none; border: 1px solid #3d2c1d;" %>
   </div>
 </div>

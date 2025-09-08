@@ -141,8 +141,8 @@
                   <% unless user == current_user %>
                     <%= link_to "Edit", edit_admin_user_path(user), 
                         style: "color: #8b6914; text-decoration: none; font-size: 0.875rem;" %>
-                    <%= link_to "Delete", admin_user_path(user), method: :delete,
-                        confirm: "Are you sure you want to delete this user?",
+                    <%= link_to "Delete", admin_user_path(user), 
+                        data: { turbo_method: :delete, confirm: "Are you sure you want to delete this user?" },
                         style: "color: #8b4513; text-decoration: none; font-size: 0.875rem;" %>
                   <% end %>
                 </div>

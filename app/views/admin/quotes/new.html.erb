@@ -4,7 +4,7 @@
   <strong>New Quote</strong>
 <% end %>
 
-<h1>Add New Quote</h1>
+<h1 style="color: #3d2c1d;">Add New Quote</h1>
 
 <div style="max-width: 800px;">
   <%= form_with model: [:admin, @quote], local: true do |f| %>
@@ -19,48 +19,59 @@
       </div>
     <% end %>
 
-    <div style="margin-bottom: 1.5rem;">
-      <%= f.label :text, style: "display: block; margin-bottom: 0.5rem; font-weight: 500;" %>
-      <%= f.text_area :text, 
-          placeholder: "Enter the quote text...",
-          style: "width: 100%; min-height: 120px; padding: 0.75rem; border: 1px solid #ced4da; border-radius: 4px; font-family: Georgia, serif; font-style: italic;" %>
-    </div>
-
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
-      <div>
-        <%= f.label :book, style: "display: block; margin-bottom: 0.5rem; font-weight: 500;" %>
-        <%= f.text_field :book, 
-            placeholder: "e.g., The Fellowship of the Ring",
-            style: "width: 100%; padding: 0.75rem; border: 1px solid #ced4da; border-radius: 4px;" %>
+    <div class="admin-section" style="margin-bottom: 1.5rem;">
+      <div style="background: #f0ebe4; padding: 1rem; border-bottom: 1px solid #8b7355; margin: -1rem -1rem 1rem -1rem;">
+        <h3 style="margin: 0; color: #3d2c1d;">Quote Text</h3>
       </div>
       
-      <div>
-        <%= f.label :chapter, style: "display: block; margin-bottom: 0.5rem; font-weight: 500;" %>
-        <%= f.text_field :chapter, 
-            placeholder: "Chapter number or name",
-            style: "width: 100%; padding: 0.75rem; border: 1px solid #ced4da; border-radius: 4px;" %>
-      </div>
+      <%= f.label :text, style: "display: block; margin-bottom: 0.5rem; font-weight: 500; color: #3d2c1d;" %>
+      <%= f.text_area :text, 
+          placeholder: "Enter the quote text...",
+          style: "width: 100%; min-height: 120px; padding: 0.75rem; border: 1px solid #8b7355; border-radius: 4px; font-family: Georgia, serif; font-style: italic; background: #fefcfa;" %>
     </div>
 
-    <div style="margin-bottom: 2rem;">
-      <%= f.label :character, style: "display: block; margin-bottom: 0.5rem; font-weight: 500;" %>
-      <%= f.text_field :character, 
-          placeholder: "Character who said the quote (optional)",
-          style: "width: 100%; padding: 0.75rem; border: 1px solid #ced4da; border-radius: 4px;" %>
+    <div class="admin-section" style="margin-bottom: 1.5rem;">
+      <div style="background: #f0ebe4; padding: 1rem; border-bottom: 1px solid #8b7355; margin: -1rem -1rem 1rem -1rem;">
+        <h3 style="margin: 0; color: #3d2c1d;">Book Details</h3>
+      </div>
+      
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+        <div>
+          <%= f.label :book, style: "display: block; margin-bottom: 0.5rem; font-weight: 500; color: #3d2c1d;" %>
+          <%= f.text_field :book, 
+              placeholder: "e.g., The Fellowship of the Ring",
+              style: "width: 100%; padding: 0.75rem; border: 1px solid #8b7355; border-radius: 4px; background: #fefcfa;" %>
+        </div>
+        
+        <div>
+          <%= f.label :chapter, style: "display: block; margin-bottom: 0.5rem; font-weight: 500; color: #3d2c1d;" %>
+          <%= f.text_field :chapter, 
+              placeholder: "Chapter number or name",
+              style: "width: 100%; padding: 0.75rem; border: 1px solid #8b7355; border-radius: 4px; background: #fefcfa;" %>
+        </div>
+      </div>
+
+      <div>
+        <%= f.label :character, style: "display: block; margin-bottom: 0.5rem; font-weight: 500; color: #3d2c1d;" %>
+        <%= f.text_field :character, 
+            placeholder: "Character who said the quote (optional)",
+            style: "width: 100%; padding: 0.75rem; border: 1px solid #8b7355; border-radius: 4px; background: #fefcfa;" %>
+      </div>
     </div>
 
     <div style="display: flex; gap: 1rem;">
-      <%= f.submit "Create Quote", 
-          style: "background: #007bff; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 4px; cursor: pointer; font-size: 1rem;" %>
-      <%= link_to "Cancel", admin_quotes_path, 
-          style: "background: #6c757d; color: white; padding: 0.75rem 1.5rem; border-radius: 4px; text-decoration: none; display: inline-block;" %>
+      <%= f.submit "Create Quote", class: "admin-nav-link" %>
+      <%= link_to "Cancel", admin_quotes_path, class: "admin-nav-link" %>
     </div>
   <% end %>
 </div>
 
-<div style="margin-top: 2rem; padding: 1rem; background: #e8f4fd; border-radius: 8px; border-left: 4px solid #2196f3; max-width: 800px;">
-  <h4 style="margin: 0 0 0.5rem 0; color: #1565c0;">Formatting Tips</h4>
-  <ul style="margin: 0; color: #1976d2;">
+<div class="admin-section" style="margin-top: 2rem; max-width: 800px;">
+  <div style="background: #f0ebe4; padding: 1rem; border-bottom: 1px solid #8b7355; margin: -1rem -1rem 1rem -1rem;">
+    <h4 style="margin: 0; color: #3d2c1d;">Formatting Tips</h4>
+  </div>
+  
+  <ul style="margin: 0; color: #3d2c1d;">
     <li>Enter the exact quote text as it appears in the book</li>
     <li>Use the full book title (e.g., "The Fellowship of the Ring")</li>
     <li>Chapter can be a number or name</li>

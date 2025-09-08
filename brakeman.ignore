@@ -1,0 +1,10 @@
+{
+  "ignore": [
+    {
+      "file": "app/controllers/admin/users_controller.rb",
+      "line": 127,
+      "warning_type": "Mass Assignment",
+      "message": "Potentially dangerous key allowed for mass assignment"
+    }
+  ]
+}

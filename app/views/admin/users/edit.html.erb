@@ -5,7 +5,7 @@
   <strong>Edit</strong>
 <% end %>
 
-<h1>Edit User</h1>
+<h1 style="color: #3d2c1d;">Edit User</h1>
 
 <div style="max-width: 600px;">
   <%= form_with model: [:admin, @user], local: true do |f| %>
@@ -20,65 +20,116 @@
       </div>
     <% end %>
 
-    <div style="margin-bottom: 1.5rem;">
-      <%= f.label :email, style: "display: block; margin-bottom: 0.5rem; font-weight: 500;" %>
+    <div class="admin-section" style="margin-bottom: 1.5rem;">
+      <div style="background: #f0ebe4; padding: 1rem; border-bottom: 1px solid #8b7355; margin: -1rem -1rem 1rem -1rem;">
+        <h3 style="margin: 0; color: #3d2c1d;">User Information</h3>
+      </div>
+      
+      <%= f.label :email, style: "display: block; margin-bottom: 0.5rem; font-weight: 500; color: #3d2c1d;" %>
       <%= f.email_field :email, 
-          style: "width: 100%; padding: 0.75rem; border: 1px solid #ced4da; border-radius: 4px;" %>
-      <small style="color: #6c757d;">User's email address for login and notifications</small>
-    </div>
-
-    <div style="margin-bottom: 2rem;">
-      <%= f.label :role, style: "display: block; margin-bottom: 0.5rem; font-weight: 500;" %>
-      <%= f.select :role, 
-          [["Commentor", "commentor"], ["Admin", "admin"]], 
-          {},
-          { style: "width: 100%; padding: 0.75rem; border: 1px solid #ced4da; border-radius: 4px;" } %>
-      <small style="color: #6c757d;">
-        <strong>Commentor:</strong> Can view quotes and leave comments (when feature is added)<br>
-        <strong>Admin:</strong> Full access to admin panel and all management features
-      </small>
+          style: "width: 100%; padding: 0.75rem; border: 1px solid #8b7355; border-radius: 4px; background: #fefcfa;" %>
+      <small style="color: #8b7355;">User's email address for login and notifications</small>
     </div>
 
     <div style="display: flex; gap: 1rem;">
-      <%= f.submit "Update User", 
-          style: "background: #007bff; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 4px; cursor: pointer; font-size: 1rem;" %>
-      <%= link_to "Cancel", admin_user_path(@user), 
-          style: "background: #6c757d; color: white; padding: 0.75rem 1.5rem; border-radius: 4px; text-decoration: none; display: inline-block;" %>
+      <%= f.submit "Update User", class: "admin-nav-link" %>
+      <%= link_to "Cancel", admin_user_path(@user), class: "admin-nav-link" %>
     </div>
   <% end %>
 </div>
 
+<!-- Role Management Section -->
+<% if current_user.admin? %>
+<div style="margin-top: 2rem; max-width: 600px;">
+  <div class="admin-section">
+    <div style="background: #f0ebe4; padding: 1rem; border-bottom: 1px solid #8b7355; margin: -1rem -1rem 1rem -1rem;">
+      <h3 style="margin: 0; color: #3d2c1d;">Role Management</h3>
+    </div>
+    
+    <div style="background: #f0ebe4; border: 1px solid #8b7355; color: #3d2c1d; padding: 1.5rem; border-radius: 8px;">
+      <div style="margin-bottom: 1rem;">
+        <strong>Current Role:</strong>
+        <span style="background: <%= @user.admin? ? '#f0ebe4' : '#fefcfa' %>; 
+                   color: <%= @user.admin? ? '#8b4513' : '#3d2c1d' %>; 
+                   padding: 0.25rem 0.75rem; border-radius: 16px; font-weight: 500; margin-left: 0.5rem; border: 1px solid #8b7355;">
+          <%= @user.role.humanize %>
+        </span>
+    </div>
+    
+    <div style="margin-bottom: 1rem;">
+      <strong>Available Roles:</strong>
+      <ul style="margin: 0.5rem 0; padding-left: 1.5rem; color: #3d2c1d;">
+        <li><strong>Commentor:</strong> Can view quotes and leave comments (when feature is added)</li>
+        <li><strong>Admin:</strong> Full access to admin panel and all management features</li>
+      </ul>
+    </div>
+    
+    <% if @user != current_user %>
+      <div>
+        <strong>Change Role:</strong>
+        <div style="margin-top: 0.5rem;">
+          <% if @user.commentor? %>
+    <%= button_to "Make Admin",
+      update_role_admin_user_path(@user, role: 'admin'),
+      method: :patch,
+      form: { style: "display:inline", data: { turbo_confirm: "Are you sure you want to make this user an admin?" } },
+                  form_class: "inline",
+                  class: "",
+                  style: "background: #8b4513; color: white; padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none; margin-right: 0.5rem; border: none; cursor: pointer;" %>
+          <% else %>
+    <%= button_to "Make Commentor",
+      update_role_admin_user_path(@user, role: 'commentor'),
+      method: :patch,
+      form: { style: "display:inline", data: { turbo_confirm: "Are you sure you want to change this user to commentor?" } },
+                  form_class: "inline",
+                  class: "",
+                  style: "background: #8b7355; color: white; padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none; margin-right: 0.5rem; border: none; cursor: pointer;" %>
+          <% end %>
+        </div>
+      </div>
+    <% else %>
+      <p style="margin: 0; color: #3d2c1d;">
+        <strong>Note:</strong> You cannot change your own role. Ask another admin to modify your role if needed.
+      </p>
+    <% end %>
+  </div>
+</div>
+<% end %>
+
 <!-- Current User Info -->
 <div style="margin-top: 2rem; max-width: 600px;">
-  <h3>Current User Information</h3>
-  <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #6c757d;">
-    <div style="display: grid; grid-template-columns: 120px 1fr; gap: 1rem; margin-bottom: 1rem;">
-      <strong>Current Email:</strong>
-      <span><%= @user.email %></span>
+  <div class="admin-section">
+    <div style="background: #f0ebe4; padding: 1rem; border-bottom: 1px solid #8b7355; margin: -1rem -1rem 1rem -1rem;">
+      <h3 style="margin: 0; color: #3d2c1d;">Current User Information</h3>
     </div>
     
     <div style="display: grid; grid-template-columns: 120px 1fr; gap: 1rem; margin-bottom: 1rem;">
-      <strong>Current Role:</strong>
-      <span style="background: <%= @user.admin? ? '#fff3e0' : '#e8f5e8' %>; 
-                 color: <%= @user.admin? ? '#ef6c00' : '#2e7d32' %>; 
-                 padding: 0.25rem 0.75rem; border-radius: 16px; font-weight: 500;">
+      <strong style="color: #3d2c1d;">Current Email:</strong>
+      <span style="color: #3d2c1d;"><%= @user.email %></span>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: 120px 1fr; gap: 1rem; margin-bottom: 1rem;">
+      <strong style="color: #3d2c1d;">Current Role:</strong>
+      <span style="background: <%= @user.admin? ? '#f0ebe4' : '#fefcfa' %>; 
+                 color: <%= @user.admin? ? '#8b4513' : '#3d2c1d' %>; 
+                 padding: 0.25rem 0.75rem; border-radius: 16px; font-weight: 500; border: 1px solid #8b7355;">
         <%= @user.role.humanize %>
       </span>
     </div>
     
     <div style="display: grid; grid-template-columns: 120px 1fr; gap: 1rem; margin-bottom: 1rem;">
-      <strong>Provider:</strong>
-      <span><%= @user.provider&.humanize || "Email" %></span>
+      <strong style="color: #3d2c1d;">Provider:</strong>
+      <span style="color: #3d2c1d;"><%= @user.provider&.humanize || "Email" %></span>
     </div>
     
     <div style="display: grid; grid-template-columns: 120px 1fr; gap: 1rem; margin-bottom: 1rem;">
-      <strong>Joined:</strong>
-      <span><%= @user.created_at.strftime("%B %d, %Y") %></span>
+      <strong style="color: #3d2c1d;">Joined:</strong>
+      <span style="color: #3d2c1d;"><%= @user.created_at.strftime("%B %d, %Y") %></span>
     </div>
     
     <div style="display: grid; grid-template-columns: 120px 1fr; gap: 1rem;">
-      <strong>Last Sign In:</strong>
-      <span>
+      <strong style="color: #3d2c1d;">Last Sign In:</strong>
+      <span style="color: #3d2c1d;">
         <% if @user.current_sign_in_at %>
           <%= @user.current_sign_in_at.strftime("%B %d, %Y") %>
         <% else %>
@@ -90,7 +141,7 @@
 </div>
 
 <% if @user == current_user %>
-  <div style="background: #fff3cd; border: 1px solid #ffeaa7; color: #856404; padding: 1rem; border-radius: 4px; margin-top: 1rem; max-width: 600px;">
+  <div style="background: #f0ebe4; border: 1px solid #8b7355; color: #3d2c1d; padding: 1rem; border-radius: 4px; margin-top: 1rem; max-width: 600px;">
     <strong>Note:</strong> You are editing your own user account. Be careful when changing your role or email address.
   </div>
 <% end %>

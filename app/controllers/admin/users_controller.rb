@@ -63,8 +63,20 @@ class Admin::UsersController < AdminController
   end
 
   def update_role
+    # Prevent admin from changing their own role
+    if @user == current_user
+      redirect_to admin_user_path(@user), alert: "You cannot change your own role."
+      return
+    end
+
     old_role = @user.role
     new_role = params[:role]
+
+    # Validate that the new role is valid
+    unless User.roles.keys.include?(new_role)
+      redirect_to admin_user_path(@user), alert: "Invalid role specified."
+      return
+    end
 
     if @user.update(role: new_role)
       log_action("user_role_change", @user, {
@@ -115,7 +127,8 @@ class Admin::UsersController < AdminController
   end
 
   def user_params
-    params.require(:user).permit(:email, :role)
+    # Only allow email updates through general update - role changes handled separately
+    params.require(:user).permit(:email)
   end
 
   def generate_users_csv
