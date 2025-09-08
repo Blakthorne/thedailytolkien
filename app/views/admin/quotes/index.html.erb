@@ -44,31 +44,33 @@
 
   <!-- Quotes Table -->
   <div class="admin-section">
-    <table style="width: 100%; border-collapse: collapse;">
+  <table style="width: 100%; border-collapse: collapse;" data-controller="sortable-table" aria-describedby="quotes-table-caption">
+      <caption id="quotes-table-caption" class="sr-only">Quotes table. Click on headers to sort. Click a row to view details.</caption>
       <thead style="background: #f0ebe4;">
         <tr>
           <th style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">
             <input type="checkbox" id="select-all" onchange="toggleAll(this)">
           </th>
-          <th style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">Quote</th>
-          <th style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">Book</th>
-          <th style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">Chapter</th>
-          <th style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">Character</th>
-          <th style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">Created</th>
-          <th style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">Actions</th>
+          <th data-type="text" role="columnheader" tabindex="0" aria-sort="none" style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">Quote</th>
+          <th data-type="text" role="columnheader" tabindex="0" aria-sort="none" style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">Book</th>
+          <th data-type="text" role="columnheader" tabindex="0" aria-sort="none" style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">Chapter</th>
+          <th data-type="text" role="columnheader" tabindex="0" aria-sort="none" style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">Character</th>
+          <th data-type="date" role="columnheader" tabindex="0" aria-sort="none" style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">Created</th>
         </tr>
       </thead>
       <tbody>
         <% if @quotes.any? %>
           <% @quotes.each do |quote| %>
-            <tr style="border-bottom: 1px solid #8b7355;">
+            <tr style="border-bottom: 1px solid #8b7355;" data-controller="row-link" data-row-link-url-value="<%= admin_quote_path(quote) %>">
               <td style="padding: 1rem;">
                 <%= check_box_tag "quote_ids[]", quote.id, false, 
                     class: "quote-checkbox", onchange: "updateBulkActions()" %>
               </td>
               <td style="padding: 1rem;">
                 <div style="max-width: 300px;">
-                  <p style="margin: 0; font-style: italic; color: #3d2c1d;">"<%= truncate(quote.text, length: 100) %>"</p>
+                  <%= link_to admin_quote_path(quote), style: "color: inherit; text-decoration: none;" do %>
+                    <p style="margin: 0; font-style: italic; color: #3d2c1d;">"<%= truncate(quote.text, length: 100) %>"</p>
+                  <% end %>
                 </div>
               </td>
               <td style="padding: 1rem;">
@@ -80,21 +82,10 @@
               <td style="padding: 1rem; color: #3d2c1d;">
                 <%= quote.character || "-" %>
               </td>
-              <td style="padding: 1rem;">
-                <small style="color: #8b7355;">
+              <td style="padding: 1rem;" data-sort-value="<%= quote.created_at.iso8601 %>">
+                <small style="color: #8b7355; display:block;">
                   <%= time_ago_in_words(quote.created_at) %> ago
                 </small>
-              </td>
-              <td style="padding: 1rem;">
-                <div style="display: flex; gap: 0.5rem;">
-                  <%= link_to "View", admin_quote_path(quote), 
-                      style: "color: #8b7355; text-decoration: none; font-size: 0.875rem;" %>
-                  <%= link_to "Edit", edit_admin_quote_path(quote), 
-                      style: "color: #8b6914; text-decoration: none; font-size: 0.875rem;" %>
-                  <%= link_to "Delete", admin_quote_path(quote), 
-                      data: { turbo_method: :delete, confirm: "Are you sure you want to delete this quote?" },
-                      style: "color: #8b4513; text-decoration: none; font-size: 0.875rem;" %>
-                </div>
               </td>
             </tr>
           <% end %>

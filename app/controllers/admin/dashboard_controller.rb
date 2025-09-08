@@ -7,7 +7,7 @@ class Admin::DashboardController < AdminController
                                   .order(created_at: :desc)
                                   .limit(10)
 
-    log_action("dashboard_view")
+    # No logging for dashboard views
   end
 
   private

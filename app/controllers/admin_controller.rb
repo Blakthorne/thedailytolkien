@@ -25,26 +25,10 @@ class AdminController < ApplicationController
   end
 
   def log_admin_activity
-    return unless current_user&.admin?
-
-    # Skip logging for AJAX requests to avoid noise
-    return if request.xhr?
-
-    # Skip logging for asset requests
-    return if request.path.start_with?("/assets", "/favicon")
-
-    ActivityLog.create!(
-      user: current_user,
-      action: "page_view",
-      ip_address: request.remote_ip,
-      user_agent: request.user_agent,
-      details: {
-        controller: params[:controller],
-        action: params[:action],
-        path: request.path,
-        method: request.method
-      }
-    )
+  # Intentionally disabled noisy page/access logging.
+  # We retain explicit logging only for meaningful admin actions
+  # (creates, updates, deletes, role changes, exports, bulk ops) via log_action.
+  nil
   end
 
   def log_action(action, target = nil, details = {})

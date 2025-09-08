@@ -18,6 +18,267 @@
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
     
+    <script>
+      // Inline JavaScript fallback for admin functionality
+      document.addEventListener('DOMContentLoaded', function() {
+        console.log('Inline admin JavaScript loaded');
+        
+        // Row clicking functionality
+        function setupRowClicking() {
+          const rows = document.querySelectorAll('[data-controller*="row-link"]');
+          console.log('Found ' + rows.length + ' clickable rows');
+          rows.forEach(row => {
+            const url = row.getAttribute('data-row-link-url-value');
+            if (url) {
+              row.style.cursor = 'pointer';
+              row.addEventListener('click', function(e) {
+                // Skip checkbox clicks
+                if (e.target.type === 'checkbox') return;
+                // Skip if clicking in first cell with checkbox
+                const firstCell = this.querySelector('td:first-child');
+                if (firstCell && firstCell.contains(e.target) && firstCell.querySelector('input[type="checkbox"]')) {
+                  return;
+                }
+                // Skip interactive elements
+                if (e.target.closest('a, button, input, select, textarea, label')) {
+                  return;
+                }
+                console.log('Row clicked, navigating to:', url);
+                window.location = url;
+              });
+            }
+          });
+        }
+        
+        // Simplified and more reliable sorting functionality  
+        function setupSorting() {
+          const tables = document.querySelectorAll('[data-controller*="sortable-table"]');
+          console.log('Found ' + tables.length + ' sortable tables');
+          
+          tables.forEach(table => {
+            const headers = table.querySelectorAll('th[role="columnheader"]');
+            console.log('Found headers:', Array.from(headers).map(h => h.textContent.trim()));
+            
+            headers.forEach((header, headerIndex) => {
+              header.style.cursor = 'pointer';
+              header.addEventListener('click', function() {
+                const headerText = this.textContent.trim();
+                console.log('=== SORTING BY:', headerText, 'Header Index:', headerIndex, '===');
+                
+                const tbody = table.querySelector('tbody');
+                const rows = Array.from(tbody.querySelectorAll('tr'));
+                const currentSort = this.getAttribute('aria-sort') || 'none';
+                const direction = currentSort === 'ascending' ? 'descending' : 'ascending';
+                
+                // Reset other headers
+                headers.forEach(h => {
+                  if (h !== this) h.setAttribute('aria-sort', 'none');
+                });
+                this.setAttribute('aria-sort', direction);
+                console.log('Sort direction:', direction);
+                
+                // Calculate actual column index (accounting for checkbox column)
+                const columnIndex = headerIndex + 1; // +1 because first column is checkbox
+                console.log('Actual column index:', columnIndex);
+                
+                // Get sample values to debug
+                console.log('Sample cell values:');
+                for (let i = 0; i < Math.min(3, rows.length); i++) {
+                  const cell = rows[i].children[columnIndex];
+                  if (cell) {
+                    const text = getCleanCellText(cell);
+                    console.log(`Row ${i}: "${text}"`);
+                  }
+                }
+                
+                const multiplier = direction === 'ascending' ? 1 : -1;
+                
+                // Sort rows
+                rows.sort((a, b) => {
+                  const aCell = a.children[columnIndex];
+                  const bCell = b.children[columnIndex];
+                  
+                  if (!aCell || !bCell) return 0;
+                  
+                  const aText = getCleanCellText(aCell);
+                  const bText = getCleanCellText(bCell);
+                  
+                  // Simple string comparison
+                  if (aText < bText) return -1 * multiplier;
+                  if (aText > bText) return 1 * multiplier;
+                  return 0;
+                });
+                
+                // Re-append sorted rows
+                const fragment = document.createDocumentFragment();
+                rows.forEach(row => fragment.appendChild(row));
+                tbody.appendChild(fragment);
+                
+                console.log('=== SORTING COMPLETE ===');
+                // Show final order
+                console.log('Final order:');
+                const finalRows = tbody.querySelectorAll('tr');
+                for (let i = 0; i < Math.min(5, finalRows.length); i++) {
+                  const cell = finalRows[i].children[columnIndex];
+                  if (cell) {
+                    console.log(`${i + 1}: "${getCleanCellText(cell)}"`);
+                  }
+                }
+              });
+            });
+          });
+        }
+        
+        // Helper function for extracting clean text from cells
+        function getCleanCellText(cell) {
+          if (!cell) return '';
+          
+          // For checkbox columns, return checked status
+          const checkbox = cell.querySelector('input[type="checkbox"]');
+          if (checkbox) {
+            return checkbox.checked ? '1' : '0';
+          }
+          
+          // Get all text content and clean it up
+          let text = cell.textContent || '';
+          
+          // Remove extra whitespace and normalize
+          text = text.trim().replace(/\s+/g, ' ');
+          
+          // Convert to lowercase for consistent sorting
+          text = text.toLowerCase();
+          
+          console.log('Extracted clean text:', `"${text}"`);
+          return text;
+        }
+        
+        // Detect column data type by analyzing sample values
+        function detectColumnType(rows, columnIndex) {
+          // Get the header to help with type detection
+          const table = rows[0].closest('table');
+          const headers = table.querySelectorAll('th[role="columnheader"]');
+          const header = headers[columnIndex - 1]; // Adjust for checkbox column
+          const headerText = header ? header.textContent.trim().toLowerCase() : '';
+          
+          console.log('Detecting type for column', columnIndex, 'header:', headerText);
+          
+          // Force text type for known text columns
+          if (headerText.includes('quote') || headerText.includes('book') || 
+              headerText.includes('chapter') || headerText.includes('character')) {
+            console.log('Forcing text type for', headerText);
+            return 'text';
+          }
+          
+          // Check for explicit date columns
+          if (headerText.includes('created') || headerText.includes('date') || headerText.includes('time')) {
+            console.log('Detected date type for', headerText);
+            return 'date';
+          }
+          
+          const sampleSize = Math.min(rows.length, 5);
+          let numericCount = 0;
+          let totalSamples = 0;
+          
+          for (let i = 0; i < sampleSize; i++) {
+            const cell = rows[i].children[columnIndex];
+            if (!cell) continue;
+            
+            const value = getRawCellValue(cell);
+            if (!value || value.trim() === '') continue;
+            
+            totalSamples++;
+            
+            // Check for pure numeric (integer or decimal)
+            if (/^\d+$/.test(value.trim()) || /^\d+\.\d+$/.test(value.trim())) {
+              numericCount++;
+            }
+          }
+          
+          // Determine type based on majority (higher threshold for numeric)
+          if (totalSamples === 0) return 'text';
+          
+          const numericRatio = numericCount / totalSamples;
+          console.log('Numeric ratio for column', columnIndex, ':', numericRatio);
+          
+          if (numericRatio >= 0.9) return 'numeric'; // Higher threshold
+          return 'text'; // Default to text for safety
+        }
+        
+        // Get raw cell value without processing
+        function getRawCellValue(cell) {
+          if (!cell) return '';
+          
+          // Check for explicit sort value first
+          const sortValue = cell.getAttribute('data-sort-value');
+          if (sortValue) return sortValue;
+          
+          // Get text content, handling nested HTML properly
+          let text = cell.innerText || cell.textContent || '';
+          
+          // Clean up common formatting
+          text = text.trim();
+          // Remove quotes from quote text if present
+          text = text.replace(/^["']|["']$/g, '');
+          
+          return text;
+        }
+        
+        // Get processed cell value based on column type
+        function getCellValue(cell, columnType) {
+          const rawValue = getRawCellValue(cell);
+          console.log('Raw cell value:', rawValue, 'Type:', columnType);
+          
+          switch (columnType) {
+            case 'numeric':
+              const num = parseFloat(rawValue.replace(/[^\d.-]/g, ''));
+              return isNaN(num) ? 0 : num;
+              
+            case 'date':
+              const date = new Date(rawValue);
+              return isNaN(date.getTime()) ? new Date(0) : date;
+              
+            case 'text':
+            default:
+              return rawValue.toLowerCase().trim();
+          }
+        }
+        
+        // Compare values based on data type
+        function compareValues(a, b, columnType) {
+          console.log('Comparing:', a, 'vs', b, 'type:', columnType);
+          
+          switch (columnType) {
+            case 'numeric':
+              return a - b;
+              
+            case 'date':
+              return a.getTime() - b.getTime();
+              
+            case 'text':
+            default:
+              // For most text columns, simple string comparison is best
+              if (a < b) return -1;
+              if (a > b) return 1;
+              return 0;
+          }
+        }
+        
+        // Setup functionality
+        setupRowClicking();
+        setupSorting();
+      });
+      
+      // Also run on Turbo page loads
+      document.addEventListener('turbo:load', function() {
+        console.log('Turbo load detected, re-running setup');
+        // Small delay to ensure DOM is ready
+        setTimeout(function() {
+          const event = new Event('DOMContentLoaded');
+          document.dispatchEvent(event);
+        }, 100);
+      });
+    </script>
+    
     <style>
       /* Admin-specific styles that harmonize with main app */
       
@@ -78,7 +339,7 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        max-width: 1200px;
+        max-width: 1440px;
         margin: 0 auto;
       }
       
@@ -120,7 +381,7 @@
       }
       
       .admin-nav-content {
-        max-width: 1200px;
+        max-width: 1440px;
         margin: 0 auto;
         display: flex;
         gap: 0.75rem;
@@ -150,7 +411,7 @@
       
       /* Container */
       .container {
-        max-width: 1200px;
+        max-width: 1440px;
         margin: 0 auto;
         padding: 0 2rem;
       }
@@ -311,6 +572,20 @@
         .admin-content-grid {
           grid-template-columns: 1fr;
         }
+      }
+
+      /* Medium screens */
+      @media (min-width: 769px) and (max-width: 1199px) {
+        .container { padding: 0 1.25rem; }
+        .admin-nav { padding: 0.75rem 1.25rem; }
+        .admin-header { padding: 1rem 1.25rem; }
+      }
+
+      /* Large desktops */
+      @media (min-width: 1440px) {
+        .container { padding: 0 2.5rem; }
+        .admin-nav { padding: 1rem 2.5rem; }
+        .admin-header { padding: 1.5rem 2.5rem; }
       }
     </style>
   </head>

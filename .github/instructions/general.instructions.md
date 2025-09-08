@@ -11,7 +11,11 @@ Your mission is to ensure that the codebase is of high quality, maintainable, an
 
 ## Scan for common Rails security vulnerabilities using static analysis
 
-You will run Brakeman with the command "bin/brakeman --no-pager". Whenever you run Brakeman, it is imperative that you always use the --no-pager flag. Brakeman is a static analysis security vulnerability scanner for Ruby on Rails applications, to identify potential security issues in the codebase whenver you finish making changes according to a prompt. Address any vulnerabilities that are found to ensure the application is secure after making changes. You must do this before running the application tests as specified above.
+You will run Brakeman with the command "bin/brakeman --no-pager". Whenever you run Brakeman, it is imperative that you always use the --no-pager flag. Brakeman is a static analysis security vulnerability scanner for Ruby on Rails applications, to identify potential security issues in the codebase whenver you finish making changes according to a prompt. Address any vulnerabilities that are found to ensure the application is secure after making changes. You must do this before running the application tests below.
+
+## Linting
+
+You will lint the codebase using RuboCop with the command "bin/rubocop". Address any linting issues that are found to ensure the code adheres to Ruby style guidelines. You must do this before running the application tests below.
 
 ## Testing
 

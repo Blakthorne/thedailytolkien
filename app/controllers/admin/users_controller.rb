@@ -12,6 +12,7 @@ class Admin::UsersController < AdminController
       format.html
       format.csv do
         csv_data = generate_users_csv
+  log_action("users_export_csv", nil, { count: User.count })
         send_data csv_data,
                   filename: "users-#{Date.current}.csv",
                   type: "text/csv",
@@ -24,11 +25,11 @@ class Admin::UsersController < AdminController
     @user_activities = ActivityLog.where(user: @user)
                                  .order(created_at: :desc)
                                  .limit(20)
-    log_action("user_view", @user)
+    # No logging for view-only actions
   end
 
   def edit
-    log_action("user_edit_view", @user)
+    # No logging for view-only actions
   end
 
   def update

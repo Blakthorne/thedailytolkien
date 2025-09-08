@@ -12,6 +12,7 @@ class Admin::QuotesController < AdminController
       format.html
       format.csv do
         csv_data = generate_quotes_csv
+  log_action("quotes_export_csv", nil, { count: Quote.count })
         send_data csv_data,
                   filename: "quotes-#{Date.current}.csv",
                   type: "text/csv",
@@ -21,7 +22,7 @@ class Admin::QuotesController < AdminController
   end
 
   def show
-    log_action("quote_view", @quote)
+    # No logging for view-only actions
   end
 
   def new
@@ -44,7 +45,7 @@ class Admin::QuotesController < AdminController
   end
 
   def edit
-    log_action("quote_edit_view", @quote)
+    # No logging for view-only actions
   end
 
   def update

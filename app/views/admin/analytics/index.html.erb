@@ -2,12 +2,12 @@
   <%= link_to "Dashboard", admin_root_path %> > <strong>Analytics</strong>
 <% end %>
 
-<h1>Analytics & Reports</h1>
+<h1 style="font-family: 'Crimson Text', serif; color: #3d2c1d; margin-bottom: 2rem;">Analytics & Reports</h1>
 
 <!-- Overview Stats -->
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 3rem;">
   <!-- Quotes Stats -->
-  <div class="admin-stat-card" style="background: linear-gradient(135deg, #8b7355 0%, #6b5b4d 100%); color: white; padding: 2rem;">
+  <div class="admin-stat-card" style="background: #f0ebe4; color: #3d2c1d; padding: 1.5rem; border: 1px solid #8b7355; border-radius: 12px;">
     <h3 style="margin: 0 0 1rem 0; display: flex; align-items: center; gap: 0.5rem;">
       📚 Quotes Overview
     </h3>
@@ -32,7 +32,7 @@
   </div>
 
   <!-- Users Stats -->
-  <div class="admin-stat-card" style="background: linear-gradient(135deg, #8b6914 0%, #6b4f0f 100%); color: white; padding: 2rem;">
+  <div class="admin-stat-card" style="background: #f0ebe4; color: #3d2c1d; padding: 1.5rem; border: 1px solid #8b7355; border-radius: 12px;">
     <h3 style="margin: 0 0 1rem 0; display: flex; align-items: center; gap: 0.5rem;">
       👥 Users Overview
     </h3>
@@ -57,7 +57,7 @@
   </div>
 
   <!-- Activity Stats -->
-  <div class="admin-stat-card" style="background: linear-gradient(135deg, #8b4513 0%, #6b340f 100%); color: white; padding: 2rem;">
+  <div class="admin-stat-card" style="background: #f0ebe4; color: #3d2c1d; padding: 1.5rem; border: 1px solid #8b7355; border-radius: 12px;">
     <h3 style="margin: 0 0 1rem 0; display: flex; align-items: center; gap: 0.5rem;">
       📊 Activity Overview
     </h3>
@@ -85,8 +85,8 @@
 <!-- Detailed Analytics -->
 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 3rem;">
   <!-- Quotes by Book -->
-  <div class="admin-section">
-    <h3 style="margin: 0 0 1.5rem 0; color: #3d2c1d;">Quotes by Book</h3>
+  <div class="admin-section" style="background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.08); border: 1px solid #e8ded2;">
+    <h3 style="margin: 0 0 1.0rem 0; color: #3d2c1d;">Quotes by Book</h3>
     <% @analytics[:quotes][:by_book].sort_by { |k, v| -v }.each do |book, count| %>
       <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid #8b7355;">
         <span style="font-weight: 500; color: #3d2c1d;"><%= truncate(book, length: 30) %></span>
@@ -101,7 +101,7 @@
   </div>
 
   <!-- Top Admin Actions -->
-  <div style="background: white; border-radius: 12px; padding: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+  <div style="background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.08); border: 1px solid #e8ded2;">
     <h3 style="margin: 0 0 1.5rem 0; color: #2d3748;">Top Admin Actions</h3>
     <% @analytics[:activity][:by_action].each do |action, count| %>
       <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid #e2e8f0;">
@@ -118,8 +118,8 @@
 </div>
 
 <!-- Activity Chart (Simple Version) -->
-<div style="background: white; border-radius: 12px; padding: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 3rem;">
-  <h3 style="margin: 0 0 1.5rem 0; color: #2d3748;">Activity Over Last 30 Days</h3>
+<div style="background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.08); border: 1px solid #e8ded2; margin-bottom: 3rem;">
+  <h3 style="margin: 0 0 1.0rem 0; color: #3d2c1d;">Activity Over Last 30 Days</h3>
   
   <div style="display: grid; grid-template-columns: repeat(30, 1fr); gap: 2px; height: 200px; align-items: end;">
     <% max_value = [@chart_data[:quotes].max, @chart_data[:users].max, @chart_data[:activities].max].compact.max %>
@@ -127,20 +127,20 @@
     
     <% @chart_data[:dates].each_with_index do |date, index| %>
       <div style="display: flex; flex-direction: column; align-items: center; height: 100%;">
-        <!-- Activities (blue) -->
-        <div style="width: 100%; background: #4299e1; margin-bottom: 1px; 
+        <!-- Activities (deep brown) -->
+        <div style="width: 100%; background: #3d2c1d; margin-bottom: 1px; 
                     height: <%= (@chart_data[:activities][index].to_f / max_value * 60).round %>px;
                     title: '<%= Date.parse(date).strftime('%b %d') %>: <%= @chart_data[:activities][index] %> activities';">
         </div>
         
-        <!-- Users (green) -->
-        <div style="width: 100%; background: #48bb78; margin-bottom: 1px; 
+        <!-- Users (warm brown) -->
+        <div style="width: 100%; background: #8b7355; margin-bottom: 1px; 
                     height: <%= (@chart_data[:users][index].to_f / max_value * 60).round %>px;
                     title: '<%= Date.parse(date).strftime('%b %d') %>: <%= @chart_data[:users][index] %> users';">
         </div>
         
-        <!-- Quotes (purple) -->
-        <div style="width: 100%; background: #9f7aea; 
+        <!-- Quotes (parchment accent) -->
+        <div style="width: 100%; background: #c9b79c; 
                     height: <%= (@chart_data[:quotes][index].to_f / max_value * 60).round %>px;
                     title: '<%= Date.parse(date).strftime('%b %d') %>: <%= @chart_data[:quotes][index] %> quotes';">
         </div>
@@ -151,29 +151,29 @@
   <!-- Legend -->
   <div style="display: flex; justify-content: center; gap: 2rem; margin-top: 1rem;">
     <div style="display: flex; align-items: center; gap: 0.5rem;">
-      <div style="width: 16px; height: 16px; background: #9f7aea; border-radius: 2px;"></div>
+      <div style="width: 16px; height: 16px; background: #c9b79c; border-radius: 2px;"></div>
       <span style="color: #4a5568; font-size: 0.875rem;">Quotes</span>
     </div>
     <div style="display: flex; align-items: center; gap: 0.5rem;">
-      <div style="width: 16px; height: 16px; background: #48bb78; border-radius: 2px;"></div>
+      <div style="width: 16px; height: 16px; background: #8b7355; border-radius: 2px;"></div>
       <span style="color: #4a5568; font-size: 0.875rem;">Users</span>
     </div>
     <div style="display: flex; align-items: center; gap: 0.5rem;">
-      <div style="width: 16px; height: 16px; background: #4299e1; border-radius: 2px;"></div>
+      <div style="width: 16px; height: 16px; background: #3d2c1d; border-radius: 2px;"></div>
       <span style="color: #4a5568; font-size: 0.875rem;">Activities</span>
     </div>
   </div>
 </div>
 
 <!-- Export Actions -->
-<div style="background: #f7fafc; border-radius: 12px; padding: 2rem; border-left: 4px solid #4299e1;">
-  <h4 style="margin: 0 0 1rem 0; color: #2d3748;">Export & Reports</h4>
+<div style="background: #f0ebe4; border-radius: 12px; padding: 1.5rem; border: 1px solid #8b7355;">
+  <h4 style="margin: 0 0 1rem 0; color: #3d2c1d;">Export & Reports</h4>
   <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-    <%= link_to "Export Quotes CSV", admin_quotes_path(format: :csv), 
-        style: "background: #4299e1; color: white; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: 500;" %>
-    <%= link_to "Export Users CSV", admin_users_path(format: :csv), 
-        style: "background: #48bb78; color: white; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: 500;" %>
-    <%= link_to "View Activity Log", admin_activity_logs_path, 
-        style: "background: #9f7aea; color: white; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: 500;" %>
+  <%= link_to "Export Quotes CSV", admin_quotes_path(format: :csv), 
+    style: "background: #3d2c1d; color: #fefcfa; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: 500; border: 1px solid #2a1f14;" %>
+  <%= link_to "Export Users CSV", admin_users_path(format: :csv), 
+    style: "background: #8b7355; color: #fefcfa; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: 500; border: 1px solid #3d2c1d;" %>
+  <%= link_to "View Activity Log", admin_activity_logs_path, 
+    style: "background: #c9b79c; color: #3d2c1d; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: 600; border: 1px solid #8b7355;" %>
   </div>
 </div>

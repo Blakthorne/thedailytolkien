@@ -10,19 +10,19 @@ class AdminUsersBulkAndExportTest < ActionDispatch::IntegrationTest
 
   test "bulk delete users excluding current user" do
     assert_difference("User.count", -2) do
-      post bulk_action_admin_users_path, params: { user_ids: [@u1.id, @u2.id, @admin.id], bulk_action: "delete" }
+      post bulk_action_admin_users_path, params: { user_ids: [ @u1.id, @u2.id, @admin.id ], bulk_action: "delete" }
     end
     assert_redirected_to admin_users_path
   end
 
   test "bulk role changes work" do
-    post bulk_action_admin_users_path, params: { user_ids: [@u1.id, @u2.id], bulk_action: "make_admin" }
+    post bulk_action_admin_users_path, params: { user_ids: [ @u1.id, @u2.id ], bulk_action: "make_admin" }
     assert_redirected_to admin_users_path
-    assert_equal ["admin", "admin"], [@u1.reload.role, @u2.reload.role]
+    assert_equal [ "admin", "admin" ], [ @u1.reload.role, @u2.reload.role ]
 
-    post bulk_action_admin_users_path, params: { user_ids: [@u1.id, @u2.id], bulk_action: "make_commentor" }
+    post bulk_action_admin_users_path, params: { user_ids: [ @u1.id, @u2.id ], bulk_action: "make_commentor" }
     assert_redirected_to admin_users_path
-    assert_equal ["commentor", "commentor"], [@u1.reload.role, @u2.reload.role]
+    assert_equal [ "commentor", "commentor" ], [ @u1.reload.role, @u2.reload.role ]
   end
 
   test "users export csv" do

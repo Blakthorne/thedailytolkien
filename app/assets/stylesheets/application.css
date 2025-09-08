@@ -1,3 +1,13 @@
+/* Visually hidden but focusable when targeted (for skip links & captions) */
+.sr-only:not(:focus):not(:active) {
+	clip: rect(0 0 0 0);
+	clip-path: inset(50%);
+	height: 1px;
+	overflow: hidden;
+	position: absolute;
+	white-space: nowrap;
+	width: 1px;
+}
 /*
  * This is a manifest file that'll be compiled into application.css.
  *
@@ -8,3 +18,31 @@
  *
  * Consider organizing styles into separate files for maintainability.
  */
+
+/* Sortable table header styles and indicators */
+table[data-controller="sortable-table"] th {
+	position: relative;
+	user-select: none;
+}
+table[data-controller="sortable-table"] th[tabindex] {
+	cursor: pointer;
+}
+table[data-controller="sortable-table"] th::after {
+	content: '';
+	position: absolute;
+	right: 0.5rem;
+	top: 50%;
+	transform: translateY(-50%);
+	color: #8b7355;
+	font-size: 0.75rem;
+}
+table[data-controller="sortable-table"] th[aria-sort="ascending"]::after {
+	content: '▲';
+}
+table[data-controller="sortable-table"] th[aria-sort="descending"]::after {
+	content: '▼';
+}
+table[data-controller="sortable-table"] th:focus {
+	outline: 2px solid #8b7355;
+	outline-offset: 2px;
+}

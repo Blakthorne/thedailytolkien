@@ -3,7 +3,7 @@ class Admin::AnalyticsController < AdminController
     @analytics = calculate_analytics
     @chart_data = prepare_chart_data
 
-    log_action("analytics_view")
+    # No logging for analytics views
   end
 
   private

@@ -73,22 +73,23 @@
 
 <!-- Activity Log Table -->
 <div class="admin-section">
-  <table style="width: 100%; border-collapse: collapse;">
+  <table style="width: 100%; border-collapse: collapse;" data-controller="sortable-table" aria-describedby="activity-table-caption">
+    <caption id="activity-table-caption" class="sr-only">Activity log table. Click on headers to sort. Click a row to view details.</caption>
     <thead style="background: #f0ebe4;">
       <tr>
-        <th style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">Time</th>
-        <th style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">User</th>
-        <th style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">Action</th>
-        <th style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">Target</th>
-        <th style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">IP Address</th>
-        <th style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">Details</th>
+  <th data-type="date" role="columnheader" tabindex="0" aria-sort="none" style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">Time</th>
+  <th data-type="text" role="columnheader" tabindex="0" aria-sort="none" style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">User</th>
+  <th data-type="text" role="columnheader" tabindex="0" aria-sort="none" style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">Action</th>
+  <th data-type="text" role="columnheader" tabindex="0" aria-sort="none" style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">Target</th>
+  <th data-type="text" role="columnheader" tabindex="0" aria-sort="none" style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">IP Address</th>
+  <th data-type="text" role="columnheader" tabindex="0" aria-sort="none" style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">Details</th>
       </tr>
     </thead>
     <tbody>
       <% if @activities.any? %>
         <% @activities.each do |activity| %>
-          <tr style="border-bottom: 1px solid #8b7355;">
-            <td style="padding: 1rem; white-space: nowrap;">
+          <tr style="border-bottom: 1px solid #8b7355;" data-controller="row-link" data-row-link-url-value="<%= admin_activity_log_path(activity) %>">
+            <td style="padding: 1rem; white-space: nowrap;" data-sort-value="<%= activity.created_at.iso8601 %>">
               <div style="font-weight: 500; color: #3d2c1d;"><%= activity.created_at.strftime("%b %d, %Y") %></div>
               <small style="color: #8b7355;"><%= activity.created_at.strftime("%I:%M %p") %></small>
             </td>
@@ -103,14 +104,14 @@
               </small>
             </td>
             <td style="padding: 1rem;">
-              <span style="background: #e6fffa; color: #234e52; padding: 0.25rem 0.75rem; border-radius: 16px; font-size: 0.875rem; font-weight: 500;">
+              <span style="background: #f0ebe4; color: #3d2c1d; padding: 0.25rem 0.75rem; border-radius: 16px; font-size: 0.875rem; font-weight: 500;">
                 <%= activity.action_description %>
               </span>
             </td>
             <td style="padding: 1rem;">
               <% if activity.target %>
-                <div style="font-weight: 500; color: #2d3748;"><%= activity.target.class.name %></div>
-                <small style="color: #6c757d;"><%= truncate(activity.target_description, length: 30) %></small>
+                <div style="font-weight: 500; color: #3d2c1d;"><%= activity.target.class.name %></div>
+                <small style="color: #8b7355;"><%= truncate(activity.target_description, length: 30) %></small>
               <% else %>
                 <span style="color: #a0aec0;">—</span>
               <% end %>
@@ -120,8 +121,7 @@
             </td>
             <td style="padding: 1rem;">
               <% if activity.details.present? %>
-                <%= link_to "View", admin_activity_log_path(activity), 
-                    style: "color: #007bff; text-decoration: none; font-size: 0.875rem;" %>
+                <span style="color: #8b7355; font-size: 0.875rem;">Has details</span>
               <% else %>
                 <span style="color: #a0aec0;">—</span>
               <% end %>
