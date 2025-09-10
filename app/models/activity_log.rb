@@ -2,6 +2,9 @@ class ActivityLog < ApplicationRecord
   belongs_to :user
   belongs_to :target, polymorphic: true, optional: true
 
+  # Serialize details as JSON
+  serialize :details, coder: JSON
+
   # Validations
   validates :action, presence: true
   validates :ip_address, presence: true

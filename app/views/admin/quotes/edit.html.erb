@@ -57,6 +57,46 @@
       </div>
     </div>
 
+    <div class="admin-section" style="margin-bottom: 1.5rem;">
+      <div style="background: #f0ebe4; padding: 1rem; border-bottom: 1px solid #8b7355; margin: -1rem -1rem 1rem -1rem;">
+        <h3 style="margin: 0; color: #3d2c1d;">Tags</h3>
+      </div>
+      
+      <div style="margin-bottom: 1rem;">
+        <p style="color: #8b7355; margin: 0 0 1rem 0; font-style: italic;">
+          Select tags that apply to this quote. Tags help organize quotes by theme, character, or topic.
+        </p>
+        
+        <% if @all_tags.any? %>
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.75rem;">
+            <% @all_tags.each do |tag| %>
+              <label style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem; background: #fefcfa; border: 1px solid #8b7355; border-radius: 4px; cursor: pointer;">
+                <%= f.check_box :tag_ids, 
+                    { multiple: true, checked: @quote.tags.include?(tag) }, 
+                    tag.id, "" %>
+                <span style="color: #3d2c1d; font-weight: 500;"><%= tag.name %></span>
+                <% if tag.description.present? %>
+                  <span style="color: #8b7355; font-size: 0.8rem;">(<%= truncate(tag.description, length: 30) %>)</span>
+                <% end %>
+              </label>
+            <% end %>
+          </div>
+        <% else %>
+          <div style="background: #f8f9fa; padding: 1rem; border-radius: 4px; border: 1px dashed #8b7355;">
+            <p style="margin: 0; color: #8b7355; text-align: center;">
+              No tags available. <%= link_to "Create tags", admin_tags_path, style: "color: #8b7355; text-decoration: underline;" %> first.
+            </p>
+          </div>
+        <% end %>
+      </div>
+      
+      <div style="background: #f8f9fa; padding: 0.75rem; border-radius: 4px; border-left: 3px solid #8b7355;">
+        <p style="margin: 0; color: #8b7355; font-size: 0.9rem;">
+          💡 <strong>Tip:</strong> You can also <%= link_to "manage all tags", admin_tags_path, style: "color: #8b7355; text-decoration: underline;" %> from the Tags section.
+        </p>
+      </div>
+    </div>
+
     <div style="display: flex; gap: 1rem;">
       <%= f.submit "Update Quote", class: "admin-nav-link" %>
       <%= link_to "Cancel", admin_quote_path(@quote), class: "admin-nav-link" %>

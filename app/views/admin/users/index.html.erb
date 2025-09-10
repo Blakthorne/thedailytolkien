@@ -47,6 +47,21 @@
     <h4 style="margin: 0;">This Week</h4>
     <p style="font-size: 1.5rem; font-weight: bold; margin: 0.25rem 0; color: #4a148c;"><%= User.where('created_at > ?', 1.week.ago).count %></p>
   </div>
+
+  <div class="admin-stat-card">
+    <h4 style="margin: 0;">Active Streaks</h4>
+    <p style="font-size: 1.5rem; font-weight: bold; margin: 0.25rem 0; color: #ff6b35;"><%= User.where('current_streak > 0').count %></p>
+  </div>
+  
+  <div class="admin-stat-card">
+    <h4 style="margin: 0;">Max Streak</h4>
+    <p style="font-size: 1.5rem; font-weight: bold; margin: 0.25rem 0; color: #8b7355;"><%= User.maximum(:longest_streak) || 0 %></p>
+  </div>
+  
+  <div class="admin-stat-card">
+    <h4 style="margin: 0;">Avg Streak</h4>
+    <p style="font-size: 1.5rem; font-weight: bold; margin: 0.25rem 0; color: #6b46c1;"><%= User.average(:current_streak)&.round(1) || 0 %></p>
+  </div>
 </div>
 
 <!-- Bulk Actions Form -->
@@ -57,6 +72,8 @@
       <%= f.select :bulk_action, [
             ["Make Admin", "make_admin"],
             ["Make Commentor", "make_commentor"],
+            ["Reset Streaks", "reset_streaks"],
+            ["Recalculate Streaks", "recalculate_streaks"],
             ["Delete Selected", "delete"]
           ], { prompt: "Choose action..." },
           { style: "padding: 0.25rem; border: 1px solid #8b7355; border-radius: 4px; background: #fefcfa;" } %>
@@ -81,6 +98,8 @@
           </th>
           <th data-type="text" role="columnheader" tabindex="0" aria-sort="none" style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">Email</th>
           <th data-type="text" role="columnheader" tabindex="0" aria-sort="none" style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">Role</th>
+          <th data-type="number" role="columnheader" tabindex="0" aria-sort="none" style="padding: 1rem; text-align: center; border-bottom: 1px solid #8b7355; color: #3d2c1d;">Current Streak</th>
+          <th data-type="number" role="columnheader" tabindex="0" aria-sort="none" style="padding: 1rem; text-align: center; border-bottom: 1px solid #8b7355; color: #3d2c1d;">Best Streak</th>
           <th data-type="text" role="columnheader" tabindex="0" aria-sort="none" style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">Provider</th>
           <th data-type="date" role="columnheader" tabindex="0" aria-sort="none" style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">Joined</th>
           <th data-type="date" style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">Last Seen</th>
@@ -113,6 +132,22 @@
                            color: #3d2c1d; 
                            padding: 0.25rem 0.75rem; border-radius: 16px; font-size: 0.875rem; font-weight: 500;">
                   <%= user.role.humanize %>
+                </span>
+              </td>
+              <td style="padding: 1rem; text-align: center;" data-sort-value="<%= user.current_streak %>">
+                <div style="display: flex; align-items: center; justify-content: center; gap: 0.25rem;">
+                  <span style="font-size: 1.1rem;"><%= user.streak_emoji %></span>
+                  <span style="font-weight: 600; color: <%= user.current_streak > 0 ? '#ff6b35' : '#8b7355' %>;">
+                    <%= user.current_streak %>
+                  </span>
+                </div>
+              </td>
+              <td style="padding: 1rem; text-align: center;" data-sort-value="<%= user.longest_streak %>">
+                <span style="font-weight: 600; color: #8b7355;">
+                  <%= user.longest_streak %>
+                  <% if user.longest_streak > 7 %>
+                    🏆
+                  <% end %>
                 </span>
               </td>
               <td style="padding: 1rem;">

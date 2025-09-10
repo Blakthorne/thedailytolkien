@@ -36,6 +36,36 @@ class Admin::AnalyticsController < AdminController
                                         .where(users: { role: "admin" })
                                         .where("activity_logs.created_at > ?", 1.week.ago)
                                         .count
+      },
+      engagement: {
+        total_likes: QuoteLike.where(like_type: "like").count,
+        total_dislikes: QuoteLike.where(like_type: "dislike").count,
+        total_comments: Comment.count,
+        top_liked_quotes: Quote.joins(:quote_likes)
+                              .where(quote_likes: { like_type: "like" })
+                              .group("quotes.id", "quotes.text", "quotes.character")
+                              .order("COUNT(quote_likes.id) DESC")
+                              .limit(10)
+                              .count
+                              .map { |key, count| { quote: key[1], character: key[2], likes: count } },
+        most_commented_quotes: Quote.joins(:comments)
+                                   .group("quotes.id", "quotes.text", "quotes.character")
+                                   .order("COUNT(comments.id) DESC")
+                                   .limit(10)
+                                   .count
+                                   .map { |key, count| { quote: key[1], character: key[2], comments: count } },
+        engagement_by_day: calculate_engagement_by_day
+      },
+      tags: {
+        total_tags: Tag.count,
+        most_used_tags: Tag.joins(:quotes)
+                          .group("tags.id", "tags.name")
+                          .order("COUNT(quotes.id) DESC")
+                          .limit(10)
+                          .count
+                          .map { |key, count| { name: key[1], usage_count: count } },
+        untagged_quotes: Quote.left_joins(:quote_tags).where(quote_tags: { id: nil }).count,
+        average_tags_per_quote: QuoteTag.count.to_f / Quote.count
       }
     }
   end
@@ -61,6 +91,25 @@ class Admin::AnalyticsController < AdminController
       quotes: dates.map { |date| quotes_by_day[date.to_s] || 0 },
       users: dates.map { |date| users_by_day[date.to_s] || 0 },
       activities: dates.map { |date| activities_by_day[date.to_s] || 0 }
+    }
+  end
+
+  def calculate_engagement_by_day
+    dates = (30.days.ago.to_date..Date.current).to_a
+
+    likes_by_day = QuoteLike.where(like_type: "like")
+                           .where("created_at > ?", 30.days.ago)
+                           .group("DATE(created_at)")
+                           .count
+
+    comments_by_day = Comment.where("created_at > ?", 30.days.ago)
+                            .group("DATE(created_at)")
+                            .count
+
+    {
+      dates: dates.map(&:to_s),
+      likes: dates.map { |date| likes_by_day[date.to_s] || 0 },
+      comments: dates.map { |date| comments_by_day[date.to_s] || 0 }
     }
   end
 end

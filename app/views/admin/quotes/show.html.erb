@@ -70,9 +70,35 @@
         <span style="color: #3d2c1d;"><%= @quote.created_at.strftime("%B %d, %Y at %I:%M %p") %></span>
       </div>
       
-      <div style="display: grid; grid-template-columns: 150px 1fr; gap: 1rem;">
+      <div style="display: grid; grid-template-columns: 150px 1fr; gap: 1rem; margin-bottom: 1rem;">
         <strong style="color: #3d2c1d;">Last Updated:</strong>
         <span style="color: #3d2c1d;"><%= @quote.updated_at.strftime("%B %d, %Y at %I:%M %p") %></span>
+      </div>
+      
+      <div style="display: grid; grid-template-columns: 150px 1fr; gap: 1rem;">
+        <strong style="color: #3d2c1d;">Tags:</strong>
+        <div>
+          <% if @quote.tags.any? %>
+            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+              <% @quote.tags.each do |tag| %>
+                <span style="background: rgba(139, 115, 85, 0.15); color: #3d2c1d; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.85rem; border: 1px solid rgba(139, 115, 85, 0.3);">
+                  <%= tag.name %>
+                </span>
+              <% end %>
+            </div>
+            <div style="margin-top: 0.5rem;">
+              <%= link_to "Manage Tags", admin_tags_path, 
+                  style: "color: #8b7355; text-decoration: underline; font-size: 0.85rem;" %>
+            </div>
+          <% else %>
+            <span style="color: #8b7355; font-style: italic;">
+              No tags assigned. 
+              <%= link_to "Add tags", edit_admin_quote_path(@quote), 
+                  style: "color: #8b7355; text-decoration: underline;" %> 
+              to organize this quote.
+            </span>
+          <% end %>
+        </div>
       </div>
     </div>
   </div>

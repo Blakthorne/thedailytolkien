@@ -19,21 +19,14 @@ class Admin::ActivityLogsController < AdminController
     @activities = @activities.order(created_at: :desc).limit(200)
 
     # Get filter options
-    @users = User.admin.order(:email)
+    @users = User.joins(:activity_logs).distinct.order(:email)
     @actions = ActivityLog.distinct.pluck(:action).compact.sort
 
-    log_action("activity_logs_view", nil, {
-      filters: {
-        user_id: params[:user_id],
-        action: params[:action],
-        start_date: params[:start_date],
-        end_date: params[:end_date]
-      }
-    })
+    # Activity logging removed for activity logs view per user request
   end
 
   def show
     @activity = ActivityLog.includes(:user, :target).find(params[:id])
-    log_action("activity_log_view", @activity)
+    # Activity logging removed for individual activity log views per user request
   end
 end

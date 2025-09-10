@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+    quote: two_towers_quote
+    tag: friendship
+
+two:
+    quote: return_king_quote
+    tag: adventure
+
+three:
+    quote: two_towers_quote
+    tag: wisdom
+
+four:
+    quote: return_king_quote
+    tag: friendship

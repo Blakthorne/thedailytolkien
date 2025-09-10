@@ -100,6 +100,85 @@
       </div>
     </div>
 
+    <!-- Streak Management -->
+    <div class="admin-section">
+      <div style="background: #f0ebe4; padding: 1rem; border-bottom: 1px solid #8b7355; margin: -1rem -1rem 1rem -1rem;">
+        <h3 style="margin: 0; color: #3d2c1d;">Login Streak Management</h3>
+      </div>
+      
+      <div>
+        <!-- Streak Display -->
+        <div style="background: #fefcfa; padding: 1.5rem; border-radius: 8px; margin-bottom: 1rem; border: 1px solid #8b7355; text-align: center;">
+          <div style="display: flex; justify-content: center; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+            <span style="font-size: 2rem;"><%= @user.streak_emoji %></span>
+            <div>
+              <div style="font-size: 1.5rem; font-weight: bold; color: #3d2c1d;"><%= @user.streak_display %></div>
+              <% if @user.has_longest_streak_record? %>
+                <div style="font-size: 0.875rem; color: #8b7355;">Personal record: <%= @user.longest_streak %> days 🏆</div>
+              <% end %>
+            </div>
+          </div>
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+            <div>
+              <div style="font-size: 0.875rem; color: #8b7355; margin-bottom: 0.25rem;">Current Streak</div>
+              <div style="font-size: 1.25rem; font-weight: bold; color: #ff6b35;"><%= @user.current_streak %></div>
+            </div>
+            <div>
+              <div style="font-size: 0.875rem; color: #8b7355; margin-bottom: 0.25rem;">Longest Streak</div>
+              <div style="font-size: 1.25rem; font-weight: bold; color: #8b7355;"><%= @user.longest_streak %></div>
+            </div>
+          </div>
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+            <div>
+              <div style="font-size: 0.875rem; color: #8b7355; margin-bottom: 0.25rem;">Timezone</div>
+              <div style="font-size: 0.875rem; color: #3d2c1d; font-family: monospace;"><%= @user.streak_timezone %></div>
+            </div>
+            <div>
+              <div style="font-size: 0.875rem; color: #8b7355; margin-bottom: 0.25rem;">Last Login Date</div>
+              <div style="font-size: 0.875rem; color: #3d2c1d;">
+                <%= @user.last_login_date&.strftime("%b %d, %Y") || "Never" %>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Streak Actions -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+          <%= button_to "Reset Streak", reset_streak_admin_user_path(@user), 
+              method: :patch,
+              form: { data: { turbo_confirm: "Are you sure you want to reset this user's streak to 0?" } },
+              style: "background: #dc2626; color: white; padding: 0.5rem 1rem; border-radius: 4px; border: none; cursor: pointer; width: 100%;" %>
+          
+          <%= button_to "Recalculate Streak", recalculate_streak_admin_user_path(@user), 
+              method: :patch,
+              form: { data: { turbo_confirm: "Recalculate streak based on login history?" } },
+              style: "background: #059669; color: white; padding: 0.5rem 1rem; border-radius: 4px; border: none; cursor: pointer; width: 100%;" %>
+        </div>
+
+        <!-- Manual Streak Update -->
+        <div style="background: #f0ebe4; padding: 1rem; border-radius: 8px; border: 1px solid #8b7355;">
+          <h4 style="margin: 0 0 1rem 0; color: #3d2c1d; font-size: 0.875rem;">Manual Update</h4>
+          <%= form_with url: update_streak_admin_user_path(@user), method: :patch, 
+              style: "display: grid; grid-template-columns: 1fr 1fr auto; gap: 1rem; align-items: end;" do |f| %>
+            <div>
+              <%= f.label :current_streak, "Current Streak", style: "font-size: 0.75rem; color: #8b7355; display: block; margin-bottom: 0.25rem;" %>
+              <%= f.number_field :current_streak, value: @user.current_streak, min: 0,
+                  style: "width: 100%; padding: 0.5rem; border: 1px solid #8b7355; border-radius: 4px; background: #fefcfa;" %>
+            </div>
+            <div>
+              <%= f.label :longest_streak, "Longest Streak", style: "font-size: 0.75rem; color: #8b7355; display: block; margin-bottom: 0.25rem;" %>
+              <%= f.number_field :longest_streak, value: @user.longest_streak, min: 0,
+                  style: "width: 100%; padding: 0.5rem; border: 1px solid #8b7355; border-radius: 4px; background: #fefcfa;" %>
+            </div>
+            <%= f.submit "Update", 
+                style: "background: #8b7355; color: white; padding: 0.5rem 1rem; border-radius: 4px; border: none; cursor: pointer; height: fit-content;" %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
     <!-- Activity Summary -->
     <div class="admin-section">
       <div style="background: #f0ebe4; padding: 1rem; border-bottom: 1px solid #8b7355; margin: -1rem -1rem 1rem -1rem;">

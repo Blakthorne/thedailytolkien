@@ -1,0 +1,206 @@
+<style>
+  .admin-container {
+    width: 1000px;
+    margin: 0 auto;
+    padding: 2rem;
+    min-height: 100vh;
+  }
+
+  .admin-header {
+    background: rgba(245, 240, 232, 0.1);
+    backdrop-filter: blur(2px);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border: 2px solid #8b7355;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+
+  .admin-header h1 {
+    font-family: 'Cinzel', serif;
+    color: #8b7355;
+    font-size: 2.5rem;
+    margin: 0;
+    text-shadow: 0 2px 4px rgba(139, 115, 85, 0.3);
+  }
+
+  .tag-info-card {
+    background: rgba(245, 240, 232, 0.1);
+    backdrop-filter: blur(2px);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border: 2px solid #8b7355;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  }
+
+  .tag-description {
+    font-family: 'Crimson Text', serif;
+    font-size: 1.1rem;
+    color: #666;
+    font-style: italic;
+    margin: 1rem 0;
+  }
+
+  .tag-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin: 1rem 0;
+  }
+
+  .stat-item {
+    text-align: center;
+    padding: 1rem;
+    background: rgba(139, 115, 85, 0.1);
+    border-radius: 8px;
+    border: 1px solid #8b7355;
+  }
+
+  .stat-number {
+    font-family: 'Cinzel', serif;
+    font-size: 2rem;
+    font-weight: bold;
+    color: #8b7355;
+    display: block;
+  }
+
+  .stat-label {
+    font-family: 'Crimson Text', serif;
+    color: #666;
+    font-size: 0.9rem;
+    margin-top: 0.25rem;
+  }
+
+  .quote-item {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid #8b7355;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .quote-text {
+    font-family: 'Crimson Text', serif;
+    font-size: 1.1rem;
+    color: #333;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+  }
+
+  .quote-author {
+    font-family: 'Crimson Text', serif;
+    color: #8b7355;
+    font-weight: bold;
+    text-align: right;
+  }
+
+  .actions-section {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin: 2rem 0;
+  }
+
+  .btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: 'Crimson Text', serif;
+    font-weight: bold;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+  }
+
+  .btn-primary {
+    background: #8b7355;
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background: #6d5a44;
+    transform: translateY(-1px);
+  }
+
+  .btn-secondary {
+    background: rgba(139, 115, 85, 0.2);
+    color: #8b7355;
+    border: 1px solid #8b7355;
+  }
+
+  .btn-secondary:hover {
+    background: rgba(139, 115, 85, 0.3);
+  }
+
+  .btn-danger {
+    background: #c53030;
+    color: white;
+  }
+
+  .btn-danger:hover {
+    background: #a02625;
+  }
+</style>
+
+<div class="admin-container">
+  <div class="admin-header">
+    <h1>Tag: <%= @tag.name %></h1>
+    <% if @tag.description.present? %>
+      <p style="font-family: 'Crimson Text', serif; color: #666; margin-top: 1rem;">
+        <%= @tag.description %>
+      </p>
+    <% end %>
+  </div>
+
+  <div class="tag-info-card">
+    <h2 style="font-family: 'Cinzel', serif; color: #8b7355; margin-bottom: 1.5rem;">Tag Statistics</h2>
+    
+    <div class="tag-stats">
+      <div class="stat-item">
+        <span class="stat-number"><%= @tag.quotes.count %></span>
+        <div class="stat-label">Total Quotes</div>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number"><%= Time.current.strftime("%B %Y") %></span>
+        <div class="stat-label">Created</div>
+      </div>
+    </div>
+
+    <div class="actions-section">
+      <%= link_to "Edit Tag", edit_admin_tag_path(@tag), class: "btn btn-primary" %>
+      <%= link_to "Delete Tag", admin_tag_path(@tag), 
+                  method: :delete, 
+                  class: "btn btn-danger",
+                  confirm: "Are you sure? This will remove this tag from all quotes." %>
+    </div>
+  </div>
+
+  <div class="tag-info-card">
+    <h2 style="font-family: 'Cinzel', serif; color: #8b7355; margin-bottom: 1.5rem;">Quotes with this Tag</h2>
+    
+    <% if @quotes.any? %>
+      <% @quotes.each do |quote| %>
+        <div class="quote-item">
+          <div class="quote-text">"<%= quote.text %>"</div>
+          <div class="quote-author">— <%= quote.character %></div>
+        </div>
+      <% end %>
+
+      <% if respond_to?(:paginate) %>
+        <%= paginate @quotes if @quotes.respond_to?(:current_page) %>
+      <% end %>
+    <% else %>
+      <p style="text-align: center; color: #666; font-style: italic; font-family: 'Crimson Text', serif; margin: 2rem 0;">
+        No quotes are tagged with "<%= @tag.name %>" yet.
+      </p>
+    <% end %>
+  </div>
+
+  <div style="text-align: center; margin-top: 2rem;">
+    <%= link_to "← Back to All Tags", admin_tags_path, class: "btn btn-secondary" %>
+  </div>
+</div>

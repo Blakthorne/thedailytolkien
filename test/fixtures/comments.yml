@@ -1,0 +1,20 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+    user: admin
+    quote: two_towers_quote
+    content: "This is a test comment"
+    depth: 0
+
+two:
+    user: commentor
+    quote: return_king_quote
+    content: "This is another test comment"
+    depth: 0
+
+three:
+    user: admin
+    quote: two_towers_quote
+    parent: one
+    content: "This is a reply to comment one"
+    depth: 1

@@ -1,7 +1,7 @@
 require "csv"
 
 class Admin::UsersController < AdminController
-  before_action :set_user, only: [ :show, :edit, :update, :destroy, :update_role, :toggle_status ]
+  before_action :set_user, only: [ :show, :edit, :update, :destroy, :update_role, :toggle_status, :reset_streak, :recalculate_streak, :update_streak ]
 
   def index
     @users = User.order(created_at: :desc)
@@ -116,8 +116,72 @@ class Admin::UsersController < AdminController
       updated_count = User.where(id: user_ids).update_all(role: "commentor")
       log_action("users_bulk_role_change", nil, { count: updated_count, user_ids: user_ids, new_role: "commentor" })
       redirect_to admin_users_path, notice: "#{updated_count} users were made commentors."
+    when "reset_streaks"
+      reset_count = bulk_reset_streaks(user_ids)
+      redirect_to admin_users_path, notice: "Reset streaks for #{reset_count} users."
+    when "recalculate_streaks"
+      recalc_count = bulk_recalculate_streaks(user_ids)
+      redirect_to admin_users_path, notice: "Recalculated streaks for #{recalc_count} users."
     else
       redirect_to admin_users_path, alert: "Invalid bulk action."
+    end
+  end
+
+  # Individual streak management actions
+  def reset_streak
+    # Capture values before resetting
+    previous_current = @user.current_streak
+    previous_longest = @user.longest_streak
+
+    @user.reset_streak!
+    log_action("user_streak_reset", @user, {
+      previous_current_streak: previous_current,
+      previous_longest_streak: previous_longest
+    })
+    redirect_to admin_user_path(@user), notice: "Streak reset for #{@user.email}."
+  end
+
+  def recalculate_streak
+    old_current = @user.current_streak
+    old_longest = @user.longest_streak
+
+    @user.recalculate_streak!
+
+    log_action("user_streak_recalculated", @user, {
+      old_current_streak: old_current,
+      old_longest_streak: old_longest,
+      new_current_streak: @user.current_streak,
+      new_longest_streak: @user.longest_streak
+    })
+
+    redirect_to admin_user_path(@user), notice: "Streak recalculated for #{@user.email}."
+  end
+
+  def update_streak
+    current_streak = params[:current_streak].to_i
+    longest_streak = params[:longest_streak].to_i
+
+    if current_streak < 0 || longest_streak < 0
+      redirect_to admin_user_path(@user), alert: "Streak values cannot be negative."
+      return
+    end
+
+    old_attributes = {
+      current_streak: @user.current_streak,
+      longest_streak: @user.longest_streak
+    }
+
+    if @user.update(current_streak: current_streak, longest_streak: longest_streak)
+      log_action("user_streak_manual_update", @user, {
+        old_attributes: old_attributes,
+        new_attributes: {
+          current_streak: current_streak,
+          longest_streak: longest_streak
+        }
+      })
+      redirect_to admin_user_path(@user), notice: "Streak updated for #{@user.email}."
+    else
+      redirect_to admin_user_path(@user), alert: "Failed to update streak: #{@user.errors.full_messages.join(', ')}"
     end
   end
 
@@ -132,15 +196,52 @@ class Admin::UsersController < AdminController
     params.require(:user).permit(:email)
   end
 
+  def bulk_reset_streaks(user_ids)
+    users = User.where(id: user_ids)
+    reset_count = 0
+
+    users.find_each do |user|
+      user.reset_streak!
+      reset_count += 1
+    end
+
+    log_action("users_bulk_streak_reset", nil, {
+      count: reset_count,
+      user_ids: user_ids
+    })
+
+    reset_count
+  end
+
+  def bulk_recalculate_streaks(user_ids)
+    users = User.where(id: user_ids)
+    recalc_count = 0
+
+    users.find_each do |user|
+      user.recalculate_streak!
+      recalc_count += 1
+    end
+
+    log_action("users_bulk_streak_recalculated", nil, {
+      count: recalc_count,
+      user_ids: user_ids
+    })
+
+    recalc_count
+  end
+
   def generate_users_csv
     CSV.generate(headers: true) do |csv|
-      csv << [ "ID", "Email", "Role", "Provider", "Created At", "Last Sign In" ]
+      csv << [ "ID", "Email", "Role", "Current Streak", "Longest Streak", "Timezone", "Provider", "Created At", "Last Sign In" ]
 
       User.find_each do |user|
         csv << [
           user.id,
           user.email,
           user.role,
+          user.current_streak,
+          user.longest_streak,
+          user.streak_timezone,
           user.provider || "email",
           user.created_at.strftime("%Y-%m-%d %H:%M:%S"),
           user.current_sign_in_at&.strftime("%Y-%m-%d %H:%M:%S") || "Never"

@@ -1,21 +1,41 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  text: MyString
-  book: MyString
-  chapter: MyString
-  context: MyString
-  character: MyString
-  days_displayed: 1
-  last_date_displayed: 1
-  first_date_displayed: 1
+    text: "Test quote one"
+    book: "Test Book"
+    chapter: "Test Chapter"
+    context: "Test Context"
+    character: "Test Character"
+    days_displayed: 1
+    last_date_displayed: 1
+    first_date_displayed: 1
 
-two:
-  text: MyString
-  book: MyString
-  chapter: MyString
-  context: MyString
-  character: MyString
-  days_displayed: 1
-  last_date_displayed: 1
-  first_date_displayed: 1
+fellowship_quote:
+    text: "You shall not pass!"
+    book: "The Fellowship of the Ring"
+    chapter: "Chapter 5"
+    context: "The Bridge of Khazad-dûm"
+    character: "Gandalf"
+    days_displayed: 1
+    last_date_displayed: 1
+    first_date_displayed: 1
+
+two_towers_quote:
+    text: "Even the smallest person can change the course of the future"
+    book: "The Two Towers"
+    chapter: "Chapter 9"
+    context: "Galadriel to Frodo"
+    character: "Galadriel"
+    days_displayed: 1
+    last_date_displayed: 1
+    first_date_displayed: 1
+
+return_king_quote:
+    text: "All that is gold does not glitter"
+    book: "The Return of the King"
+    chapter: "Chapter 1"
+    context: "Aragorn's heritage"
+    character: "Bilbo"
+    days_displayed: 1
+    last_date_displayed: 1
+    first_date_displayed: 1

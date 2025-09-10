@@ -1,7 +1,12 @@
 Rails.application.routes.draw do
   devise_for :users, controllers: {
-    omniauth_callbacks: "users/omniauth_callbacks"
+    omniauth_callbacks: "users/omniauth_callbacks",
+    sessions: "users/sessions"
   }
+
+  # User management routes
+  patch "users/update_timezone", to: "users#update_timezone"
+
   get "philosophy" => "philosophy#show"
 
   # Admin routes - protected by authentication
@@ -20,6 +25,9 @@ Rails.application.routes.draw do
       member do
         patch :update_role
         patch :toggle_status
+        patch :reset_streak
+        patch :recalculate_streak
+        patch :update_streak
       end
       collection do
         get :export
@@ -28,6 +36,13 @@ Rails.application.routes.draw do
     end
     resources :analytics, only: [ :index ]
     resources :activity_logs, only: [ :index, :show ]
+    resources :tags do
+      member do
+        post :add_to_quote
+        delete :remove_from_quote
+      end
+    end
+    resources :comments, only: [ :index, :destroy ]
   end
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
@@ -39,6 +54,14 @@ Rails.application.routes.draw do
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
+
+  # Quote interaction routes
+  resources :quotes, only: [] do
+    resources :quote_likes, only: [ :create ], path: "likes"
+    resources :comments, only: [ :index, :create ]
+  end
+
+  resources :comments, only: [ :update, :destroy ]
 
   # Defines the root path route ("/")
   # This sets the home page to display the daily Tolkien quote via the QuotesController's index action.

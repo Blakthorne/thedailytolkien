@@ -28,6 +28,9 @@ gem "omniauth-rails_csrf_protection"
 # Admin functionality
 gem "kaminari"
 
+# Thread-safe request-specific storage
+gem "request_store"
+
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
 

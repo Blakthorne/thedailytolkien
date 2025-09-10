@@ -11,6 +11,10 @@ class PublicSiteTest < ActionDispatch::IntegrationTest
   end
 
   test "home loads gracefully when no quotes present" do
+    # Clean up related data first to avoid foreign key constraints
+    QuoteTag.delete_all
+    QuoteLike.delete_all
+    Comment.delete_all
     Quote.delete_all
 
     get root_path

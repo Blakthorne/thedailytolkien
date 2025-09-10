@@ -87,10 +87,21 @@
           <h1><%= link_to "The Daily Tolkien", root_path, class: "header-title-link" %></h1>
           <div class="auth-links">
             <% if user_signed_in? %>
-              <span class="user-info">Welcome, <%= current_user.name || current_user.email %></span>
-              <%= form_with(url: destroy_user_session_path, method: :delete, data: { turbo: false }) do |f| %>
-                <%= f.submit "Logout", class: "auth-link logout-link" %>
-              <% end %>
+              <div class="user-section" data-user-timezone="<%= current_user.streak_timezone %>">
+                <div class="streak-display">
+                  <span class="streak-emoji"><%= current_user.streak_emoji %></span>
+                  <span class="streak-text"><%= current_user.streak_display %></span>
+                  <% if current_user.has_longest_streak_record? %>
+                    <span class="record-badge" title="Personal Record: <%= current_user.longest_streak %> days">
+                      🏆 <%= current_user.longest_streak %>
+                    </span>
+                  <% end %>
+                </div>
+                <span class="user-info">Welcome, <%= current_user.name || current_user.email %></span>
+                <%= form_with(url: destroy_user_session_path, method: :delete, data: { turbo: false }) do |f| %>
+                  <%= f.submit "Logout", class: "auth-link logout-link" %>
+                <% end %>
+              </div>
             <% else %>
               <%= link_to "Login", new_user_session_path, class: "auth-link login-link" %>
             <% end %>
@@ -214,6 +225,47 @@
         opacity: 1; /* Full opacity on hover */
       }
 
+      /* Streak Display Styles */
+      .user-section {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+      }
+
+      .streak-display {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(139, 115, 85, 0.1);
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        border: 1px solid rgba(139, 115, 85, 0.2);
+      }
+
+      .streak-emoji {
+        font-size: 1.1rem;
+      }
+
+      .streak-text {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #3d2c1d;
+        font-family: 'Source Sans Pro', sans-serif;
+      }
+
+      .record-badge {
+        background: linear-gradient(135deg, #ffd700, #ffa500);
+        color: #3d2c1d;
+        padding: 0.1rem 0.4rem;
+        border-radius: 10px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        border: 1px solid #ffd700;
+        cursor: help;
+      }
+
       .app-header h1 {
         font-size: 1.75rem !important;
         color: #3d2c1d; /* Dark brown text */
@@ -297,6 +349,19 @@
 
         .auth-links {
           justify-content: center;
+        }
+
+        .user-section {
+          align-items: center;
+          text-align: center;
+        }
+
+        .streak-display {
+          font-size: 0.9rem;
+        }
+
+        .streak-text {
+          font-size: 0.8rem !important;
         }
 
         .app-header h1 {

@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+friendship:
+    name: "friendship"
+    description: "Quotes about friendship"
+
+adventure:
+    name: "adventure"
+    description: "Quotes about adventure and journeys"
+
+wisdom:
+    name: "wisdom"
+    description: "Quotes about wisdom and knowledge"

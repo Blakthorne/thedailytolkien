@@ -13,13 +13,14 @@ class Admin::DashboardController < AdminController
   private
 
   def calculate_dashboard_stats
+    today_start = Date.current.beginning_of_day
+
     {
-      total_quotes: Quote.count,
       total_users: User.count,
       admin_users: User.admin.count,
-      recent_quotes: Quote.where("created_at > ?", 7.days.ago).count,
       recent_users: User.where("created_at > ?", 7.days.ago).count,
-      recent_activities: ActivityLog.where("created_at > ?", 24.hours.ago).count
+      comments_today: Comment.where("created_at >= ?", today_start).count,
+      likes_dislikes_today: QuoteLike.where("created_at >= ?", today_start).count
     }
   end
 end

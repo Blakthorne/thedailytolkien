@@ -6,12 +6,6 @@
 
 <div class="admin-stats-grid">
   <div class="admin-stat-card">
-    <h3>Total Quotes</h3>
-    <p class="stat-number"><%= @stats[:total_quotes] %></p>
-    <small class="stat-detail"><%= @stats[:recent_quotes] %> added this week</small>
-  </div>
-  
-  <div class="admin-stat-card">
     <h3>Total Users</h3>
     <p class="stat-number"><%= @stats[:total_users] %></p>
     <small class="stat-detail"><%= @stats[:recent_users] %> joined this week</small>
@@ -24,9 +18,15 @@
   </div>
   
   <div class="admin-stat-card">
-    <h3>Recent Activity</h3>
-    <p class="stat-number"><%= @stats[:recent_activities] %></p>
-    <small class="stat-detail">Actions in last 24h</small>
+    <h3>Comments Today</h3>
+    <p class="stat-number"><%= @stats[:comments_today] %></p>
+    <small class="stat-detail">Comments and replies posted today</small>
+  </div>
+  
+  <div class="admin-stat-card">
+    <h3>Likes/Dislikes Today</h3>
+    <p class="stat-number"><%= @stats[:likes_dislikes_today] %></p>
+    <small class="stat-detail">Quote engagement today</small>
   </div>
 </div>
 

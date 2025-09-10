@@ -27,6 +27,38 @@ class Quote < ApplicationRecord
   # chapter, context, and character are optional string fields that provide
   # additional metadata about the quote's origin and content.
   # No validations are needed here as they can be nil.
+
+  # Associations for interaction system
+  has_many :quote_likes, dependent: :destroy
+  has_many :comments, dependent: :destroy
+
+  # Associations for tagging system
+  has_many :quote_tags, dependent: :destroy
+  has_many :tags, through: :quote_tags
+
+  # Engagement metrics methods
+  def likes_count
+    quote_likes.likes.count
+  end
+
+  def dislikes_count
+    quote_likes.dislikes.count
+  end
+
+  def comments_count
+    comments.count
+  end
+
+  def engagement_score
+    likes_count + comments_count - dislikes_count
+  end
+
+  # Check if user has liked/disliked this quote
+  def user_like_status(user)
+    return nil unless user
+    quote_like = quote_likes.find_by(user: user)
+    quote_like&.like_type
+  end
 end
     private
 

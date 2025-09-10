@@ -1,0 +1,177 @@
+<style>
+  .admin-container {
+    width: 1000px;
+    margin: 0 auto;
+    padding: 2rem;
+    min-height: 100vh;
+  }
+
+  .admin-header {
+    background: rgba(245, 240, 232, 0.1);
+    backdrop-filter: blur(2px);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border: 2px solid #8b7355;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+
+  .admin-header h1 {
+    font-family: 'Cinzel', serif;
+    color: #8b7355;
+    font-size: 2.5rem;
+    margin: 0;
+    text-shadow: 0 2px 4px rgba(139, 115, 85, 0.3);
+  }
+
+  .admin-card {
+    background: rgba(245, 240, 232, 0.1);
+    backdrop-filter: blur(2px);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border: 2px solid #8b7355;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  }
+
+  .tags-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .tag-item {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid #8b7355;
+    border-radius: 8px;
+    padding: 1rem;
+    transition: all 0.3s ease;
+  }
+
+  .tag-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  }
+
+  .tag-name {
+    font-family: 'Crimson Text', serif;
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #8b7355;
+    margin-bottom: 0.5rem;
+  }
+
+  .tag-description {
+    font-family: 'Crimson Text', serif;
+    color: #666;
+    font-style: italic;
+    margin-bottom: 1rem;
+    line-height: 1.4;
+  }
+
+  .tag-stats {
+    font-size: 0.9rem;
+    color: #999;
+    margin-bottom: 1rem;
+  }
+
+  .tag-actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: 'Crimson Text', serif;
+    font-weight: bold;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+  }
+
+  .btn-primary {
+    background: #8b7355;
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background: #6d5a44;
+    transform: translateY(-1px);
+  }
+
+  .btn-secondary {
+    background: rgba(139, 115, 85, 0.2);
+    color: #8b7355;
+    border: 1px solid #8b7355;
+  }
+
+  .btn-secondary:hover {
+    background: rgba(139, 115, 85, 0.3);
+  }
+
+  .btn-danger {
+    background: #c53030;
+    color: white;
+  }
+
+  .btn-danger:hover {
+    background: #a02625;
+  }
+
+  .create-new-section {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+</style>
+
+<div class="admin-container">
+  <div class="admin-header">
+    <h1>Tag Management</h1>
+    <p style="font-family: 'Crimson Text', serif; color: #666; margin-top: 1rem;">
+      Organize quotes by themes, characters, and concepts
+    </p>
+  </div>
+
+  <div class="create-new-section">
+    <%= link_to "Create New Tag", new_admin_tag_path, class: "btn btn-primary" %>
+  </div>
+
+  <div class="admin-card">
+    <h2 style="font-family: 'Cinzel', serif; color: #8b7355; margin-bottom: 1.5rem;">All Tags</h2>
+    
+    <% if @tags.any? %>
+      <div class="tags-grid">
+        <% @tags.each do |tag| %>
+          <div class="tag-item">
+            <div class="tag-name"><%= tag.name %></div>
+            <% if tag.description.present? %>
+              <div class="tag-description"><%= tag.description %></div>
+            <% end %>
+            <div class="tag-stats">
+              Used on <%= pluralize(tag.quotes.count, 'quote') %>
+            </div>
+            <div class="tag-actions">
+              <%= link_to "Edit", edit_admin_tag_path(tag), class: "btn btn-secondary" %>
+              <%= link_to "Delete", admin_tag_path(tag), 
+                          data: { turbo_method: :delete, turbo_confirm: "Are you sure you want to delete this tag?" }, 
+                          class: "btn btn-danger" %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <p style="text-align: center; color: #666; font-style: italic; font-family: 'Crimson Text', serif; margin: 2rem 0;">
+        No tags created yet. Create your first tag to start organizing quotes!
+      </p>
+    <% end %>
+  </div>
+
+  <div style="text-align: center; margin-top: 2rem;">
+    <%= link_to "← Back to Admin Dashboard", admin_root_path, class: "btn btn-secondary" %>
+  </div>
+</div>

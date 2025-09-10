@@ -1,12 +1,12 @@
 <style>
-  
   /* Main content styles */
   .main-content {
-    width: 800px;
+    width: 900px;
     margin: 0 auto;
     padding: 2rem;
     position: relative;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     flex: 1;
@@ -24,6 +24,117 @@
     width: 100%;
   }
 
+  /* Engagement and Tags Section - unified layout */
+  .quote-engagement-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+    padding: 0 1rem;
+    min-height: 2.5rem;
+  }
+
+  /* Tags on the left */
+  .quote-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+    flex: 1;
+  }
+
+  .quote-tags-placeholder {
+    flex: 1;
+  }
+
+  .tag-badge {
+    background: rgba(139, 115, 85, 0.1);
+    color: #8b7355;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    border: 1px solid rgba(139, 115, 85, 0.2);
+    white-space: nowrap;
+  }
+
+  /* Engagement controls on the right */
+  .quote-engagement {
+    display: flex;
+    gap: 0.5rem;
+    right: 2rem;
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    z-index: 10;
+  }
+
+  .engagement-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    background: rgba(245, 240, 232, 0.95);
+    border: 2px solid rgba(139, 115, 85, 0.3);
+    border-radius: 50px;
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.875rem;
+    color: #8b7355;
+    font-weight: 500;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    min-width: 3rem;
+  }
+
+  .engagement-btn:hover {
+    background: rgba(245, 240, 232, 1);
+    border-color: rgba(139, 115, 85, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  }
+
+  .engagement-btn.like-active {
+    background: rgba(34, 197, 94, 0.1);
+    border-color: rgba(34, 197, 94, 0.5);
+    color: #16a34a;
+  }
+
+  .engagement-btn.dislike-active {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.5);
+    color: #dc2626;
+  }
+
+  /* Hollow thumb SVG icons */
+  .thumb-icon {
+    width: 1rem;
+    height: 1rem;
+    display: inline-block;
+  }
+
+  .thumb-icon svg {
+    width: 100%;
+    height: 100%;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .engagement-btn .count {
+    font-weight: 600;
+    min-width: 1ch;
+    text-align: center;
+  }
+
+  .engagement-btn.loading {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
   .quote-text {
     font-family: 'Crimson Text', serif;
     font-size: 1.75rem;
@@ -35,16 +146,6 @@
     position: relative;
     padding: 0 1rem;
     letter-spacing: 0.01em;
-  }
-  
-  .quote-text::before {
-    left: 0;
-    top: -10px;
-  }
-
-  .quote-text::after {
-    right: 0;
-    bottom: -40px;
   }
 
   .metadata-section {
@@ -84,25 +185,382 @@
     line-height: 1.3;
   }
 
-  .no-quote {
-    text-align: center;
-    padding: 3rem 2rem;
-    background: rgba(30, 41, 59, 0.8);
-    backdrop-filter: blur(20px);
+  /* Interaction Section Styles - for comments only */
+  .interaction-section {
+    width: 100%;
+    margin-top: 2rem;
+    padding: 0;
+  }
+
+  .interaction-card {
+    background: rgba(245, 240, 232, 0.1);
+    backdrop-filter: blur(2px);
     border-radius: 12px;
-    border: 1px solid #475569;
-    color: #94a3b8;
-    font-size: 1.1rem;
+    padding: 2rem;
+    border: 2px solid #8b7355;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+  }
+
+  .section-title {
+    font-family: 'Crimson Text', serif;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #3d2c1d;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .empty-message {
+    color: #8b7355;
+    font-style: italic;
+    font-family: 'Crimson Text', serif;
+  }
+
+  /* Comments Section */
+  .comments-section {
+    margin-top: 1rem;
+  }
+
+  .comment-form {
+    margin-bottom: 2rem;
+  }
+
+  .form-group {
+    margin-bottom: 1rem;
+  }
+
+  .form-group label {
+    display: block;
+    font-family: 'Crimson Text', serif;
+    font-weight: 600;
+    color: #3d2c1d;
+    margin-bottom: 0.5rem;
+  }
+
+  .form-control {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #8b7355;
+    border-radius: 8px;
+    background: rgba(245, 240, 232, 0.8);
+    font-family: 'Source Sans Pro', sans-serif;
+    color: #3d2c1d;
+    resize: vertical;
+  }
+
+  .form-control:focus {
+    outline: none;
+    border-color: #3d2c1d;
+    box-shadow: 0 0 0 3px rgba(139, 115, 85, 0.2);
+  }
+
+  .btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Crimson Text', serif;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .btn-primary {
+    background: #8b7355;
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background: #6d5a44;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Comments Display */
+  .comments-list {
+    margin-top: 2rem;
+  }
+
+  .comment {
+    background: rgba(245, 240, 232, 0.3);
+    border: 1px solid rgba(139, 115, 85, 0.3);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+
+  .comment-author {
+    font-family: 'Crimson Text', serif;
+    font-weight: 600;
+    color: #3d2c1d;
+  }
+
+  .comment-date {
+    font-size: 0.85rem;
+    color: #8b7355;
     font-style: italic;
   }
 
+  .comment-content {
+    color: #3d2c1d;
+    line-height: 1.6;
+    margin-bottom: 0.5rem;
+  }
+
+  .comment-actions {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.85rem;
+  }
+
+  .comment-action {
+    color: #8b7355;
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .comment-action:hover {
+    color: #3d2c1d;
+    text-decoration: underline;
+  }
+
+  .comment-action.danger {
+    color: #c53030;
+  }
+
+  .comment-action.danger:hover {
+    color: #a02625;
+  }
+
+  /* Reply functionality styles */
+  .comment-depth-indicator {
+    font-size: 0.75rem;
+    color: #8b7355;
+    font-style: italic;
+    margin-left: 0.5rem;
+  }
+
+  .reply-btn {
+    background: none;
+    border: none;
+    color: #8b7355;
+    font-weight: 500;
+    cursor: pointer;
+    font-size: 0.85rem;
+    padding: 0;
+  }
+
+  .reply-btn:hover {
+    color: #3d2c1d;
+    text-decoration: underline;
+  }
+
+  .reply-form {
+    border-left: 3px solid #8b7355;
+    background: rgba(245, 240, 232, 0.7);
+    margin-top: 1rem;
+    padding: 1rem;
+    border-radius: 8px;
+  }
+
+  .reply-form label {
+    font-size: 0.9rem;
+    color: #3d2c1d;
+    margin-bottom: 0.5rem;
+    display: block;
+    font-weight: 500;
+  }
+
+  .reply-form textarea {
+    width: 100%;
+    border: 1px solid rgba(139, 115, 85, 0.3);
+    border-radius: 4px;
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.8);
+    color: #3d2c1d;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 80px;
+  }
+
+  .reply-form textarea:focus {
+    outline: none;
+    border-color: #8b7355;
+    box-shadow: 0 0 0 2px rgba(139, 115, 85, 0.2);
+  }
+
+  .reply-form-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+  }
+
+  .btn-sm {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+  }
+
+  .btn-secondary {
+    background: rgba(139, 115, 85, 0.1);
+    border: 1px solid rgba(139, 115, 85, 0.3);
+    color: #8b7355;
+  }
+
+  .btn-secondary:hover {
+    background: rgba(139, 115, 85, 0.2);
+    color: #3d2c1d;
+  }
+
+  /* Enhanced visual hierarchy for nested comments */
+  .comment[data-depth="0"] {
+    border-left: none;
+    background: rgba(245, 240, 232, 0.2);
+  }
+
+  .comment[data-depth="1"] {
+    border-left: 4px solid rgba(139, 115, 85, 0.6);
+    background: rgba(245, 240, 232, 0.3);
+    margin-left: 3rem !important;
+    padding-left: 1.5rem;
+  }
+
+  .comment[data-depth="2"] {
+    border-left: 4px solid rgba(139, 115, 85, 0.7);
+    background: rgba(245, 240, 232, 0.4);
+    margin-left: 6rem !important;
+    padding-left: 1.5rem;
+  }
+
+  .comment[data-depth="3"] {
+    border-left: 4px solid rgba(139, 115, 85, 0.8);
+    background: rgba(245, 240, 232, 0.5);
+    margin-left: 9rem !important;
+    padding-left: 1.5rem;
+  }
+
+  .comment[data-depth="4"] {
+    border-left: 4px solid rgba(139, 115, 85, 0.9);
+    background: rgba(245, 240, 232, 0.6);
+    margin-left: 12rem !important;
+    padding-left: 1.5rem;
+  }
+
+  /* Edit functionality styles */
+  .edit-btn {
+    background: none;
+    border: none;
+    color: #8b7355;
+    font-weight: 500;
+    cursor: pointer;
+    font-size: 0.85rem;
+    padding: 0;
+  }
+
+  .edit-btn:hover {
+    color: #3d2c1d;
+    text-decoration: underline;
+  }
+
+  .edit-form {
+    border-left: 3px solid #8b7355;
+    background: rgba(245, 240, 232, 0.8);
+    margin-top: 1rem;
+    padding: 1rem;
+    border-radius: 8px;
+  }
+
+  .edit-form label {
+    font-size: 0.9rem;
+    color: #3d2c1d;
+    margin-bottom: 0.5rem;
+    display: block;
+    font-weight: 500;
+  }
+
+  .edit-form textarea {
+    width: 100%;
+    border: 1px solid rgba(139, 115, 85, 0.3);
+    border-radius: 4px;
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.9);
+    color: #3d2c1d;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 80px;
+  }
+
+  .edit-form textarea:focus {
+    outline: none;
+    border-color: #8b7355;
+    box-shadow: 0 0 0 2px rgba(139, 115, 85, 0.2);
+  }
+
+  .edit-form-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+  }
+
+  .edit-indicator {
+    font-size: 0.75rem;
+    color: #8b7355;
+    font-style: italic;
+    margin-left: 1rem;
+  }
+
+  .delete-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font-size: 0.85rem;
+  }
+
+  /* Responsive adjustments for mobile */
+  @media (max-width: 768px) {
+    .comment[data-depth="1"] { margin-left: 1.5rem !important; }
+    .comment[data-depth="2"] { margin-left: 3rem !important; }
+    .comment[data-depth="3"] { margin-left: 4.5rem !important; }
+    .comment[data-depth="4"] { margin-left: 6rem !important; }
+  }
+
+  .no-quote {
+    text-align: center;
+    padding: 3rem 2rem;
+    background: rgba(245, 240, 232, 0.2);
+    backdrop-filter: blur(20px);
+    border-radius: 12px;
+    border: 2px solid #8b7355;
+    color: #8b7355;
+    font-size: 1.1rem;
+    font-style: italic;
+    font-family: 'Crimson Text', serif;
+  }
+
+  /* Loading states */
+  .loading {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+
+  /* Responsive */
   @media (max-width: 768px) {
     .main-content {
       padding: 0 1rem;
       width: 100%;
     }
 
-    .quote-card {
+    .quote-card, .interaction-card {
       padding: 2rem 1.5rem;
     }
 
@@ -111,36 +569,56 @@
       padding: 0 0.5rem;
     }
 
-    .quote-text::before,
-    .quote-text::after {
-      font-size: 2rem;
+    .engagement-controls {
+      flex-direction: column;
+      gap: 1rem;
     }
 
     .metadata-section {
       grid-template-columns: 1fr;
       gap: 0.75rem;
     }
+
+    .admin-buttons, .tags-list {
+      flex-direction: column;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .quote-engagement-section {
+      flex-direction: column;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+
+    .quote-tags {
+      justify-content: flex-start;
+    }
+
+    .quote-engagement {
+      align-self: center;
+    }
   }
 
   @media (max-width: 480px) {
-    .header h1 {
-      font-size: 1.75rem;
-    }
-
     .quote-text {
       font-size: 1.2rem;
     }
 
-    .quote-card {
+    .quote-card, .interaction-card {
       padding: 1.5rem 1rem;
+    }
+
+    .quote-engagement-section {
+      padding: 0;
     }
   }
 </style>
 
 <main class="main-content">
   <% if @quote %>
+    <!-- Main Quote Card -->
     <div class="quote-card">
-
       <blockquote class="quote-text">
         <%= @quote.text %>
       </blockquote>
@@ -165,10 +643,510 @@
           </div>
         <% end %>
       </div>
+
+      <!-- Engagement and Tags Section (unified layout) -->
+      <div class="quote-engagement-section">
+        <!-- Tags (left side) -->
+        <% if @tags.any? %>
+          <div class="quote-tags">
+            <% @tags.each do |tag| %>
+              <span class="tag-badge"><%= tag.name %></span>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="quote-tags-placeholder"></div>
+        <% end %>
+
+        <!-- Like/Dislike buttons (right side) -->
+        <% if user_signed_in? %>
+          <div class="quote-engagement" data-quote-id="<%= @quote.id %>">
+            <button class="engagement-btn like-btn <%= 'like-active' if @user_like_status == 'like' %>"
+                    data-type="like" data-quote-id="<%= @quote.id %>">
+              <span class="thumb-icon">
+                <svg viewBox="0 0 24 24">
+                  <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
+                </svg>
+              </span>
+              <span class="count"><%= @likes_count %></span>
+            </button>
+            
+            <button class="engagement-btn dislike-btn <%= 'dislike-active' if @user_like_status == 'dislike' %>"
+                    data-type="dislike" data-quote-id="<%= @quote.id %>">
+              <span class="thumb-icon">
+                <svg viewBox="0 0 24 24">
+                  <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path>
+                </svg>
+              </span>
+              <span class="count"><%= @dislikes_count %></span>
+            </button>
+          </div>
+        <% else %>
+          <div class="quote-engagement">
+            <div class="engagement-btn">
+              <span class="thumb-icon">
+                <svg viewBox="0 0 24 24">
+                  <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
+                </svg>
+              </span>
+              <span class="count"><%= @likes_count %></span>
+            </div>
+            <div class="engagement-btn">
+              <span class="thumb-icon">
+                <svg viewBox="0 0 24 24">
+                  <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path>
+                </svg>
+              </span>
+              <span class="count"><%= @dislikes_count %></span>
+            </div>
+          </div>
+        <% end %>
+      </div>
     </div>
-  <% else %>
+
+    <!-- Comments Section -->
+    <div class="interaction-section">
+      <div class="interaction-card">
+        <div class="comments-section">
+                    <h2 class="section-title">
+            Comments (<%= @comments_count %>)
+          </h2>
+
+          <!-- Comment Form -->
+          <% if user_signed_in? %>
+            <%= form_with model: [@quote, Comment.new], url: quote_comments_path(@quote), method: :post, local: false, 
+                          class: "comment-form", id: "comment-form" do |f| %>
+              <div class="form-group">
+                <label for="comment_content">Share your thoughts about this quote:</label>
+                <%= f.text_area :content, class: "form-control", id: "comment_content", 
+                                rows: 4, placeholder: "What does this quote mean to you?" %>
+              </div>
+              <%= f.submit "Post Comment", class: "btn btn-primary" %>
+            <% end %>
+          <% else %>
+            <div class="comment-form">
+              <p class="empty-message" style="text-align: center;">
+                <%= link_to "Sign in", new_user_session_path, style: "color: #8b7355; text-decoration: underline;" %> 
+                to join the conversation
+              </p>
+            </div>
+          <% end %>
+
+          <!-- Comments List -->
+          <div class="comments-list" id="comments-list">
+            <% if @comments.any? %>
+              <% @comments.each do |comment| %>
+                <%= render 'comment_with_replies', comment: comment, depth: 0 %>
+              <% end %>
+            <% else %>
+              <div class="empty-message" style="text-align: center; padding: 2rem;">
+                No comments yet. Be the first to share your thoughts!
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>  <% else %>
     <div class="no-quote">
       <p>No quotes available at the moment. Please check back later.</p>
     </div>
   <% end %>
 </main>
+
+<!-- JavaScript for Real-time Interactions -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Like/Dislike AJAX functionality
+  const engagementButtons = document.querySelectorAll('.engagement-btn[data-type]');
+  
+  engagementButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const quoteId = this.dataset.quoteId;
+      const type = this.dataset.type;
+      
+      // Add loading state
+      this.classList.add('loading');
+      
+      // Make AJAX request
+      fetch(`/quotes/${quoteId}/likes`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({ like_type: type })
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Update UI based on response
+        updateEngagementUI(data);
+        this.classList.remove('loading');
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        this.classList.remove('loading');
+        // Show error message
+        alert('Sorry, there was an error processing your request. Please try again.');
+      });
+    });
+  });
+  
+  function updateEngagementUI(data) {
+    // Update like button
+    const likeBtn = document.querySelector('.like-btn');
+    const dislikeBtn = document.querySelector('.dislike-btn');
+    
+    // Reset active states
+    likeBtn.classList.remove('like-active');
+    dislikeBtn.classList.remove('dislike-active');
+    
+    // Update counts
+    likeBtn.querySelector('.count').textContent = data.likes_count;
+    dislikeBtn.querySelector('.count').textContent = data.dislikes_count;
+    
+    // Set active state based on user's current preference
+    if (data.user_like_status === 'like') {
+      likeBtn.classList.add('like-active');
+    } else if (data.user_like_status === 'dislike') {
+      dislikeBtn.classList.add('dislike-active');
+    }
+  }
+  
+  // Comment form AJAX
+  const commentForm = document.getElementById('comment-form');
+  if (commentForm) {
+    commentForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const formData = new FormData(this);
+      const submitBtn = this.querySelector('.btn-primary');
+      
+      // Add loading state
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Posting...';
+      
+      fetch(this.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Clear form
+          document.getElementById('comment_content').value = '';
+          
+          // Add new comment to list (or reload comments section)
+          if (data.html) {
+            const commentsList = document.getElementById('comments-list');
+            if (commentsList.innerHTML.includes('No comments yet')) {
+              commentsList.innerHTML = data.html;
+            } else {
+              commentsList.insertAdjacentHTML('beforeend', data.html);
+            }
+          }
+          
+          // Update comment count in title
+          const commentsTitle = document.querySelector('.comments-section .section-title');
+          if (commentsTitle) {
+            commentsTitle.innerHTML = `💬 Comments (${data.comments_count})`;
+          }
+        } else {
+          const errorMessage = data.errors ? data.errors.join(', ') : (data.error || 'Error posting comment. Please try again.');
+          alert(errorMessage);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Error posting comment. Please try again.');
+      })
+      .finally(() => {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Post Comment';
+      });
+    });
+  }
+  
+  // Reply functionality
+  document.addEventListener('click', function(e) {
+    // Handle reply button clicks
+    if (e.target.classList.contains('reply-btn')) {
+      const commentId = e.target.dataset.commentId;
+      const replyForm = document.getElementById(`reply-form-${commentId}`);
+      
+      // Hide all other reply forms
+      document.querySelectorAll('.reply-form').forEach(form => {
+        if (form.id !== `reply-form-${commentId}`) {
+          form.style.display = 'none';
+        }
+      });
+      
+      // Toggle this reply form
+      replyForm.style.display = replyForm.style.display === 'none' ? 'block' : 'none';
+      
+      // Focus on textarea if showing
+      if (replyForm.style.display === 'block') {
+        const textarea = replyForm.querySelector('textarea');
+        setTimeout(() => textarea.focus(), 100);
+      }
+    }
+    
+    // Handle cancel reply button clicks
+    if (e.target.classList.contains('cancel-reply-btn')) {
+      const commentId = e.target.dataset.commentId;
+      const replyForm = document.getElementById(`reply-form-${commentId}`);
+      replyForm.style.display = 'none';
+      
+      // Clear the form
+      const textarea = replyForm.querySelector('textarea');
+      textarea.value = '';
+    }
+    
+    // Handle edit button clicks
+    if (e.target.classList.contains('edit-btn')) {
+      const commentId = e.target.dataset.commentId;
+      const editForm = document.getElementById(`edit-form-${commentId}`);
+      const commentContent = document.querySelector(`[data-comment-id="${commentId}"] .comment-content`);
+      
+      // Hide all other edit forms
+      document.querySelectorAll('.edit-form').forEach(form => {
+        if (form.id !== `edit-form-${commentId}`) {
+          form.style.display = 'none';
+        }
+      });
+      
+      // Hide comment content and show edit form
+      if (commentContent && editForm) {
+        commentContent.style.display = 'none';
+        editForm.style.display = 'block';
+        
+        // Focus on textarea
+        const textarea = editForm.querySelector('textarea');
+        setTimeout(() => textarea.focus(), 100);
+      }
+    }
+    
+    // Handle cancel edit button clicks
+    if (e.target.classList.contains('cancel-edit-btn')) {
+      const commentId = e.target.dataset.commentId;
+      const editForm = document.getElementById(`edit-form-${commentId}`);
+      const commentContent = document.querySelector(`[data-comment-id="${commentId}"] .comment-content`);
+      
+      if (editForm && commentContent) {
+        editForm.style.display = 'none';
+        commentContent.style.display = 'block';
+      }
+    }
+  });
+  
+  // Handle reply form submissions
+  document.addEventListener('submit', function(e) {
+    if (e.target.classList.contains('reply-form-inner')) {
+      e.preventDefault();
+      
+      const form = e.target;
+      const formData = new FormData(form);
+      const submitBtn = form.querySelector('.btn-primary');
+      const commentId = form.dataset.commentId;
+      
+      // Add loading state
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Posting...';
+      
+      fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Hide and clear the reply form
+          const replyForm = document.getElementById(`reply-form-${commentId}`);
+          replyForm.style.display = 'none';
+          form.querySelector('textarea').value = '';
+          
+          // Refresh the comments section to show the new reply
+          // In a more sophisticated implementation, you could append the new reply directly
+          location.reload();
+        } else {
+          const errorMessage = data.errors ? data.errors.join(', ') : (data.error || 'Error posting reply. Please try again.');
+          alert(errorMessage);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Error posting reply. Please try again.');
+      })
+      .finally(() => {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Post Reply';
+      });
+    }
+  });
+  
+  // Handle edit form submissions
+  document.addEventListener('submit', function(e) {
+    if (e.target.classList.contains('edit-form-inner')) {
+      e.preventDefault();
+      
+      const form = e.target;
+      const formData = new FormData(form);
+      const submitBtn = form.querySelector('.btn-primary');
+      const commentId = form.dataset.commentId;
+      
+      // Add loading state
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Saving...';
+      
+      fetch(form.action, {
+        method: 'PATCH',
+        body: formData,
+        headers: {
+          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Update the comment content
+          const commentContent = document.querySelector(`[data-comment-id="${commentId}"] .comment-content`);
+          const editForm = document.getElementById(`edit-form-${commentId}`);
+          const textarea = form.querySelector('textarea');
+          
+          if (commentContent && editForm) {
+            // Update content with new text (simple format - preserve whitespace and line breaks)
+            const simpleFormatted = textarea.value
+              .replace(/&/g, '&amp;')
+              .replace(/</g, '&lt;')
+              .replace(/>/g, '&gt;')
+              .replace(/\n\s*\n/g, '</p><p>')
+              .replace(/\n/g, '<br>')
+              .replace(/^/, '<p>')
+              .replace(/$/, '</p>')
+              .replace(/<p><\/p>/g, '');
+            commentContent.innerHTML = simpleFormatted;
+            
+            // Add/update edit indicator
+            let editIndicator = document.querySelector(`[data-comment-id="${commentId}"] .edit-indicator`);
+            if (!editIndicator) {
+              editIndicator = document.createElement('span');
+              editIndicator.className = 'edit-indicator';
+              document.querySelector(`[data-comment-id="${commentId}"] .comment-actions`).appendChild(editIndicator);
+            }
+            editIndicator.textContent = `(edited just now)`;
+            
+            // Hide edit form, show content
+            editForm.style.display = 'none';
+            commentContent.style.display = 'block';
+          }
+        } else {
+          const errorMessage = data.errors ? data.errors.join(', ') : (data.error || 'Error saving changes. Please try again.');
+          alert(errorMessage);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Error saving changes. Please try again.');
+      })
+      .finally(() => {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Save Changes';
+      });
+    }
+  });
+  
+  // Handle delete button clicks
+  document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('delete-btn')) {
+      const commentId = e.target.dataset.commentId;
+      const confirmMessage = e.target.dataset.turboConfirm;
+      
+      if (confirm(confirmMessage)) {
+        // Add loading state
+        e.target.disabled = true;
+        e.target.textContent = 'Deleting...';
+        
+        fetch(`/comments/${commentId}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'Accept': 'application/json'
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            // Remove the comment from the DOM
+            const commentElement = document.querySelector(`[data-comment-id="${commentId}"]`);
+            if (commentElement) {
+              commentElement.remove();
+            }
+            
+            // Update comment count if available
+            if (data.total_count !== undefined) {
+              const commentsTitle = document.querySelector('.comments-section .section-title');
+              if (commentsTitle) {
+                commentsTitle.innerHTML = `Comments (${data.total_count})`;
+              }
+            }
+          } else {
+            const errorMessage = data.error || 'Error deleting comment. Please try again.';
+            alert(errorMessage);
+            // Restore button state
+            e.target.disabled = false;
+            e.target.textContent = e.target.textContent.includes('Admin') ? 'Delete (Admin)' : 'Delete';
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Error deleting comment. Please try again.');
+          // Restore button state
+          e.target.disabled = false;
+          e.target.textContent = e.target.textContent.includes('Admin') ? 'Delete (Admin)' : 'Delete';
+        });
+      }
+    }
+  });
+});
+
+// ActionCable setup for real-time updates
+document.addEventListener('DOMContentLoaded', function() {
+  <% if @quote %>
+  // Subscribe to quote interaction updates
+  App.quoteChannel = App.cable.subscriptions.create({
+    channel: "QuoteInteractionChannel",
+    quote_id: <%= @quote.id %>
+  }, {
+    received: function(data) {
+      console.log('Received real-time update:', data);
+      
+      if (data.type === 'like_update') {
+        // Update like/dislike counts from other users
+        updateEngagementUI(data);
+      } else if (data.type === 'comment_update') {
+        // Handle new comments from other users
+        if (data.html) {
+          const commentsList = document.getElementById('comments-list');
+          if (commentsList.innerHTML.includes('No comments yet')) {
+            commentsList.innerHTML = data.html;
+          } else {
+            commentsList.insertAdjacentHTML('beforeend', data.html);
+          }
+        }
+        
+        // Update comment count
+        const commentsTitle = document.querySelector('.comments-section .section-title');
+        if (commentsTitle) {
+          commentsTitle.innerHTML = `Comments (${data.comments_count})`;
+        }
+      }
+    }
+  });
+  <% end %>
+});
+</script>

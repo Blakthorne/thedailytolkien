@@ -14,14 +14,34 @@
 <!-- Search and Filter Bar -->
 <div class="admin-section" style="margin-bottom: 2rem;">
   <%= form_with url: admin_quotes_path, method: :get, local: true, 
-      style: "display: flex; gap: 1rem; align-items: center;" do |f| %>
+      style: "display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;" do |f| %>
     <%= f.text_field :search, placeholder: "Search quotes or books...", 
         value: params[:search],
-        style: "flex: 1; padding: 0.5rem; border: 1px solid #8b7355; border-radius: 4px; background: #fefcfa;" %>
-    <%= f.submit "Search", class: "admin-nav-link" %>
-    <% if params[:search].present? %>
-      <%= link_to "Clear", admin_quotes_path, class: "admin-nav-link" %>
+        style: "flex: 1; min-width: 200px; padding: 0.5rem; border: 1px solid #8b7355; border-radius: 4px; background: #fefcfa;" %>
+    
+    <%= f.select :tag_id, 
+        options_from_collection_for_select(@tags, :id, :name, params[:tag_id]),
+        { prompt: "Filter by tag..." },
+        { style: "padding: 0.5rem; border: 1px solid #8b7355; border-radius: 4px; background: #fefcfa;" } %>
+    
+    <%= f.submit "Filter", class: "admin-nav-link" %>
+    
+    <% if params[:search].present? || params[:tag_id].present? %>
+      <%= link_to "Clear All", admin_quotes_path, class: "admin-nav-link" %>
     <% end %>
+  <% end %>
+  
+  <% if params[:tag_id].present? %>
+    <div style="margin-top: 1rem; padding: 0.75rem; background: #f0ebe4; border-radius: 4px; border-left: 3px solid #8b7355;">
+      <p style="margin: 0; color: #3d2c1d;">
+        <strong>Filtered by tag:</strong> 
+        <span style="background: rgba(139, 115, 85, 0.15); padding: 0.25rem 0.5rem; border-radius: 8px;">
+          <%= @tags.find(params[:tag_id]).name %>
+        </span>
+        <%= link_to "Clear filter", admin_quotes_path(search: params[:search]), 
+            style: "color: #8b7355; text-decoration: underline; margin-left: 1rem;" %>
+      </p>
+    </div>
   <% end %>
 </div>
 
@@ -55,6 +75,7 @@
           <th data-type="text" role="columnheader" tabindex="0" aria-sort="none" style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">Book</th>
           <th data-type="text" role="columnheader" tabindex="0" aria-sort="none" style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">Chapter</th>
           <th data-type="text" role="columnheader" tabindex="0" aria-sort="none" style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">Character</th>
+          <th data-type="text" role="columnheader" tabindex="0" aria-sort="none" style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">Tags</th>
           <th data-type="date" role="columnheader" tabindex="0" aria-sort="none" style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">Created</th>
         </tr>
       </thead>
@@ -82,6 +103,22 @@
               <td style="padding: 1rem; color: #3d2c1d;">
                 <%= quote.character || "-" %>
               </td>
+              <td style="padding: 1rem;">
+                <% if quote.tags.any? %>
+                  <div style="display: flex; flex-wrap: wrap; gap: 0.25rem;">
+                    <% quote.tags.limit(3).each do |tag| %>
+                      <span style="background: rgba(139, 115, 85, 0.15); color: #3d2c1d; padding: 0.15rem 0.5rem; border-radius: 8px; font-size: 0.75rem; white-space: nowrap;">
+                        <%= tag.name %>
+                      </span>
+                    <% end %>
+                    <% if quote.tags.count > 3 %>
+                      <span style="color: #8b7355; font-size: 0.75rem;">+<%= quote.tags.count - 3 %> more</span>
+                    <% end %>
+                  </div>
+                <% else %>
+                  <span style="color: #8b7355; font-style: italic; font-size: 0.85rem;">-</span>
+                <% end %>
+              </td>
               <td style="padding: 1rem;" data-sort-value="<%= quote.created_at.iso8601 %>">
                 <small style="color: #8b7355; display:block;">
                   <%= time_ago_in_words(quote.created_at) %> ago
@@ -91,7 +128,7 @@
           <% end %>
         <% else %>
           <tr>
-            <td colspan="7" style="padding: 3rem; text-align: center; color: #8b7355;">
+            <td colspan="8" style="padding: 3rem; text-align: center; color: #8b7355;">
               <% if params[:search].present? %>
                 No quotes found matching "<%= params[:search] %>"
                 <br><br>

@@ -4,9 +4,18 @@ class Admin::QuotesController < AdminController
   before_action :set_quote, only: [ :show, :edit, :update, :destroy, :toggle_status ]
 
   def index
-    @quotes = Quote.order(created_at: :desc)
+    @quotes = Quote.includes(:tags).order(created_at: :desc)
     @quotes = @quotes.where("text ILIKE ? OR book ILIKE ?", "%#{params[:search]}%", "%#{params[:search]}%") if params[:search].present?
+
+    # Filter by tag if specified
+    if params[:tag_id].present?
+      @quotes = @quotes.joins(:tags).where(tags: { id: params[:tag_id] })
+    end
+
     @quotes = @quotes.limit(20).offset(params[:page].to_i * 20) if params[:page].present?
+
+    # Load all tags for filter dropdown
+    @tags = Tag.alphabetical
 
     respond_to do |format|
       format.html
@@ -22,11 +31,14 @@ class Admin::QuotesController < AdminController
   end
 
   def show
+    # Load tags for display
+    @quote = Quote.includes(:tags).find(params[:id])
     # No logging for view-only actions
   end
 
   def new
     @quote = Quote.new
+    @all_tags = Tag.alphabetical
   end
 
   def create
@@ -40,11 +52,15 @@ class Admin::QuotesController < AdminController
 
       redirect_to admin_quote_path(@quote), notice: "Quote was successfully created."
     else
+      # Load tags for re-rendering the form on error
+      @all_tags = Tag.alphabetical
       render :new, status: :unprocessable_entity
     end
   end
 
   def edit
+    # Load tags for selection
+    @all_tags = Tag.alphabetical
     # No logging for view-only actions
   end
 
@@ -59,6 +75,8 @@ class Admin::QuotesController < AdminController
 
       redirect_to admin_quote_path(@quote), notice: "Quote was successfully updated."
     else
+      # Load tags for re-rendering the form on error
+      @all_tags = Tag.alphabetical
       render :edit, status: :unprocessable_entity
     end
   end
@@ -103,7 +121,7 @@ class Admin::QuotesController < AdminController
   end
 
   def quote_params
-    params.require(:quote).permit(:text, :book, :chapter, :character)
+    params.require(:quote).permit(:text, :book, :chapter, :character, tag_ids: [])
   end
 
   def generate_quotes_csv
