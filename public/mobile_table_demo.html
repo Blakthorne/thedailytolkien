@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Table Fix Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 1rem;
+            background: #f5f0e8;
+        }
+        
+        /* Table Section Container - Enhanced Mobile Support */
+        .app-table-section {
+          background: rgba(245, 240, 232, 0.1);
+          backdrop-filter: blur(2px);
+          border-radius: 12px;
+          padding: 2rem;
+          border: 2px solid #8b7355;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+          width: 100%;
+          overflow-x: auto; /* Always allow horizontal scrolling */
+          -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+        }
+
+        /* Mobile optimizations for table sections */
+        @media (max-width: 768px) {
+          .app-table-section {
+            padding: 1rem;
+            border-radius: 8px;
+            /* Fix mobile container sizing - remove negative margin that causes cutoff */
+            margin: 0;
+            width: 100%;
+            /* Ensure the container can actually scroll */
+            position: relative;
+            /* Force hardware acceleration for smooth scrolling */
+            transform: translateZ(0);
+            will-change: scroll-position;
+          }
+        }
+
+        /* Main Table Class - Enhanced Mobile Support */
+        .app-table {
+          width: 100%;
+          border-collapse: collapse;
+          background: rgba(255, 255, 255, 0.8);
+          border-radius: 8px;
+          overflow: hidden;
+          font-size: 0.9rem;
+          min-width: 600px; /* Ensure horizontal scroll on small screens */
+        }
+
+        /* Mobile specific table improvements */
+        @media (max-width: 768px) {
+          .app-table {
+            font-size: 0.8rem;
+            min-width: 800px; /* Force horizontal scroll for better mobile UX */
+            /* Ensure table doesn't break out of scrollable container */
+            table-layout: fixed;
+            margin: 0;
+          }
+          
+          .app-table th,
+          .app-table td {
+            padding: 0.75rem 0.5rem;
+            white-space: nowrap; /* Prevent text wrapping that creates uneven row heights */
+            /* Set minimum widths for important columns */
+            min-width: 80px;
+          }
+        }
+
+        /* Table Headers */
+        .app-table th {
+          background: rgba(139, 115, 85, 0.1);
+          color: #3d2c1d;
+          padding: 1rem;
+          text-align: left;
+          border-bottom: 2px solid rgba(139, 115, 85, 0.3);
+          font-weight: 600;
+          cursor: pointer;
+          transition: background-color 0.3s ease;
+          position: relative;
+          outline: none;
+        }
+
+        .app-table th:hover {
+          background: rgba(139, 115, 85, 0.2);
+        }
+
+        /* Sorting indicators for app-table - NO unsorted state indicator */
+        .app-table th[data-type][aria-sort="none"]::after {
+          display: none; /* Remove the unsorted state arrow completely */
+        }
+
+        .app-table th[aria-sort="ascending"]::after {
+          content: ' ▲';
+          color: #8b7355;
+          font-size: 0.75rem;
+          margin-left: 0.25rem;
+        }
+
+        .app-table th[aria-sort="descending"]::after {
+          content: ' ▼';
+          color: #8b7355;
+          font-size: 0.75rem;
+          margin-left: 0.25rem;
+        }
+
+        /* Table Cells */
+        .app-table td {
+          padding: 1rem;
+          border-bottom: 1px solid rgba(139, 115, 85, 0.2);
+          color: #3d2c1d;
+          vertical-align: top;
+        }
+
+        /* Table Rows */
+        .app-table tr {
+          transition: background-color 0.3s ease;
+        }
+
+        .app-table tbody tr:hover {
+          background: rgba(139, 115, 85, 0.05);
+        }
+        
+        .demo-controls {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+        }
+        
+        .demo-controls button {
+            margin: 0.25rem;
+            padding: 0.5rem 1rem;
+            border: 1px solid #8b7355;
+            background: white;
+            color: #8b7355;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .demo-controls button:hover {
+            background: #8b7355;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 Mobile Table Fix Demo</h1>
+    <p>This demonstrates the mobile table scrolling and sorting indicator fixes.</p>
+    
+    <div class="demo-controls">
+        <h3>Test Sorting Indicators:</h3>
+        <button onclick="setSortState('name', 'ascending')">Name ▲</button>
+        <button onclick="setSortState('name', 'descending')">Name ▼</button>
+        <button onclick="setSortState('name', 'none')">Name (no sort)</button>
+        <button onclick="setSortState('email', 'ascending')">Email ▲</button>
+        <button onclick="setSortState('email', 'descending')">Email ▼</button>
+    </div>
+    
+    <div class="app-table-section">
+        <table class="app-table">
+            <thead>
+                <tr>
+                    <th id="name-header" data-type="string" aria-sort="none">Name</th>
+                    <th id="email-header" data-type="string" aria-sort="none">Email</th>
+                    <th data-type="string" aria-sort="none">Role</th>
+                    <th data-type="date" aria-sort="none">Created</th>
+                    <th data-type="string" aria-sort="none">Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Frodo Baggins</td>
+                    <td>frodo@shire.com</td>
+                    <td>Ring Bearer</td>
+                    <td>2024-01-15</td>
+                    <td>Active</td>
+                    <td><a href="#">Edit</a> | <a href="#">Delete</a></td>
+                </tr>
+                <tr>
+                    <td>Gandalf the Grey</td>
+                    <td>gandalf@istari.org</td>
+                    <td>Wizard</td>
+                    <td>2024-01-10</td>
+                    <td>Active</td>
+                    <td><a href="#">Edit</a> | <a href="#">Delete</a></td>
+                </tr>
+                <tr>
+                    <td>Legolas Greenleaf</td>
+                    <td>legolas@mirkwood.elves</td>
+                    <td>Archer</td>
+                    <td>2024-01-20</td>
+                    <td>Active</td>
+                    <td><a href="#">Edit</a> | <a href="#">Delete</a></td>
+                </tr>
+                <tr>
+                    <td>Gimli son of Glóin</td>
+                    <td>gimli@erebor.dwarves</td>
+                    <td>Warrior</td>
+                    <td>2024-01-18</td>
+                    <td>Active</td>
+                    <td><a href="#">Edit</a> | <a href="#">Delete</a></td>
+                </tr>
+                <tr>
+                    <td>Aragorn Elessar</td>
+                    <td>aragorn@gondor.gov</td>
+                    <td>King</td>
+                    <td>2024-01-12</td>
+                    <td>Active</td>
+                    <td><a href="#">Edit</a> | <a href="#">Delete</a></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <div style="margin-top: 2rem; padding: 1rem; background: white; border-radius: 8px;">
+        <h3>✅ Testing Instructions:</h3>
+        <ol>
+            <li><strong>Mobile Testing:</strong> Use browser dev tools (F12) → Device simulation (Ctrl+Shift+M)</li>
+            <li><strong>Responsive Sizes:</strong> Test iPhone SE (375px), iPhone 12 Pro (390px), etc.</li>
+            <li><strong>Horizontal Scrolling:</strong> Verify table scrolls horizontally without cutoff</li>
+            <li><strong>Sorting Indicators:</strong> Click buttons above to test clean triangle indicators (▲▼)</li>
+            <li><strong>No Unsorted Arrows:</strong> Columns without sorting should show no indicators</li>
+        </ol>
+        
+        <h3>🎯 Key Improvements:</h3>
+        <ul>
+            <li>✅ Removed negative margins causing mobile cutoff</li>
+            <li>✅ Clean triangle sorting indicators (▲▼) instead of emoji arrows</li>
+            <li>✅ Proper horizontal scrolling on mobile devices</li>
+            <li>✅ No indicators shown for unsorted columns</li>
+        </ul>
+    </div>
+
+    <script>
+        function setSortState(column, state) {
+            // Reset all headers
+            document.querySelectorAll('th[data-type]').forEach(th => {
+                th.setAttribute('aria-sort', 'none');
+            });
+            
+            // Set the requested state
+            if (state !== 'none') {
+                const header = document.getElementById(column + '-header');
+                if (header) {
+                    header.setAttribute('aria-sort', state);
+                }
+            }
+        }
+    </script>
+</body>
+</html>

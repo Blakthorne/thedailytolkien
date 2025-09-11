@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unified Table System Demo</title>
+    <link rel="stylesheet" href="/assets/application.css">
+</head>
+<body style="padding: 1rem; background: #f5f0e8;">
+    <h1>🔧 Unified Table System Test</h1>
+    <p>This tests the consolidated table styling system.</p>
+    
+    <div class="app-table-section">
+        <table class="app-table" data-controller="sortable-table">
+            <thead>
+                <tr>
+                    <th data-type="text" tabindex="0" aria-sort="none">Name</th>
+                    <th data-type="text" tabindex="0" aria-sort="ascending">Email</th>
+                    <th data-type="text" tabindex="0" aria-sort="descending">Role</th>
+                    <th data-type="date" tabindex="0" aria-sort="none">Created</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Frodo Baggins</td>
+                    <td>frodo@shire.com</td>
+                    <td><span class="table-badge">Ring Bearer</span></td>
+                    <td>2024-01-15</td>
+                    <td><a href="#" class="action-link">Edit</a></td>
+                </tr>
+                <tr>
+                    <td>Gandalf the Grey</td>
+                    <td>gandalf@istari.org</td>
+                    <td><span class="table-badge table-badge-admin">Wizard</span></td>
+                    <td>2024-01-10</td>
+                    <td><a href="#" class="action-link">Edit</a></td>
+                </tr>
+                <tr>
+                    <td>Legolas Greenleaf</td>
+                    <td>legolas@mirkwood.elves</td>
+                    <td><span class="table-badge">Archer</span></td>
+                    <td>2024-01-20</td>
+                    <td><a href="#" class="action-link">Edit</a></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <div style="margin: 2rem 0; padding: 1rem; background: white; border-radius: 8px;">
+        <h3>✅ Key Features:</h3>
+        <ul>
+            <li>Unified styling for all tables (admin and archive)</li>
+            <li>Clean triangle sorting indicators (▲▼)</li>
+            <li>Mobile horizontal scrolling preserved</li>
+            <li>No duplicate CSS systems</li>
+            <li>Responsive column priority system</li>
+        </ul>
+    </div>
+</body>
+</html>

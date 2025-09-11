@@ -141,7 +141,7 @@ class ArchiveSystemTest < ApplicationSystemTestCase
     visit archive_index_path
 
     assert_selector "table"  # Table should still be present
-    assert_selector ".table-section"  # Sections should adapt with new class names
+    assert_selector ".app-table-section"  # Sections should adapt with new unified class names
     assert_selector ".search-section"  # Search section should be responsive
   end
 

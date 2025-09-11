@@ -1,10 +1,16 @@
 class ApplicationController < ActionController::Base
-  # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
-  allow_browser versions: :modern
+  # Allow all browsers - no restrictions for maximum compatibility
+  # allow_browser versions: :modern  # Commented out - was too restrictive
 
   before_action :configure_permitted_parameters, if: :devise_controller?
   before_action :store_current_ip
   after_action :update_user_streak, if: :user_signed_in?
+
+  # Handle routing errors and show custom error pages
+  rescue_from ActionController::RoutingError, with: :render_404
+  rescue_from ActiveRecord::RecordNotFound, with: :render_404
+  rescue_from ActionController::InvalidAuthenticityToken, with: :render_422
+  rescue_from StandardError, with: :render_500 if Rails.env.production?
 
   protected
 
@@ -46,5 +52,35 @@ class ApplicationController < ActionController::Base
   ensure
     # Clear the flag after checking
     session.delete(:just_signed_in)
+  end
+
+  public
+
+  # Error handling methods for custom error pages
+  def render_404
+    respond_to do |format|
+      format.html { render file: Rails.public_path.join("404.html"), status: :not_found, layout: false }
+      format.json { render json: { error: "Not found" }, status: :not_found }
+      format.any { head :not_found }
+    end
+  end
+
+  def render_422
+    respond_to do |format|
+      format.html { render file: Rails.public_path.join("422.html"), status: :unprocessable_entity, layout: false }
+      format.json { render json: { error: "Unprocessable entity" }, status: :unprocessable_entity }
+      format.any { head :unprocessable_entity }
+    end
+  end
+
+  def render_500(exception = nil)
+    logger.error "Internal Server Error: #{exception.message}" if exception
+    logger.error exception.backtrace.join("\n") if exception
+
+    respond_to do |format|
+      format.html { render file: Rails.public_path.join("500.html"), status: :internal_server_error, layout: false }
+      format.json { render json: { error: "Internal server error" }, status: :internal_server_error }
+      format.any { head :internal_server_error }
+    end
   end
 end

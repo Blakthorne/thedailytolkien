@@ -406,7 +406,7 @@
         <div class="admin-header-content">
           <h1>Admin Dashboard</h1>
           <div class="admin-header-links">
-            <span class="admin-header-link">Welcome, <%= current_user.email %></span>
+            <span class="admin-header-link">Welcome, <%= current_user.display_name %></span>
             <span class="admin-header-link">|</span>
             <%= link_to "Back to Site", root_path, class: "admin-header-link" %>
             <span class="admin-header-link">|</span>

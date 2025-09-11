@@ -231,7 +231,7 @@
         flex-direction: row;
         align-items: center;
         justify-content: center;
-        gap: 0.5rem;
+        gap: 1rem;
       }
 
       .streak-display {
@@ -393,6 +393,7 @@
 
         .footer-nav {
           justify-content: center;
+          gap: 1rem;
         }
       }
     </style>
@@ -404,6 +405,9 @@
           <a href="/" class="footer-link">Home</a>
           <a href="/archive" class="footer-link">Archive</a>
           <a href="/philosophy" class="footer-link">Philosophy</a>
+          <% if user_signed_in? && current_user.admin? %>
+            <%= link_to "Admin", admin_root_path, class: "footer-link" %>
+          <% end %>
         </nav>
       </div>
     </footer>

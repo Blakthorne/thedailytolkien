@@ -71,4 +71,7 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   # This sets the home page to display the daily Tolkien quote via the QuotesController's index action.
   root "quotes#index"
+
+  # Catch-all route for unmatched URLs - must be last
+  match "*unmatched", to: "application#render_404", via: :all
 end

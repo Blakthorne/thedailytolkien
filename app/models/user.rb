@@ -24,7 +24,7 @@ class User < ApplicationRecord
   enum :role, { commentor: "commentor", admin: "admin" }
 
   # Associations for interaction system
-  has_many :quote_likes, dependent: :destroy
+  has_many :quote_likes, dependent: :nullify
   has_many :comments, dependent: :nullify
   has_many :activity_logs, dependent: :destroy
 

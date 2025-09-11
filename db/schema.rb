@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_11_033545) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_11_145405) do
   create_table "activity_logs", force: :cascade do |t|
     t.integer "user_id", null: false
     t.string "action"
@@ -43,7 +43,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_11_033545) do
   end
 
   create_table "quote_likes", force: :cascade do |t|
-    t.integer "user_id", null: false
+    t.integer "user_id"
     t.integer "quote_id", null: false
     t.integer "like_type", null: false
     t.datetime "created_at", null: false
@@ -124,7 +124,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_11_033545) do
   add_foreign_key "comments", "quotes"
   add_foreign_key "comments", "users", on_delete: :nullify
   add_foreign_key "quote_likes", "quotes"
-  add_foreign_key "quote_likes", "users"
+  add_foreign_key "quote_likes", "users", on_delete: :nullify
   add_foreign_key "quote_tags", "quotes"
   add_foreign_key "quote_tags", "tags"
 end
