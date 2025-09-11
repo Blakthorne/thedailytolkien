@@ -59,6 +59,47 @@ class Quote < ApplicationRecord
     quote_like = quote_likes.find_by(user: user)
     quote_like&.like_type
   end
+
+  # Archive-specific methods for quote archive system
+
+  # Class method to find quotes displayed on a specific date
+  def self.displayed_on_date(date)
+    timestamp_start = date.beginning_of_day.to_i
+    timestamp_end = date.end_of_day.to_i
+    where(last_date_displayed: timestamp_start..timestamp_end)
+  end
+
+  # Instance method returning formatted display date from last_date_displayed
+  def archive_date
+    return nil unless last_date_displayed
+    Time.at(last_date_displayed).to_date
+  end
+
+  # Instance method for truncated quote text for archive snippets
+  def archive_snippet(length = 100)
+    return text if text.nil? || text.length <= length
+    truncated = text[0, length]
+    last_space = truncated.rindex(" ")
+    last_space ? truncated[0, last_space] + "..." : truncated + "..."
+  end
+
+  # Instance method checking if quote has been displayed
+  def has_been_displayed?
+    last_date_displayed.present?
+  end
+
+  # Scope for quotes that have been displayed (last_date_displayed not nil)
+  scope :displayed, -> { where.not(last_date_displayed: nil) }
+
+  # Scope to order by display date descending
+  scope :by_display_date, -> { order(last_date_displayed: :desc) }
+
+  # Scope to filter by date range
+  scope :date_range, ->(start_date, end_date) {
+    start_timestamp = start_date.beginning_of_day.to_i
+    end_timestamp = end_date.end_of_day.to_i
+    where(last_date_displayed: start_timestamp..end_timestamp)
+  }
 end
     private
 

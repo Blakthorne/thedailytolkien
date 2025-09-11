@@ -15,7 +15,7 @@ Whenever you make any changes to the view of the website, make sure that it is v
 
 ## Thought Processes
 
-It will be useful for you, when thinking about a task, to make a todo list of items that you'll need to perform in the after thinking about it thoroughly. Make sure that you're moving along in the last as you check items off.
+When thinking about a task, make a todo list of items that you'll need to perform in the after thinking about it thoroughly. Make sure that you're moving along in the last as you check items off. Do this no matter how the task may seem, even if making a todo list doesn't seem like a good idea.
 
 ## Scan for common Rails security vulnerabilities using static analysis
 

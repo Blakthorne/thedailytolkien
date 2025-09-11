@@ -294,20 +294,26 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   const form = document.querySelector('form');
-  const nameField = document.querySelector('.field');
+  const firstNameField = document.querySelector('.field:has(input[name="user[first_name]"])');
+  const lastNameField = document.querySelector('.field:has(input[name="user[last_name]"])');
   const emailField = document.querySelector('.field:has([type="email"])');
-  const passwordField = document.querySelector('.field:nth-child(3)');
-  const passwordConfirmField = document.querySelector('.field:nth-child(4)');
+  const passwordField = document.querySelector('.field:has(input[name="user[password]"])');
+  const passwordConfirmField = document.querySelector('.field:has(input[name="user[password_confirmation]"])');
 
-  const nameInput = document.querySelector('[type="text"]');
+  const firstNameInput = document.querySelector('input[name="user[first_name]"]');
+  const lastNameInput = document.querySelector('input[name="user[last_name]"]');
   const emailInput = document.querySelector('[type="email"]');
   const passwordInput = document.querySelector('input[name="user[password]"]');
   const passwordConfirmInput = document.querySelector('input[name="user[password_confirmation]"]');
 
   // Create error message elements
-  const nameError = document.createElement('div');
-  nameError.className = 'error-message';
-  nameField.appendChild(nameError);
+  const firstNameError = document.createElement('div');
+  firstNameError.className = 'error-message';
+  firstNameField.appendChild(firstNameError);
+
+  const lastNameError = document.createElement('div');
+  lastNameError.className = 'error-message';
+  lastNameField.appendChild(lastNameError);
 
   const emailError = document.createElement('div');
   emailError.className = 'error-message';
@@ -344,14 +350,21 @@ document.addEventListener('DOMContentLoaded', function() {
     let isValid = true;
 
     // Clear previous errors
-    clearError(nameField);
+    clearError(firstNameField);
+    clearError(lastNameField);
     clearError(emailField);
     clearError(passwordField);
     clearError(passwordConfirmField);
 
-    // Validate name
-    if (!nameInput.value.trim()) {
-      showError(nameField, 'Name is required');
+    // Validate first name
+    if (!firstNameInput.value.trim()) {
+      showError(firstNameField, 'First name is required');
+      isValid = false;
+    }
+
+    // Validate last name
+    if (!lastNameInput.value.trim()) {
+      showError(lastNameField, 'Last name is required');
       isValid = false;
     }
 
@@ -381,16 +394,21 @@ document.addEventListener('DOMContentLoaded', function() {
       showError(passwordField, 'Passwords do not match');
       showError(passwordConfirmField, 'Passwords do not match');
       isValid = false;
-    } else if (passwordInput.value === passwordConfirmInput.value && passwordInput.value.trim()) {
     }
 
     return isValid;
   }
 
   // Real-time validation
-  nameInput.addEventListener('input', function() {
-    if (nameInput.value.trim()) {
-      clearError(nameField);
+  firstNameInput.addEventListener('input', function() {
+    if (firstNameInput.value.trim()) {
+      clearError(firstNameField);
+    }
+  });
+
+  lastNameInput.addEventListener('input', function() {
+    if (lastNameInput.value.trim()) {
+      clearError(lastNameField);
     }
   });
 
@@ -483,8 +501,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     <div class="registration-form">
       <div class="field">
-        <%= f.label :name %>
-        <%= f.text_field :name, autofocus: true, autocomplete: "name" %>
+        <%= f.label :first_name %>
+        <%= f.text_field :first_name, autofocus: true, autocomplete: "given-name" %>
+      </div>
+
+      <div class="field">
+        <%= f.label :last_name %>
+        <%= f.text_field :last_name, autocomplete: "family-name" %>
       </div>
 
       <div class="field">
@@ -504,6 +527,9 @@ document.addEventListener('DOMContentLoaded', function() {
         <%= f.label :password_confirmation %>
         <%= f.password_field :password_confirmation, autocomplete: "new-password" %>
       </div>
+
+      <!-- Hidden timezone field to be populated by JavaScript -->
+      <%= f.hidden_field :streak_timezone %>
     </div>
 
     <div class="actions">
@@ -534,6 +560,18 @@ document.addEventListener('DOMContentLoaded', function() {
   <div class="signin-link">
     <%= link_to "Already have an account? Sign in", new_session_path(resource_name) %>
   </div>
+
+  <script>
+    // Detect and populate timezone for registration
+    document.addEventListener('DOMContentLoaded', function() {
+      const timezoneField = document.getElementById('user_streak_timezone');
+      if (timezoneField) {
+        const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        timezoneField.value = detectedTimezone;
+        console.log('Timezone detected and set for registration:', detectedTimezone);
+      }
+    });
+  </script>
 
   <%# <%= render "devise/shared/links" %>
   </div>

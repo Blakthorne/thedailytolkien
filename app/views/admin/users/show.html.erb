@@ -6,13 +6,15 @@
 
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
   <h1 style="color: #3d2c1d;">User Details</h1>
-  <div>
+  <div style="display: flex; gap: 0.5rem;">
     <% unless @user == current_user %>
       <%= link_to "Edit", edit_admin_user_path(@user), class: "admin-nav-link", 
           style: "margin-right: 0.5rem;" %>
-      <%= link_to "Delete", admin_user_path(@user), 
-          data: { turbo_method: :delete, confirm: "Are you sure you want to delete this user?" },
-          style: "background: #8b4513; color: white; padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none;" %>
+      <%= form_with model: [:admin, @user], local: true, method: :delete, 
+          data: { turbo_confirm: "Are you sure you want to delete this user? This action cannot be undone." },
+          style: "display: inline;" do |form| %>
+        <%= form.submit "Delete", style: "background: #dc3545; color: white; padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none; border: none; cursor: pointer; height: 100%" %>
+      <% end %>
     <% end %>
   </div>
 </div>
@@ -26,6 +28,11 @@
       </div>
       
       <div>
+        <div style="display: grid; grid-template-columns: 120px 1fr; gap: 1rem; margin-bottom: 1rem;">
+          <strong style="color: #3d2c1d;">Name:</strong>
+          <span style="color: #3d2c1d;"><%= @user.full_name %></span>
+        </div>
+        
         <div style="display: grid; grid-template-columns: 120px 1fr; gap: 1rem; margin-bottom: 1rem;">
           <strong style="color: #3d2c1d;">Email:</strong>
           <span style="color: #3d2c1d;"><%= @user.email %></span>
@@ -163,17 +170,17 @@
           <%= form_with url: update_streak_admin_user_path(@user), method: :patch, 
               style: "display: grid; grid-template-columns: 1fr 1fr auto; gap: 1rem; align-items: end;" do |f| %>
             <div>
-              <%= f.label :current_streak, "Current Streak", style: "font-size: 0.75rem; color: #8b7355; display: block; margin-bottom: 0.25rem;" %>
+              <%= f.label :current_streak, "Current Streak", style: "font-size: 0.75rem; color: #8b7355; display: block;" %>
               <%= f.number_field :current_streak, value: @user.current_streak, min: 0,
                   style: "width: 100%; padding: 0.5rem; border: 1px solid #8b7355; border-radius: 4px; background: #fefcfa;" %>
             </div>
             <div>
-              <%= f.label :longest_streak, "Longest Streak", style: "font-size: 0.75rem; color: #8b7355; display: block; margin-bottom: 0.25rem;" %>
+              <%= f.label :longest_streak, "Longest Streak", style: "font-size: 0.75rem; color: #8b7355; display: block; margin-top: 0.5rem;" %>
               <%= f.number_field :longest_streak, value: @user.longest_streak, min: 0,
                   style: "width: 100%; padding: 0.5rem; border: 1px solid #8b7355; border-radius: 4px; background: #fefcfa;" %>
             </div>
             <%= f.submit "Update", 
-                style: "background: #8b7355; color: white; padding: 0.5rem 1rem; border-radius: 4px; border: none; cursor: pointer; height: fit-content;" %>
+                style: "background: #8b7355; color: white; padding: 0.5rem 1rem; border-radius: 4px; border: none; cursor: pointer; height: fit-content; margin-top: 0.5rem;" %>
           <% end %>
         </div>
       </div>

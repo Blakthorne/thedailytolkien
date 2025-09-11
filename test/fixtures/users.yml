@@ -1,25 +1,29 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 admin:
-    name: "Test Admin"
+    first_name: "Test"
+    last_name: "Admin"
     email: "admin@example.com"
     encrypted_password: <%= Devise::Encryptor.digest(User, 'password123') %>
     role: "admin"
 
 admin_user:
-    name: "Test Admin User"
+    first_name: "Test"
+    last_name: "AdminUser"
     email: "admin_user@example.com"
     encrypted_password: <%= Devise::Encryptor.digest(User, 'password123') %>
     role: "admin"
 
 commentor:
-    name: "Test Commentor"
+    first_name: "Test"
+    last_name: "Commentor"
     email: "commentor@example.com"
     encrypted_password: <%= Devise::Encryptor.digest(User, 'password123') %>
     role: "commentor"
 
 commentor_user:
-    name: "Test Commentor User"
+    first_name: "Test"
+    last_name: "CommentorUser"
     email: "commentor_user@example.com"
     encrypted_password: <%= Devise::Encryptor.digest(User, 'password123') %>
     role: "commentor"

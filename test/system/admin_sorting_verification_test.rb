@@ -7,6 +7,8 @@ class AdminSortingVerificationTest < ApplicationSystemTestCase
     User.where(email: "admin@test.com").destroy_all
 
     @user = User.create!(
+      first_name: "Test",
+      last_name: "Admin",
       email: "admin@test.com",
       password: "password123",
       role: "admin"

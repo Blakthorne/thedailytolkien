@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_09_213026) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_11_033545) do
   create_table "activity_logs", force: :cascade do |t|
     t.integer "user_id", null: false
     t.string "action"
@@ -25,7 +25,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_09_213026) do
   end
 
   create_table "comments", force: :cascade do |t|
-    t.integer "user_id", null: false
+    t.integer "user_id"
     t.integer "quote_id", null: false
     t.integer "parent_id"
     t.text "content", null: false
@@ -75,6 +75,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_09_213026) do
     t.integer "first_date_displayed"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["first_date_displayed"], name: "index_quotes_on_first_date_displayed"
+    t.index ["last_date_displayed", "created_at"], name: "index_quotes_on_last_date_created_at"
+    t.index ["last_date_displayed"], name: "index_quotes_on_last_date_displayed"
   end
 
   create_table "tags", force: :cascade do |t|
@@ -106,6 +109,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_09_213026) do
     t.integer "longest_streak", default: 0, null: false
     t.date "last_login_date"
     t.string "streak_timezone", default: "UTC", null: false
+    t.string "first_name", null: false
+    t.string "last_name", null: false
     t.index ["current_streak"], name: "index_users_on_current_streak"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["last_login_date"], name: "index_users_on_last_login_date"
@@ -117,7 +122,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_09_213026) do
   add_foreign_key "activity_logs", "users"
   add_foreign_key "comments", "comments", column: "parent_id"
   add_foreign_key "comments", "quotes"
-  add_foreign_key "comments", "users"
+  add_foreign_key "comments", "users", on_delete: :nullify
   add_foreign_key "quote_likes", "quotes"
   add_foreign_key "quote_likes", "users"
   add_foreign_key "quote_tags", "quotes"

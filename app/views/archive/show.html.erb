@@ -1,0 +1,623 @@
+<% content_for :title, @quote ? "Quote for #{@archive_date.strftime('%B %d, %Y')}" : "Quote Archive - #{@archive_date.strftime('%B %d, %Y')}" %>
+
+<style>
+  /* Main content styles */
+  .main-content {
+    width: 900px;
+    margin: 0 auto;
+    padding: 2rem;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+  }
+
+  .archive-header {
+    background: rgba(245, 240, 232, 0.95);
+    border: 1px solid #8b7355;
+    border-radius: 8px;
+    padding: 1rem 2rem;
+    margin-bottom: 2rem;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    backdrop-filter: blur(4px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .archive-header h1 {
+    margin: 0;
+    color: #3d2c1d;
+    font-size: 1.5rem;
+  }
+
+  .back-to-archive {
+    background: #8b7355;
+    color: white;
+    padding: 0.5rem 1rem;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+  }
+
+  .back-to-archive:hover {
+    background: #6d5940;
+    color: white;
+  }
+
+  .quote-card {
+    background: rgba(245, 240, 232, 0.1);
+    backdrop-filter: blur(2px);
+    border-radius: 12px;
+    padding: 3rem 2rem;
+    margin-bottom: 2rem;
+    border: 2px solid #8b7355;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    position: relative;
+    width: 100%;
+  }
+
+  .quote-text {
+    font-family: 'Crimson Text', serif;
+    font-size: 1.75rem;
+    line-height: 1.6;
+    color: #3d2c1d; /* Dark brown text */
+    text-align: center;
+    margin-bottom: 2rem;
+    font-weight: 400;
+    position: relative;
+    padding: 0 1rem;
+    letter-spacing: 0.01em;
+  }
+
+  .metadata-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+
+  .metadata-item {
+    background: rgba(212, 196, 168, 0.5); /* Semi-transparent aged parchment */
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 3px solid #8b7355; /* Darker parchment border */
+    transition: all 0.2s ease;
+  }
+
+  .metadata-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #8b7355; /* Muted brown for labels */
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: block;
+  }
+
+  .metadata-value {
+    color: #3d2c1d;
+    font-size: 1rem;
+  }
+
+  .quote-engagement-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+    padding: 0 1rem;
+    min-height: 2.5rem;
+  }
+
+  .quote-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+    flex: 1;
+  }
+
+  .quote-tags-placeholder {
+    flex: 1;
+  }
+
+  .tag-badge {
+    background: rgba(139, 115, 85, 0.1);
+    color: #8b7355;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    border: 1px solid rgba(139, 115, 85, 0.2);
+    white-space: nowrap;
+  }
+
+  .quote-engagement {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    z-index: 10;
+  }
+
+  .engagement-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    background: rgba(245, 240, 232, 0.95);
+    border: 2px solid rgba(139, 115, 85, 0.3);
+    border-radius: 50px;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    color: #8b7355;
+    font-weight: 500;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    min-width: 3rem;
+    cursor: default;
+    opacity: 0.7;
+  }
+
+  .engagement-btn .thumb-icon svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+  }
+
+  .archive-notice {
+    background: rgba(139, 115, 85, 0.1);
+    color: #8b7355;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    text-align: center;
+    font-style: italic;
+    border: 1px solid rgba(139, 115, 85, 0.2);
+  }
+
+  .interaction-section {
+    width: 100%;
+    margin-top: 2rem;
+  }
+
+  .interaction-card {
+    background: rgba(245, 240, 232, 0.1);
+    backdrop-filter: blur(2px);
+    border-radius: 12px;
+    border: 2px solid #8b7355;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+
+  .comments-section {
+    padding: 2rem;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+    color: #3d2c1d;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+  }
+
+  .comment-form {
+    background: rgba(245, 240, 232, 0.5);
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+    border: 1px solid rgba(139, 115, 85, 0.2);
+  }
+
+  .comment-form.disabled {
+    opacity: 0.6;
+  }
+
+  .form-group {
+    margin-bottom: 1rem;
+  }
+
+  .form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #3d2c1d;
+    font-weight: 500;
+  }
+
+  .form-control {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #8b7355;
+    border-radius: 4px;
+    background: #fefcfa;
+    color: #3d2c1d;
+    font-family: inherit;
+    resize: vertical;
+  }
+
+  .form-control:disabled {
+    background: #f5f0e8;
+    color: #8b7355;
+    cursor: not-allowed;
+  }
+
+  .btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+  }
+
+  .btn-primary {
+    background: #8b7355;
+    color: white;
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    background: #6d5940;
+  }
+
+  .btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+  }
+
+  .comment-item {
+    border-bottom: 1px solid rgba(139, 115, 85, 0.1);
+    padding: 1.5rem 0;
+  }
+
+  .comment-item:last-child {
+    border-bottom: none;
+  }
+
+  .comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+  }
+
+  .comment-author {
+    font-weight: 600;
+    color: #3d2c1d;
+  }
+
+  .comment-time {
+    color: #8b7355;
+    font-size: 0.85rem;
+  }
+
+  .comment-content {
+    color: #3d2c1d;
+    line-height: 1.6;
+    margin: 0.75rem 0;
+  }
+
+  .comment-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.75rem;
+  }
+
+  .comment-action {
+    background: none;
+    border: none;
+    color: #8b7355;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    transition: background-color 0.3s ease;
+  }
+
+  .comment-action:hover {
+    background: rgba(139, 115, 85, 0.1);
+  }
+
+  .comment-action:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .comment-action.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  .comment-replies {
+    margin-left: 2rem;
+    margin-top: 1rem;
+  }
+
+  .empty-message {
+    text-align: center;
+    color: #8b7355;
+    font-style: italic;
+    padding: 2rem;
+  }
+
+  .no-quote {
+    text-align: center;
+    padding: 3rem;
+    color: #8b7355;
+  }
+
+  .no-quote h2 {
+    color: #3d2c1d;
+    margin-bottom: 1rem;
+  }
+
+  @media (max-width: 768px) {
+    .main-content {
+      width: 95%;
+      padding: 1rem;
+    }
+
+    .quote-card {
+      padding: 2rem 1.5rem;
+    }
+
+    .quote-text {
+      font-size: 1.25rem;
+    }
+
+    .archive-header {
+      flex-direction: column;
+      gap: 1rem;
+      text-align: center;
+    }
+
+    .metadata-section {
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .comment-replies {
+      margin-left: 1rem;
+    }
+  }
+
+  /* Comments Display Styles (matching home page) */
+  .comments-list {
+    margin-top: 2rem;
+  }
+
+  .comment {
+    background: rgba(245, 240, 232, 0.3);
+    border: 1px solid rgba(139, 115, 85, 0.3);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+
+  .comment-author {
+    font-family: 'Crimson Text', serif;
+    font-weight: 600;
+    color: #3d2c1d;
+  }
+
+  .comment-date {
+    font-size: 0.85rem;
+    color: #8b7355;
+    font-style: italic;
+  }
+
+  .comment-content {
+    color: #3d2c1d;
+    line-height: 1.6;
+    margin-bottom: 0.5rem;
+  }
+
+  .comment-actions {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.85rem;
+  }
+
+  .comment-action {
+    color: #8b7355;
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .comment-action:hover {
+    color: #3d2c1d;
+    text-decoration: underline;
+  }
+
+  .comment-action.danger {
+    color: #c53030;
+  }
+
+  .comment-action.danger:hover {
+    color: #a02625;
+  }
+
+  .comment-depth-indicator {
+    font-size: 0.75rem;
+    color: #8b7355;
+    font-style: italic;
+    margin-left: 0.5rem;
+  }
+
+  .edit-indicator {
+    font-size: 0.75rem;
+    color: #8b7355;
+    font-style: italic;
+    margin-left: 1rem;
+  }
+
+  .delete-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font-size: 0.85rem;
+  }
+
+  /* Enhanced visual hierarchy for nested comments */
+  .comment[data-depth="0"] {
+    border-left: none;
+    background: rgba(245, 240, 232, 0.2);
+  }
+
+  .comment[data-depth="1"] {
+    border-left: 4px solid rgba(139, 115, 85, 0.6);
+    background: rgba(245, 240, 232, 0.3);
+    margin-left: 3rem !important;
+    padding-left: 1.5rem;
+  }
+
+  .comment[data-depth="2"] {
+    border-left: 4px solid rgba(139, 115, 85, 0.7);
+    background: rgba(245, 240, 232, 0.4);
+    margin-left: 6rem !important;
+    padding-left: 1.5rem;
+  }
+
+  .comment[data-depth="3"] {
+    border-left: 4px solid rgba(139, 115, 85, 0.8);
+    background: rgba(245, 240, 232, 0.5);
+    margin-left: 9rem !important;
+    padding-left: 1.5rem;
+  }
+
+  .comment[data-depth="4"] {
+    border-left: 4px solid rgba(139, 115, 85, 0.9);
+    background: rgba(245, 240, 232, 0.6);
+    margin-left: 12rem !important;
+    padding-left: 1.5rem;
+  }
+
+  /* Responsive adjustments for mobile */
+  @media (max-width: 768px) {
+    .comment[data-depth="1"] { margin-left: 1.5rem !important; }
+    .comment[data-depth="2"] { margin-left: 3rem !important; }
+    .comment[data-depth="3"] { margin-left: 4.5rem !important; }
+    .comment[data-depth="4"] { margin-left: 6rem !important; }
+  }
+</style>
+
+<main class="main-content">
+  <!-- Archive Header -->
+  <div class="archive-header">
+    <div>
+      <h1>Quote for <%= @archive_date.strftime('%B %d, %Y') %></h1>
+    </div>
+    <%= link_to "← Back to Archived Quotes", archive_index_path, class: "back-to-archive" %>
+  </div>
+
+  <% if @quote %>
+    <div class="archive-notice">
+    This is an archived quote. <%= link_to "View today's quote", root_path, style: "color: #8b7355; font-weight: 500;", onmouseover: "this.style.color='#6d5940'", onmouseout: "this.style.color='#8b7355'" %>.
+    </div>
+
+    <!-- Main Quote Card -->
+    <div class="quote-card">
+      <blockquote class="quote-text">
+        <%= @quote.text %>
+      </blockquote>
+
+      <div class="metadata-section">
+        <% if @quote.book.present? %>
+          <div class="metadata-item">
+            <span class="metadata-label">Book</span>
+            <span class="metadata-value"><%= @quote.book %></span>
+          </div>
+        <% end %>
+        <% if @quote.chapter.present? %>
+          <div class="metadata-item">
+            <span class="metadata-label">Chapter</span>
+            <span class="metadata-value"><%= @quote.chapter %></span>
+          </div>
+        <% end %>
+        <% if @quote.character.present? %>
+          <div class="metadata-item">
+            <span class="metadata-label">Character</span>
+            <span class="metadata-value"><%= @quote.character %></span>
+          </div>
+        <% end %>
+      </div>
+
+      <!-- Engagement and Tags Section -->
+      <div class="quote-engagement-section">
+        <!-- Tags (left side) -->
+        <% if @quote.tags.any? %>
+          <div class="quote-tags">
+            <% @quote.tags.each do |tag| %>
+              <span class="tag-badge"><%= tag.name %></span>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="quote-tags-placeholder"></div>
+        <% end %>
+
+        <!-- Like/Dislike buttons (right side) - Read-only -->
+        <div class="quote-engagement">
+          <div class="engagement-btn">
+            <span class="thumb-icon">
+              <svg viewBox="0 0 24 24">
+                <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
+              </svg>
+            </span>
+            <span class="count"><%= @quote.likes_count %></span>
+          </div>
+          
+          <div class="engagement-btn">
+            <span class="thumb-icon">
+              <svg viewBox="0 0 24 24">
+                <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path>
+              </svg>
+            </span>
+            <span class="count"><%= @quote.dislikes_count %></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Comments Section -->
+    <div class="interaction-section">
+      <div class="interaction-card">
+        <div class="comments-section">
+          <h2 class="section-title">
+            Comments (<%= @quote.comments_count %>)
+          </h2>
+
+          <!-- Comments List -->
+          <div class="comments-list" id="comments-list">
+            <% if @comments.any? %>
+              <% @comments.each do |comment| %>
+                <%= render 'archive_comment_with_replies', comment: comment, depth: 0 %>
+              <% end %>
+            <% else %>
+              <div class="empty-message">
+                No comments for this quote.
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% else %>
+    <div class="no-quote">
+      <h2>No quote for this date</h2>
+      <p>There was no quote displayed on <%= @archive_date.strftime('%B %d, %Y') %>.</p>
+      <p>
+        <%= link_to "← Back to Archived Quotes", archive_index_path, style: "color: #8b7355; text-decoration: none;" %> |
+        <%= link_to "Browse Archive", archive_index_path, style: "color: #8b7355; text-decoration: none;" %>
+      </p>
+    </div>
+  <% end %>
+</main>

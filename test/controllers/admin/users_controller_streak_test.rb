@@ -3,12 +3,16 @@ require "test_helper"
 class Admin::UsersControllerStreakTest < ActionDispatch::IntegrationTest
   def setup
     @admin = User.create!(
+      first_name: "Test",
+      last_name: "Admin",
       email: "admin_streak_#{SecureRandom.hex(8)}@example.com",
       password: "password",
       role: "admin"
     )
 
     @user = User.create!(
+      first_name: "Test",
+      last_name: "User",
       email: "user_streak_#{SecureRandom.hex(8)}@example.com",
       password: "password",
       role: "commentor",
@@ -83,6 +87,8 @@ class Admin::UsersControllerStreakTest < ActionDispatch::IntegrationTest
 
   test "should handle bulk streak reset" do
     user2 = User.create!(
+      first_name: "Test",
+      last_name: "User2",
       email: "user2@example.com",
       password: "password",
       role: "commentor",
@@ -109,6 +115,8 @@ class Admin::UsersControllerStreakTest < ActionDispatch::IntegrationTest
 
   test "should handle bulk streak recalculation" do
     user2 = User.create!(
+      first_name: "Test",
+      last_name: "User2",
       email: "user2@example.com",
       password: "password",
       role: "commentor"

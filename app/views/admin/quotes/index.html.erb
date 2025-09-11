@@ -63,82 +63,78 @@
   </div>
 
   <!-- Quotes Table -->
-  <div class="admin-section">
-  <table style="width: 100%; border-collapse: collapse;" data-controller="sortable-table" aria-describedby="quotes-table-caption">
+  <div class="app-table-section">
+    <table class="app-table" data-controller="sortable-table" aria-describedby="quotes-table-caption">
       <caption id="quotes-table-caption" class="sr-only">Quotes table. Click on headers to sort. Click a row to view details.</caption>
-      <thead style="background: #f0ebe4;">
+      <thead>
         <tr>
-          <th style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">
-            <input type="checkbox" id="select-all" onchange="toggleAll(this)">
+          <th class="checkbox-cell">
+            <input type="checkbox" id="select-all" onchange="toggleAll(this)" aria-label="Select all quotes">
           </th>
-          <th data-type="text" role="columnheader" tabindex="0" aria-sort="none" style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">Quote</th>
-          <th data-type="text" role="columnheader" tabindex="0" aria-sort="none" style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">Book</th>
-          <th data-type="text" role="columnheader" tabindex="0" aria-sort="none" style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">Chapter</th>
-          <th data-type="text" role="columnheader" tabindex="0" aria-sort="none" style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">Character</th>
-          <th data-type="text" role="columnheader" tabindex="0" aria-sort="none" style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">Tags</th>
-          <th data-type="date" role="columnheader" tabindex="0" aria-sort="none" style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">Created</th>
+          <th data-type="text" role="columnheader" tabindex="0" aria-sort="descending" style="outline: none;">Quote</th>
+          <th data-type="text" role="columnheader" tabindex="0" aria-sort="none" style="outline: none;">Book</th>
+          <th data-type="text" role="columnheader" tabindex="0" aria-sort="none" style="outline: none;">Chapter</th>
+          <th data-type="text" role="columnheader" tabindex="0" aria-sort="none" style="outline: none;">Character</th>
+          <th data-type="text" role="columnheader" tabindex="0" aria-sort="none" style="outline: none;">Tags</th>
+          <th data-type="date" role="columnheader" tabindex="0" aria-sort="none" style="outline: none;">Created</th>
         </tr>
       </thead>
       <tbody>
         <% if @quotes.any? %>
           <% @quotes.each do |quote| %>
-            <tr style="border-bottom: 1px solid #8b7355;" data-controller="row-link" data-row-link-url-value="<%= admin_quote_path(quote) %>">
-              <td style="padding: 1rem;">
+            <tr data-controller="row-link" data-row-link-url-value="<%= admin_quote_path(quote) %>" tabindex="0" aria-label="Quote: <%= truncate(quote.text, length: 50) %>">
+              <td class="checkbox-cell">
                 <%= check_box_tag "quote_ids[]", quote.id, false, 
-                    class: "quote-checkbox", onchange: "updateBulkActions()" %>
+                    class: "quote-checkbox", onchange: "updateBulkActions()", "aria-label": "Select quote" %>
               </td>
-              <td style="padding: 1rem;">
-                <div style="max-width: 300px;">
-                  <%= link_to admin_quote_path(quote), style: "color: inherit; text-decoration: none;" do %>
-                    <p style="margin: 0; font-style: italic; color: #3d2c1d;">"<%= truncate(quote.text, length: 100) %>"</p>
-                  <% end %>
-                </div>
+              <td class="quote-preview">
+                <%= link_to admin_quote_path(quote), class: "action-link", style: "color: inherit; text-decoration: none;" do %>
+                  "<%= truncate(quote.text, length: 100) %>"
+                <% end %>
               </td>
-              <td style="padding: 1rem;">
-                <span style="font-weight: 500; color: #3d2c1d;"><%= quote.book %></span>
+              <td>
+                <span class="user-info"><%= quote.book %></span>
               </td>
-              <td style="padding: 1rem; color: #3d2c1d;">
+              <td>
                 <%= quote.chapter || "-" %>
               </td>
-              <td style="padding: 1rem; color: #3d2c1d;">
+              <td>
                 <%= quote.character || "-" %>
               </td>
-              <td style="padding: 1rem;">
+              <td>
                 <% if quote.tags.any? %>
-                  <div style="display: flex; flex-wrap: wrap; gap: 0.25rem;">
+                  <div class="tag-list">
                     <% quote.tags.limit(3).each do |tag| %>
-                      <span style="background: rgba(139, 115, 85, 0.15); color: #3d2c1d; padding: 0.15rem 0.5rem; border-radius: 8px; font-size: 0.75rem; white-space: nowrap;">
+                      <span class="app-tag-badge">
                         <%= tag.name %>
                       </span>
                     <% end %>
                     <% if quote.tags.count > 3 %>
-                      <span style="color: #8b7355; font-size: 0.75rem;">+<%= quote.tags.count - 3 %> more</span>
+                      <span class="tag-more">+<%= quote.tags.count - 3 %> more</span>
                     <% end %>
                   </div>
                 <% else %>
-                  <span style="color: #8b7355; font-style: italic; font-size: 0.85rem;">-</span>
+                  <span class="secondary-info">-</span>
                 <% end %>
               </td>
-              <td style="padding: 1rem;" data-sort-value="<%= quote.created_at.iso8601 %>">
-                <small style="color: #8b7355; display:block;">
+              <td class="date-cell" data-sort-value="<%= quote.created_at.iso8601 %>">
+                <div class="secondary-info">
                   <%= time_ago_in_words(quote.created_at) %> ago
-                </small>
+                </div>
               </td>
             </tr>
           <% end %>
         <% else %>
           <tr>
-            <td colspan="8" style="padding: 3rem; text-align: center; color: #8b7355;">
+            <td colspan="7" class="empty-state">
               <% if params[:search].present? %>
-                No quotes found matching "<%= params[:search] %>"
-                <br><br>
-                <%= link_to "Clear search", admin_quotes_path, 
-                    style: "color: #8b7355; text-decoration: none;" %>
+                <h3>No quotes found</h3>
+                <p>No quotes found matching "<%= params[:search] %>"</p>
+                <%= link_to "Clear search", admin_quotes_path, class: "action-link" %>
               <% else %>
-                No quotes found
-                <br><br>
-                <%= link_to "Add the first quote", new_admin_quote_path, 
-                    style: "color: #8b7355; text-decoration: none;" %>
+                <h3>No quotes found</h3>
+                <p>Get started by adding your first quote.</p>
+                <%= link_to "Add the first quote", new_admin_quote_path, class: "action-link" %>
               <% end %>
             </td>
           </tr>

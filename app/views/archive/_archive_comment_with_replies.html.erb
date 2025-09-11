@@ -1,0 +1,70 @@
+<%
+  # Archive-specific recursive partial for displaying comments and their nested replies
+  # Similar to _comment_with_replies.html.erb but without interactive elements (reply/edit)
+  max_depth = 4
+  indent_size = 3 # rem units for each level of nesting (increased from 1.5)
+  
+  # Calculate depth-based styling
+  depth_class = "comment-depth-#{[depth, 4].min}"
+  border_left_width = depth > 0 ? 3 : 0
+  margin_left = depth * indent_size
+  
+  # Background opacity increases with depth
+  background_opacity = 0.2 + (depth * 0.1)
+  background_color = "rgba(245, 240, 232, #{[background_opacity, 0.8].min})"
+%>
+
+<div class="comment <%= depth_class %>" 
+     data-comment-id="<%= comment.id %>" 
+     data-depth="<%= depth %>"
+     style="margin-left: <%= margin_left %>rem; 
+            <%= depth > 0 ? "border-left: #{border_left_width}px solid rgba(139, 115, 85, 0.4);" : '' %>
+            <%= depth > 0 ? "background: #{background_color};" : '' %>
+            <%= depth > 0 ? "padding-left: 1rem;" : '' %>">
+  <div class="comment-header">
+    <span class="comment-author">
+      <%= comment.user_display_name %>
+    </span>
+    <span class="comment-date">
+      <%= time_ago_in_words(comment.created_at) %> ago
+    </span>
+    <% if depth > 0 %>
+      <span class="comment-depth-indicator">
+        └ Reply
+      </span>
+    <% end %>
+  </div>
+  
+  <div class="comment-content">
+    <%= simple_format(comment.filtered_content) %>
+  </div>
+  
+  <div class="comment-actions">
+    <!-- Archive view: Only show admin delete option, no reply/edit buttons -->
+    <% if current_user&.admin? %>
+      <%= link_to "Delete", comment_path(comment), 
+          method: :delete,
+          class: "comment-action danger",
+          style: "color: #dc3545; text-decoration: none;",
+          data: { 
+            turbo_method: :delete,
+            turbo_confirm: "Are you sure you want to delete this comment?"
+          } %>
+      <% if comment.user.nil? || current_user != comment.user %>
+        <span style="font-size: 0.75rem; color: #8b7355;">(Admin)</span>
+      <% end %>
+    <% end %>
+    
+    <!-- Show edit indicator -->
+    <% if comment.edited? %>
+      <span class="edit-indicator">
+        (edited <%= time_ago_in_words(comment.edited_at) %> ago)
+      </span>
+    <% end %>
+  </div>
+</div>
+
+<!-- Render nested replies recursively -->
+<% comment.replies.ordered.each do |reply| %>
+  <%= render 'archive_comment_with_replies', comment: reply, depth: depth + 1 %>
+<% end %>

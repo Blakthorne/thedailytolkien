@@ -22,6 +22,8 @@ class AdminRoleManagementTest < ActionDispatch::IntegrationTest
   test "admin can demote admin to commentor" do
     # Create another admin user to demote
     another_admin = User.create!(
+      first_name: "Another",
+      last_name: "Admin",
       email: "another@admin.com",
       password: "password123",
       role: "admin"

@@ -3,6 +3,8 @@ require "application_system_test_case"
 class QuoteSortingTest < ApplicationSystemTestCase
   setup do
     @admin_user = User.create!(
+      first_name: "Test",
+      last_name: "Admin",
       email: "admin@sorttest.com",
       password: "password123",
       role: "admin"

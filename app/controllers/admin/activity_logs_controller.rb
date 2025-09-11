@@ -20,7 +20,9 @@ class Admin::ActivityLogsController < AdminController
 
     # Get filter options
     @users = User.joins(:activity_logs).distinct.order(:email)
-    @actions = ActivityLog.distinct.pluck(:action).compact.sort
+    # Only show actions that exist in database AND are defined in the model
+    existing_actions = ActivityLog.distinct.pluck(:action).compact
+    @actions = (ActivityLog::ACTIONS & existing_actions).sort
 
     # Activity logging removed for activity logs view per user request
   end

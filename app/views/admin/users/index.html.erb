@@ -9,23 +9,6 @@
   </div>
 </div>
 
-<!-- Search and Filter Bar -->
-<div class="admin-section" style="margin-bottom: 2rem;">
-  <%= form_with url: admin_users_path, method: :get, local: true, 
-      style: "display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;" do |f| %>
-    <%= f.text_field :search, placeholder: "Search by email...", 
-        value: params[:search],
-        style: "flex: 1; min-width: 200px; padding: 0.5rem; border: 1px solid #8b7355; border-radius: 4px; background: #fefcfa;" %>
-    <%= f.select :role, [["All Roles", ""], ["Admin", "admin"], ["Commentor", "commentor"]], 
-        { selected: params[:role] },
-        { style: "padding: 0.5rem; border: 1px solid #8b7355; border-radius: 4px; background: #fefcfa;" } %>
-    <%= f.submit "Search", class: "admin-nav-link" %>
-    <% if params[:search].present? || params[:role].present? %>
-      <%= link_to "Clear", admin_users_path, class: "admin-nav-link" %>
-    <% end %>
-  <% end %>
-</div>
-
 <!-- User Stats -->
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
   <div class="admin-stat-card">
@@ -87,108 +70,131 @@
     </div>
   </div>
 
+  <!-- Search and Filter Bar -->
+  <div class="admin-section" style="margin-bottom: 2rem;">
+    <%= form_with url: admin_users_path, method: :get, local: true, 
+        style: "display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;" do |f| %>
+      <%= f.text_field :search, placeholder: "Search by email...", 
+          value: params[:search],
+          style: "flex: 1; min-width: 200px; padding: 0.5rem; border: 1px solid #8b7355; border-radius: 4px; background: #fefcfa;" %>
+      <%= f.select :role, [["All Roles", ""], ["Admin", "admin"], ["Commentor", "commentor"]], 
+          { selected: params[:role] },
+          { style: "padding: 0.5rem; border: 1px solid #8b7355; border-radius: 4px; background: #fefcfa;" } %>
+      <%= f.submit "Search", class: "admin-nav-link" %>
+      <% if params[:search].present? || params[:role].present? %>
+        <%= link_to "Clear", admin_users_path, class: "admin-nav-link" %>
+      <% end %>
+    <% end %>
+  </div>
+
   <!-- Users Table -->
   <div class="admin-section">
-    <table style="width: 100%; border-collapse: collapse;" data-controller="sortable-table" aria-describedby="users-table-caption">
-      <caption id="users-table-caption" class="sr-only">Users table. Click on headers to sort. Click a row to view details.</caption>
-      <thead style="background: #f0ebe4;">
-        <tr>
-          <th style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">
-            <input type="checkbox" id="select-all" onchange="toggleAll(this)">
-          </th>
-          <th data-type="text" role="columnheader" tabindex="0" aria-sort="none" style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">Email</th>
-          <th data-type="text" role="columnheader" tabindex="0" aria-sort="none" style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">Role</th>
-          <th data-type="number" role="columnheader" tabindex="0" aria-sort="none" style="padding: 1rem; text-align: center; border-bottom: 1px solid #8b7355; color: #3d2c1d;">Current Streak</th>
-          <th data-type="number" role="columnheader" tabindex="0" aria-sort="none" style="padding: 1rem; text-align: center; border-bottom: 1px solid #8b7355; color: #3d2c1d;">Best Streak</th>
-          <th data-type="text" role="columnheader" tabindex="0" aria-sort="none" style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">Provider</th>
-          <th data-type="date" role="columnheader" tabindex="0" aria-sort="none" style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">Joined</th>
-          <th data-type="date" style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">Last Seen</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% if @users.any? %>
-          <% @users.each do |user| %>
-            <tr style="border-bottom: 1px solid #8b7355;" data-controller="row-link" data-row-link-url-value="<%= admin_user_path(user) %>">
-              <td style="padding: 1rem;">
-                <% unless user == current_user %>
-                  <%= check_box_tag "user_ids[]", user.id, false, 
-                      class: "user-checkbox", onchange: "updateBulkActions()" %>
-                <% end %>
-              </td>
-              <td style="padding: 1rem;">
-                <div>
-                  <%= link_to admin_user_path(user), style: "color: inherit; text-decoration: none; font-weight: 700;" do %>
-                    <span style="color: #3d2c1d;"><%= user.email %></span>
+    <div class="responsive-table-container">
+      <table class="responsive-table" data-controller="sortable-table" aria-describedby="users-table-caption">
+        <caption id="users-table-caption" class="sr-only">Users table. Click on headers to sort. Click a row to view details.</caption>
+        <thead>
+          <tr>
+            <th class="col-priority-critical">
+              <input type="checkbox" id="select-all" onchange="toggleAll(this)" aria-label="Select all users">
+            </th>
+            <th class="col-priority-critical" data-type="text" role="columnheader" tabindex="0" aria-sort="none" style="outline: none;">Name</th>
+            <th class="col-priority-critical" data-type="text" role="columnheader" tabindex="0" aria-sort="descending" style="outline: none;">Email</th>
+            <th class="col-priority-high" data-type="text" role="columnheader" tabindex="0" aria-sort="none" style="outline: none;">Role</th>
+            <th class="col-priority-medium" data-type="number" role="columnheader" tabindex="0" aria-sort="none" style="outline: none;">Current Streak</th>
+            <th class="col-priority-low" data-type="number" role="columnheader" tabindex="0" aria-sort="none" style="outline: none;">Best Streak</th>
+            <th class="col-priority-low" data-type="text" role="columnheader" tabindex="0" aria-sort="none" style="outline: none;">Provider</th>
+            <th class="col-priority-medium" data-type="date" role="columnheader" tabindex="0" aria-sort="none" style="outline: none;">Joined</th>
+            <th class="col-priority-low" data-type="date" style="outline: none;">Last Seen</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if @users.any? %>
+            <% @users.each do |user| %>
+              <tr data-controller="row-link" data-row-link-url-value="<%= admin_user_path(user) %>" tabindex="0" aria-label="User: <%= user.full_name %>">
+                <td class="col-priority-critical" data-label="Select">
+                  <% unless user == current_user %>
+                    <%= check_box_tag "user_ids[]", user.id, false, 
+                        class: "user-checkbox", onchange: "updateBulkActions()", "aria-label": "Select #{user.full_name}" %>
                   <% end %>
-                  <% if user == current_user %>
-                    <span style="background: #f0ebe4; color: #8b7355; padding: 0.125rem 0.5rem; border-radius: 12px; font-size: 0.75rem; margin-left: 0.5rem;">
-                      You
-                    </span>
+                </td>
+                <td class="col-priority-critical" data-label="Name">
+                  <%= link_to admin_user_path(user), style: "color: inherit; text-decoration: none;" do %>
+                    <span style="color: #3d2c1d; font-weight: 600;"><%= user.full_name %></span>
                   <% end %>
-                </div>
-              </td>
-              <td style="padding: 1rem;">
-                <span style="background: #f0ebe4; 
-                           color: #3d2c1d; 
-                           padding: 0.25rem 0.75rem; border-radius: 16px; font-size: 0.875rem; font-weight: 500;">
-                  <%= user.role.humanize %>
-                </span>
-              </td>
-              <td style="padding: 1rem; text-align: center;" data-sort-value="<%= user.current_streak %>">
-                <div style="display: flex; align-items: center; justify-content: center; gap: 0.25rem;">
-                  <span style="font-size: 1.1rem;"><%= user.streak_emoji %></span>
-                  <span style="font-weight: 600; color: <%= user.current_streak > 0 ? '#ff6b35' : '#8b7355' %>;">
-                    <%= user.current_streak %>
+                </td>
+                <td class="col-priority-critical" data-label="Email">
+                  <div>
+                    <%= link_to admin_user_path(user), style: "color: inherit; text-decoration: none; font-weight: 700;" do %>
+                      <span style="color: #3d2c1d;"><%= user.email %></span>
+                    <% end %>
+                    <% if user == current_user %>
+                      <span class="table-badge" style="margin-left: 0.5rem;">You</span>
+                    <% end %>
+                  </div>
+                </td>
+                <td class="col-priority-high" data-label="Role">
+                  <span class="table-badge <%= 'table-badge-admin' if user.admin? %>">
+                    <%= user.role.humanize %>
                   </span>
-                </div>
-              </td>
-              <td style="padding: 1rem; text-align: center;" data-sort-value="<%= user.longest_streak %>">
-                <span style="font-weight: 600; color: #8b7355;">
-                  <%= user.longest_streak %>
-                  <% if user.longest_streak > 7 %>
-                    🏆
-                  <% end %>
-                </span>
-              </td>
-              <td style="padding: 1rem;">
-                <span style="color: #8b7355; font-size: 0.875rem;">
-                  <%= user.provider&.humanize || "Email" %>
-                </span>
-              </td>
-              <td style="padding: 1rem;" data-sort-value="<%= user.created_at.iso8601 %>">
-                <small style="color: #8b7355;">
-                  <%= time_ago_in_words(user.created_at) %> ago
-                  <br><%= user.created_at.strftime("%b %d, %Y") %>
-                </small>
-              </td>
-              <td style="padding: 1rem;" data-sort-value="<%= user.current_sign_in_at&.iso8601 || '' %>">
-                <small style="color: #8b7355; display:block;">
-                  <% if user.current_sign_in_at %>
-                    <%= time_ago_in_words(user.current_sign_in_at) %> ago
-                    <br><%= user.current_sign_in_at.strftime("%b %d, %Y") %>
-                  <% else %>
-                    Never signed in
-                  <% end %>
-                </small>
+                </td>
+                <td class="col-priority-medium" data-label="Current Streak" data-sort-value="<%= user.current_streak %>" style="text-align: center;">
+                  <div style="display: flex; align-items: center; justify-content: center; gap: 0.25rem;">
+                    <span style="font-size: 1.1rem;"><%= user.streak_emoji %></span>
+                    <span style="font-weight: 600; color: <%= user.current_streak > 0 ? '#ff6b35' : '#8b7355' %>;">
+                      <%= user.current_streak %>
+                    </span>
+                  </div>
+                </td>
+                <td class="col-priority-low" data-label="Best Streak" data-sort-value="<%= user.longest_streak %>" style="text-align: center;">
+                  <span style="font-weight: 600; color: #8b7355;">
+                    <%= user.longest_streak %>
+                    <% if user.longest_streak > 7 %>
+                      🏆
+                    <% end %>
+                  </span>
+                </td>
+                <td class="col-priority-low" data-label="Provider">
+                  <span style="color: #8b7355; font-size: 0.875rem;">
+                    <%= user.provider&.humanize || "Email" %>
+                  </span>
+                </td>
+                <td class="col-priority-medium" data-label="Joined" data-sort-value="<%= user.created_at.iso8601 %>">
+                  <small style="color: #8b7355;">
+                    <%= time_ago_in_words(user.created_at) %> ago
+                    <br><%= user.created_at.strftime("%b %d, %Y") %>
+                  </small>
+                </td>
+                <td class="col-priority-low" data-label="Last Seen" data-sort-value="<%= user.current_sign_in_at&.iso8601 || '' %>">
+                  <small style="color: #8b7355;">
+                    <% if user.current_sign_in_at %>
+                      <%= time_ago_in_words(user.current_sign_in_at) %> ago
+                      <br><%= user.current_sign_in_at.strftime("%b %d, %Y") %>
+                    <% else %>
+                      Never signed in
+                    <% end %>
+                  </small>
+                </td>
+              </tr>
+            <% end %>
+          <% else %>
+            <tr>
+              <td colspan="9" class="table-empty-state">
+                <% if params[:search].present? || params[:role].present? %>
+                  <h3>No users found matching your criteria</h3>
+                  <p>
+                    <%= link_to "Clear filters", admin_users_path, 
+                        style: "color: #8b7355; text-decoration: none;" %>
+                  </p>
+                <% else %>
+                  <h3>No users found</h3>
+                  <p>This shouldn't normally happen!</p>
+                <% end %>
               </td>
             </tr>
           <% end %>
-        <% else %>
-          <tr>
-            <td colspan="7" style="padding: 3rem; text-align: center; color: #6c757d;">
-              <% if params[:search].present? || params[:role].present? %>
-                No users found matching your criteria
-                <br><br>
-                <%= link_to "Clear filters", admin_users_path, 
-                    style: "color: #007bff; text-decoration: none;" %>
-              <% else %>
-                No users found
-              <% end %>
-            </td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
+        </tbody>
+      </table>
+    </div>
   </div>
 <% end %>
 

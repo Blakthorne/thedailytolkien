@@ -2,12 +2,25 @@
   <%= link_to "Dashboard", admin_root_path %> > <strong>Activity Log</strong>
 <% end %>
 
-<h1>Activity Log</h1>
+<div style="max-width: 1200px;">
+  <h1>Activity Log</h1>
 
-<!-- Filters -->
-<div class="admin-section" style="margin-bottom: 2rem;">
+  <!-- Filters -->
+  <div class="admin-section" style="margin-bottom: 2rem;">
   <%= form_with url: admin_activity_logs_path, method: :get, local: true do |f| %>
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+    <div class="activity-filters" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1rem;">
+      <style>
+        @media (max-width: 768px) {
+          .activity-filters {
+            grid-template-columns: 1fr !important;
+          }
+        }
+        @media (min-width: 769px) and (max-width: 1024px) {
+          .activity-filters {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+        }
+      </style>
       <div>
         <%= f.label :user_id, "Filter by User", style: "display: block; margin-bottom: 0.5rem; font-weight: 500; color: #3d2c1d;" %>
         <%= f.select :user_id, 
@@ -48,8 +61,20 @@
   <% end %>
 </div>
 
-<!-- Activity Stats -->
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+  <!-- Activity Stats -->
+  <div class="activity-stats" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem;">
+    <style>
+      @media (max-width: 768px) {
+        .activity-stats {
+          grid-template-columns: repeat(2, 1fr) !important;
+        }
+      }
+      @media (min-width: 769px) and (max-width: 1024px) {
+        .activity-stats {
+          grid-template-columns: repeat(4, 1fr) !important;
+        }
+      }
+    </style>
   <div class="admin-stat-card">
     <h4 style="margin: 0;">Total Activities</h4>
     <p style="font-size: 1.5rem; font-weight: bold; margin: 0.25rem 0;"><%= ActivityLog.count %></p>
@@ -71,83 +96,82 @@
   </div>
 </div>
 
-<!-- Activity Log Table -->
-<div class="admin-section">
-  <table style="width: 100%; border-collapse: collapse;" data-controller="sortable-table" aria-describedby="activity-table-caption">
+  <!-- Activity Log Table -->
+  <div class="app-table-section">
+  <table class="app-table" data-controller="sortable-table" aria-describedby="activity-table-caption">
     <caption id="activity-table-caption" class="sr-only">Activity log table. Click on headers to sort. Click a row to view details.</caption>
-    <thead style="background: #f0ebe4;">
+    <thead>
       <tr>
-  <th data-type="date" role="columnheader" tabindex="0" aria-sort="none" style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">Time</th>
-  <th data-type="text" role="columnheader" tabindex="0" aria-sort="none" style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">User</th>
-  <th data-type="text" role="columnheader" tabindex="0" aria-sort="none" style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">Action</th>
-  <th data-type="text" role="columnheader" tabindex="0" aria-sort="none" style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">Target</th>
-  <th data-type="text" role="columnheader" tabindex="0" aria-sort="none" style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">IP Address</th>
-  <th data-type="text" role="columnheader" tabindex="0" aria-sort="none" style="padding: 1rem; text-align: left; border-bottom: 1px solid #8b7355; color: #3d2c1d;">Details</th>
+        <th data-type="date" role="columnheader" tabindex="0" aria-sort="none" style="outline: none;">Time</th>
+        <th data-type="text" role="columnheader" tabindex="0" aria-sort="none" style="outline: none;">User</th>
+        <th data-type="text" role="columnheader" tabindex="0" aria-sort="none" style="outline: none;">Action</th>
+        <th data-type="text" role="columnheader" tabindex="0" aria-sort="none" style="outline: none;">Target</th>
+        <th data-type="text" role="columnheader" tabindex="0" aria-sort="none" style="outline: none;">IP Address</th>
+        <th data-type="text" role="columnheader" tabindex="0" aria-sort="none" style="outline: none;">Details</th>
       </tr>
     </thead>
     <tbody>
       <% if @activities.any? %>
         <% @activities.each do |activity| %>
-          <tr style="border-bottom: 1px solid #8b7355;" data-controller="row-link" data-row-link-url-value="<%= admin_activity_log_path(activity) %>">
-            <td style="padding: 1rem; white-space: nowrap;" data-sort-value="<%= activity.created_at.iso8601 %>">
-              <div style="font-weight: 500; color: #3d2c1d;"><%= activity.created_at.strftime("%b %d, %Y") %></div>
-              <small style="color: #8b7355;"><%= activity.created_at.strftime("%I:%M %p") %></small>
+          <tr data-controller="row-link" data-row-link-url-value="<%= admin_activity_log_path(activity) %>" tabindex="0" aria-label="Activity: <%= activity.action_description %>">
+            <td class="date-cell" data-sort-value="<%= activity.created_at.iso8601 %>">
+              <div class="user-info"><%= activity.created_at.strftime("%b %d, %Y") %></div>
+              <div class="secondary-info"><%= activity.created_at.strftime("%I:%M %p") %></div>
             </td>
-            <td style="padding: 1rem;">
-              <div style="font-weight: 500; color: #3d2c1d;"><%= activity.user.email %></div>
-              <small style="color: #8b7355;">
-                <span style="background: #f0ebe4; 
-                           color: #3d2c1d; 
-                           padding: 0.125rem 0.5rem; border-radius: 12px; font-size: 0.75rem;">
+            <td>
+              <div class="user-info"><%= activity.user.email %></div>
+              <div class="secondary-info">
+                <span class="role-badge">
                   <%= activity.user.role.humanize %>
                 </span>
-              </small>
+              </div>
             </td>
-            <td style="padding: 1rem;">
-              <span style="background: #f0ebe4; color: #3d2c1d; padding: 0.25rem 0.75rem; border-radius: 16px; font-size: 0.875rem; font-weight: 500;">
+            <td>
+              <span class="status-badge">
                 <%= activity.action_description %>
               </span>
             </td>
-            <td style="padding: 1rem;">
+            <td>
               <% if activity.target %>
-                <div style="font-weight: 500; color: #3d2c1d;"><%= activity.target.class.name %></div>
-                <small style="color: #8b7355;"><%= truncate(activity.target_description, length: 30) %></small>
+                <div class="user-info"><%= activity.target.class.name %></div>
+                <div class="secondary-info"><%= truncate(activity.target_description, length: 30) %></div>
               <% else %>
-                <span style="color: #a0aec0;">—</span>
+                <span class="secondary-info">—</span>
               <% end %>
             </td>
-            <td style="padding: 1rem;">
-              <small style="color: #6c757d; font-family: monospace;"><%= activity.ip_address || "—" %></small>
+            <td>
+              <span class="monospace"><%= activity.ip_address || "—" %></span>
             </td>
-            <td style="padding: 1rem;">
+            <td>
               <% if activity.details.present? %>
-                <span style="color: #8b7355; font-size: 0.875rem;">Has details</span>
+                <span class="secondary-info">Has details</span>
               <% else %>
-                <span style="color: #a0aec0;">—</span>
+                <span class="secondary-info">—</span>
               <% end %>
             </td>
           </tr>
         <% end %>
       <% else %>
         <tr>
-          <td colspan="6" style="padding: 3rem; text-align: center; color: #6c757d;">
+          <td colspan="6" class="empty-state">
             <% if params.slice(:user_id, :action, :start_date, :end_date).values.any?(&:present?) %>
-              No activity found matching your filters
-              <br><br>
-              <%= link_to "Clear filters", admin_activity_logs_path, 
-                  style: "color: #007bff; text-decoration: none;" %>
+              <h3>No activity found</h3>
+              <p>No activity found matching your filters</p>
+              <%= link_to "Clear filters", admin_activity_logs_path, class: "action-link" %>
             <% else %>
-              No activity recorded yet
+              <h3>No activity recorded</h3>
+              <p>No activity has been recorded yet</p>
             <% end %>
           </td>
         </tr>
       <% end %>
     </tbody>
   </table>
-</div>
-
-<% if @activities.count == 200 %>
-  <div style="background: #fff3cd; border: 1px solid #ffeaa7; color: #856404; padding: 1rem; border-radius: 4px; margin-top: 1rem;">
-    <strong>Note:</strong> Showing the most recent 200 activities. Use filters to narrow down results.
   </div>
-<% end %>
+
+  <% if @activities.count == 200 %>
+    <div style="background: #fff3cd; border: 1px solid #ffeaa7; color: #856404; padding: 1rem; border-radius: 4px; margin-top: 1rem;">
+      <strong>Note:</strong> Showing the most recent 200 activities. Use filters to narrow down results.
+    </div>
+  <% end %>
+</div>

@@ -25,10 +25,23 @@
         <h3 style="margin: 0; color: #3d2c1d;">User Information</h3>
       </div>
       
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+        <div>
+          <%= f.label :first_name, style: "display: block; margin-bottom: 0.5rem; font-weight: 500; color: #3d2c1d;" %>
+          <%= f.text_field :first_name, 
+              style: "width: 100%; padding: 0.75rem; border: 1px solid #8b7355; border-radius: 4px; background: #fefcfa;" %>
+        </div>
+        
+        <div>
+          <%= f.label :last_name, style: "display: block; margin-bottom: 0.5rem; font-weight: 500; color: #3d2c1d;" %>
+          <%= f.text_field :last_name, 
+              style: "width: 100%; padding: 0.75rem; border: 1px solid #8b7355; border-radius: 4px; background: #fefcfa;" %>
+        </div>
+      </div>
+      
       <%= f.label :email, style: "display: block; margin-bottom: 0.5rem; font-weight: 500; color: #3d2c1d;" %>
       <%= f.email_field :email, 
           style: "width: 100%; padding: 0.75rem; border: 1px solid #8b7355; border-radius: 4px; background: #fefcfa;" %>
-      <small style="color: #8b7355;">User's email address for login and notifications</small>
     </div>
 
     <div style="display: flex; gap: 1rem;">
@@ -101,6 +114,11 @@
   <div class="admin-section">
     <div style="background: #f0ebe4; padding: 1rem; border-bottom: 1px solid #8b7355; margin: -1rem -1rem 1rem -1rem;">
       <h3 style="margin: 0; color: #3d2c1d;">Current User Information</h3>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: 120px 1fr; gap: 1rem; margin-bottom: 1rem;">
+      <strong style="color: #3d2c1d;">Name:</strong>
+      <span style="color: #3d2c1d;"><%= @user.full_name %></span>
     </div>
     
     <div style="display: grid; grid-template-columns: 120px 1fr; gap: 1rem; margin-bottom: 1rem;">

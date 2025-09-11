@@ -87,6 +87,7 @@
           <h1><%= link_to "The Daily Tolkien", root_path, class: "header-title-link" %></h1>
           <div class="auth-links">
             <% if user_signed_in? %>
+              <span class="user-info">Welcome, <%= current_user.display_name %></span>
               <div class="user-section" data-user-timezone="<%= current_user.streak_timezone %>">
                 <div class="streak-display">
                   <span class="streak-emoji"><%= current_user.streak_emoji %></span>
@@ -97,7 +98,6 @@
                     </span>
                   <% end %>
                 </div>
-                <span class="user-info">Welcome, <%= current_user.name || current_user.email %></span>
                 <%= form_with(url: destroy_user_session_path, method: :delete, data: { turbo: false }) do |f| %>
                   <%= f.submit "Logout", class: "auth-link logout-link" %>
                 <% end %>
@@ -402,6 +402,7 @@
         <p>&copy; <%= Date.current.year %> David Polar. All rights reserved.</p>
         <nav class="footer-nav">
           <a href="/" class="footer-link">Home</a>
+          <a href="/archive" class="footer-link">Archive</a>
           <a href="/philosophy" class="footer-link">Philosophy</a>
         </nav>
       </div>

@@ -34,14 +34,19 @@ export default class extends Controller {
 
     // Reset aria-sort on other headers
     this.headers.forEach(h => {
-      if (h !== th) h.removeAttribute("aria-sort")
+      if (h !== th) h.setAttribute("aria-sort", "none")
     })
     th.setAttribute("aria-sort", direction)
 
-    const rows = Array.from(this.tbody.querySelectorAll("tr"))
+    const allRows = Array.from(this.tbody.querySelectorAll("tr"))
     const multiplier = direction === "ascending" ? 1 : -1
 
-    rows.sort((a, b) => {
+    // Separate data rows from empty state rows
+    const dataRows = allRows.filter(row => !row.querySelector('.empty-state'))
+    const emptyRows = allRows.filter(row => row.querySelector('.empty-state'))
+
+    // Sort only data rows
+    dataRows.sort((a, b) => {
       const aCell = a.children[index]
       const bCell = b.children[index]
       const aVal = this.cellValue(aCell, type)
@@ -51,8 +56,10 @@ export default class extends Controller {
       return 0
     })
 
-    // Re-append rows
-    rows.forEach(r => this.tbody.appendChild(r))
+    // Clear tbody and re-append sorted data rows first, then empty rows
+    this.tbody.innerHTML = ""
+    dataRows.forEach(r => this.tbody.appendChild(r))
+    emptyRows.forEach(r => this.tbody.appendChild(r))
   }
 
   cellValue(cell, type) {

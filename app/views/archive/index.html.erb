@@ -1,0 +1,495 @@
+<% content_for :title, "Quote Archive" %>
+
+<style>
+  /* Main layout consistent with home page */
+  .main-content {
+    width: 900px;
+    margin: 0 auto;
+    padding: 2rem;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    flex: 1;
+  }
+
+  /* Archive header */
+  .archive-header {
+    background: rgba(245, 240, 232, 0.95);
+    border: 2px solid #8b7355;
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    backdrop-filter: blur(4px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  }
+
+  .archive-header h1 {
+    margin: 0 0 1rem 0;
+    color: #3d2c1d;
+    font-size: 2.5rem;
+    font-family: 'Crimson Text', serif;
+    font-weight: 600;
+  }
+
+  .archive-subtitle {
+    color: #8b7355;
+    font-style: italic;
+    margin-bottom: 1.5rem;
+    font-size: 1.1rem;
+  }
+
+  .back-to-home {
+    background: #8b7355;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    border: 2px solid #8b7355;
+  }
+
+  .back-to-home:hover {
+    background: #6d5940;
+    border-color: #6d5940;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(109, 89, 64, 0.3);
+  }
+
+  /* Search and filter section */
+  .search-section {
+    background: rgba(245, 240, 232, 0.1);
+    backdrop-filter: blur(2px);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border: 2px solid #8b7355;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    width: 100%;
+  }
+
+  .search-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .search-header h2 {
+    margin: 0 0 0.5rem 0;
+    color: #3d2c1d;
+    font-size: 1.5rem;
+    font-family: 'Crimson Text', serif;
+  }
+
+  .search-subtitle {
+    color: #8b7355;
+    font-style: italic;
+    font-size: 0.95rem;
+  }
+
+  .search-form {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 1rem;
+    align-items: end;
+    margin-bottom: 1rem;
+  }
+
+  .search-controls {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .form-label {
+    font-weight: 500;
+    color: #3d2c1d;
+    font-size: 0.9rem;
+    margin: 0;
+  }
+
+  .form-input, .form-select {
+    padding: 0.75rem;
+    border: 2px solid rgba(139, 115, 85, 0.3);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.8);
+    color: #3d2c1d;
+    font-family: inherit;
+    font-size: 0.95rem;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .form-input:focus, .form-select:focus {
+    outline: none;
+    border-color: #8b7355;
+    box-shadow: 0 0 0 3px rgba(139, 115, 85, 0.1);
+  }
+
+  .btn {
+    padding: 0.75rem 1.5rem;
+    border: 2px solid #8b7355;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    font-size: 0.9rem;
+    background: none;
+    display: inline-block;
+  }
+
+  .btn-primary {
+    background: #8b7355;
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background: #6d5940;
+    border-color: #6d5940;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(109, 89, 64, 0.3);
+  }
+
+  .btn-secondary {
+    background: rgba(139, 115, 85, 0.1);
+    color: #8b7355;
+  }
+
+  .btn-secondary:hover {
+    background: rgba(139, 115, 85, 0.2);
+    color: #6d5940;
+    transform: translateY(-1px);
+  }
+
+  .active-filter {
+    background: rgba(139, 115, 85, 0.1);
+    border: 1px solid rgba(139, 115, 85, 0.3);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .filter-info {
+    flex: 1;
+    color: #3d2c1d;
+    margin: 0;
+  }
+
+  .filter-tag {
+    background: rgba(139, 115, 85, 0.2);
+    color: #3d2c1d;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+
+  .clear-filter-link {
+    color: #8b7355;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+  }
+
+  .clear-filter-link:hover {
+    color: #6d5940;
+    text-decoration: underline;
+  }
+
+  /* Table styles now handled by unified app-table system in application.css */
+
+  /* Pagination */
+  .pagination-section {
+    display: flex;
+    justify-content: center;
+    margin-top: 2rem;
+  }
+
+  .pagination {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    background: rgba(245, 240, 232, 0.8);
+    padding: 1rem 2rem;
+    border-radius: 12px;
+    border: 2px solid rgba(139, 115, 85, 0.3);
+  }
+
+  .pagination-btn {
+    padding: 0.5rem 1rem;
+    background: #8b7355;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    font-weight: 500;
+  }
+
+  .pagination-btn:hover {
+    background: #6d5940;
+    color: white;
+    transform: translateY(-1px);
+  }
+
+  .pagination-info {
+    padding: 0.5rem 1rem;
+    color: #3d2c1d;
+    font-weight: 500;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .main-content {
+      width: 100%;
+      padding: 1rem;
+    }
+
+    .archive-header {
+      padding: 1.5rem;
+    }
+
+    .archive-header h1 {
+      font-size: 2rem;
+    }
+
+    .search-section {
+      padding: 1.5rem;
+    }
+
+    .search-form {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+
+    .search-controls {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .table-section {
+      padding: 1rem;
+      overflow-x: auto;
+    }
+
+    .archive-table {
+      min-width: 600px;
+    }
+
+    .archive-table th,
+    .archive-table td {
+      padding: 0.75rem;
+    }
+
+    .quote-preview {
+      max-width: 200px;
+    }
+
+    .active-filter {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .archive-header h1 {
+      font-size: 1.75rem;
+    }
+
+    .search-form {
+      gap: 1rem;
+    }
+
+    .archive-table th,
+    .archive-table td {
+      padding: 0.5rem;
+    }
+
+    .quote-preview {
+      max-width: 150px;
+    }
+  }
+</style>
+
+<main class="main-content">
+  <!-- Archive Header -->
+  <div class="archive-header">
+    <h1>Quote Archive</h1>
+    <p class="archive-subtitle">Browse previous quotes from The Daily Tolkien collection</p>
+    <%= link_to "← Back to Today's Quote", root_path, class: "back-to-home" %>
+  </div>
+
+  <!-- Search and Filter Section -->
+  <div class="search-section">
+    <div class="search-header">
+      <h2>Search & Filter Quotes</h2>
+    </div>
+    
+    <%= form_with url: archive_index_path, method: :get, local: true, class: "search-form", id: "archive-filter-form" do |form| %>
+      <div class="form-group">
+        <%= form.label :search, "Search:", class: "form-label" %>
+        <%= form.text_field :search, value: params[:search], placeholder: "Search quotes, books, characters...", class: "form-input" %>
+      </div>
+      
+      <div class="form-group">
+        <%= form.label :book, "Book:", class: "form-label" %>
+        <%= form.select :book, options_for_select(@books.map { |book| [book, book] }, params[:book]), 
+            { prompt: "All books" }, { class: "form-select" } %>
+      </div>
+      
+      <div class="form-group">
+        <%= form.label :character, "Character:", class: "form-label" %>
+        <%= form.select :character, options_for_select(@characters.map { |char| [char, char] }, params[:character]), 
+            { prompt: "All characters" }, { class: "form-select" } %>
+      </div>
+      
+      <div class="form-group">
+        <%= form.label :tag_id, "Tag:", class: "form-label" %>
+        <%= form.select :tag_id, options_from_collection_for_select(@tags, :id, :name, params[:tag_id]), 
+            { prompt: "All tags" }, { class: "form-select" } %>
+      </div>
+    <% end %>
+    
+    <div class="search-controls">
+      <%= submit_tag "Filter", class: "btn btn-primary", form: "archive-filter-form" %>
+      <%= link_to "Clear All", archive_index_path, class: "btn btn-secondary" %>
+    </div>
+    
+    <% if params[:search].present? || params[:book].present? || params[:character].present? || params[:tag_id].present? %>
+      <div class="active-filter">
+        <p class="filter-info">
+          <strong>Active filters:</strong>
+          <% if params[:search].present? %>
+            <span class="filter-tag">Search: "<%= params[:search] %>"</span>
+          <% end %>
+          <% if params[:book].present? %>
+            <span class="filter-tag">Book: <%= params[:book] %></span>
+          <% end %>
+          <% if params[:character].present? %>
+            <span class="filter-tag">Character: <%= params[:character] %></span>
+          <% end %>
+          <% if params[:tag_id].present? && @tags.find_by(id: params[:tag_id]) %>
+            <span class="filter-tag">Tag: <%= @tags.find(params[:tag_id]).name %></span>
+          <% end %>
+        </p>
+        <%= link_to "Clear all filters", archive_index_path, class: "clear-filter-link" %>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Table Section -->
+  <div class="app-table-section">
+    <table class="app-table" data-controller="sortable-table" aria-describedby="archive-table-caption">
+      <caption id="archive-table-caption" class="sr-only">Archive table. Click on headers to sort. Click a row to view archived quote.</caption>
+      <thead>
+        <tr>
+          <th data-type="date" role="columnheader" tabindex="0" aria-sort="descending" style="outline: none;">Date</th>
+          <th data-type="text" role="columnheader" tabindex="0" aria-sort="none" style="outline: none;">Quote</th>
+          <th data-type="text" role="columnheader" tabindex="0" aria-sort="none" style="outline: none;">Book</th>
+          <th data-type="text" role="columnheader" tabindex="0" aria-sort="none" style="outline: none;">Character</th>
+          <th style="outline: none;">Tags</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if @quotes.any? %>
+          <% @quotes.each do |quote| %>
+            <tr onclick="window.location.href='<%= archive_path(quote.archive_date.strftime('%Y-%m-%d')) %>'"
+                data-sort-date="<%= quote.last_date_displayed %>">
+              <td class="date-cell">
+                <%= Time.at(quote.last_date_displayed).in_time_zone(@user_timezone).strftime('%B %d, %Y') %>
+              </td>
+              <td>
+                <div class="quote-preview">
+                  "<%= quote.archive_snippet(50) %>"
+                </div>
+              </td>
+              <td>
+                <strong><%= quote.book %></strong>
+              </td>
+              <td>
+                <%= quote.character || "—" %>
+              </td>
+              <td>
+                <% if quote.tags.any? %>
+                  <div class="tag-list">
+                    <% quote.tags.limit(3).each do |tag| %>
+                      <span class="tag-badge"><%= tag.name %></span>
+                    <% end %>
+                    <% if quote.tags.count > 3 %>
+                      <span class="tag-more">+<%= quote.tags.count - 3 %> more</span>
+                    <% end %>
+                  </div>
+                <% else %>
+                  <span style="color: #8b7355; font-style: italic;">—</span>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        <% else %>
+          <tr>
+            <td colspan="5">
+              <div class="empty-state">
+                <h3>
+                  <% if params[:search].present? || params[:book].present? || params[:character].present? || params[:tag_id].present? %>
+                    No quotes found matching your filters
+                  <% else %>
+                    No archived quotes found
+                  <% end %>
+                </h3>
+                <p>
+                  <% if params[:search].present? || params[:book].present? || params[:character].present? || params[:tag_id].present? %>
+                    Try adjusting your search criteria or filters
+                  <% else %>
+                    Check back once quotes have been archived
+                  <% end %>
+                </p>
+                <%= link_to "← View Today's Quote", root_path, class: "btn btn-primary" %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination Section -->
+  <% if @quotes.respond_to?(:current_page) %>
+    <div class="pagination-section">
+      <div class="pagination">
+        <% if @quotes.prev_page %>
+          <%= link_to "‹ Previous", archive_index_path(page: @quotes.prev_page, **request.query_parameters.except(:page)), 
+              class: "pagination-btn" %>
+        <% end %>
+        
+        <span class="pagination-info">
+          Page <%= @quotes.current_page %> of <%= @quotes.total_pages %>
+          (<%= @quotes.total_count %> total quotes)
+        </span>
+        
+        <% if @quotes.next_page %>
+          <%= link_to "Next ›", archive_index_path(page: @quotes.next_page, **request.query_parameters.except(:page)), 
+              class: "pagination-btn" %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</main>
+
+

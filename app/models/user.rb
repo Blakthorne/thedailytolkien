@@ -7,6 +7,8 @@ class User < ApplicationRecord
 
   # Validations
   validates :role, inclusion: { in: %w[admin commentor] }
+  validates :first_name, presence: true, length: { minimum: 1, maximum: 50 }
+  validates :last_name, presence: true, length: { minimum: 1, maximum: 50 }
   validates :streak_timezone, presence: true, inclusion: {
     in: ActiveSupport::TimeZone.all.map(&:name),
     message: "must be a valid timezone"
@@ -23,18 +25,29 @@ class User < ApplicationRecord
 
   # Associations for interaction system
   has_many :quote_likes, dependent: :destroy
-  has_many :comments, dependent: :destroy
+  has_many :comments, dependent: :nullify
   has_many :activity_logs, dependent: :destroy
 
   # Callbacks
   before_validation :set_default_role, on: :create
   before_validation :set_default_timezone, on: :create
+  after_create :initialize_streak_data
 
   # Class methods
   def self.from_omniauth(auth)
     where(provider: auth.provider, uid: auth.uid).first_or_create do |user|
       user.email = auth.info.email
-      user.name = auth.info.name
+
+      # Split the OAuth name into first and last name
+      if auth.info.name.present?
+        name_parts = auth.info.name.strip.split(" ")
+        user.first_name = name_parts.first
+        user.last_name = name_parts.length > 1 ? name_parts[1..-1].join(" ") : "User"
+      else
+        user.first_name = "User"
+        user.last_name = "Name"
+      end
+
       user.password = Devise.friendly_token[0, 20]
     end
   end
@@ -46,6 +59,28 @@ class User < ApplicationRecord
 
   def commentor?
     role == "commentor"
+  end
+
+  # Name display methods
+  def full_name
+    "#{first_name} #{last_name}".strip
+  end
+
+  def display_name
+    "#{first_name} #{last_name.first}."
+  end
+
+  # For backward compatibility
+  def name
+    full_name
+  end
+
+  def name=(full_name_string)
+    return if full_name_string.blank?
+
+    name_parts = full_name_string.strip.split(" ")
+    self.first_name = name_parts.first
+    self.last_name = name_parts.length > 1 ? name_parts[1..-1].join(" ") : "User"
   end
 
   # Streak-related methods
@@ -63,7 +98,7 @@ class User < ApplicationRecord
   def streak_emoji
     case current_streak
     when 0
-      "📅"
+      ""
     when 1..7
       "🔥"
     when 8..30
@@ -109,5 +144,12 @@ class User < ApplicationRecord
 
   def set_default_timezone
     self.streak_timezone ||= "UTC"
+  end
+
+  def initialize_streak_data
+    # Set initial login date to today in the user's timezone
+    # This ensures their streak starts correctly from day 1
+    today_in_timezone = Time.current.in_time_zone(streak_timezone).to_date
+    update_column(:last_login_date, today_in_timezone)
   end
 end

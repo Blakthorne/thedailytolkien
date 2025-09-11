@@ -48,7 +48,10 @@ class Admin::UsersController < AdminController
   end
 
   def destroy
-    return if @user == current_user # Prevent self-deletion
+    if @user == current_user # Prevent self-deletion
+      redirect_to admin_users_path, alert: "You cannot delete yourself."
+      return
+    end
 
     user_info = {
       email: @user.email,
@@ -192,8 +195,8 @@ class Admin::UsersController < AdminController
   end
 
   def user_params
-    # Only allow email updates through general update - role changes handled separately
-    params.require(:user).permit(:email)
+    # Allow email, first_name, and last_name updates - role changes handled separately
+    params.require(:user).permit(:email, :first_name, :last_name)
   end
 
   def bulk_reset_streaks(user_ids)

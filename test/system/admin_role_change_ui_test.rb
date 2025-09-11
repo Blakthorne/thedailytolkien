@@ -2,8 +2,8 @@ require "application_system_test_case"
 
 class AdminRoleChangeUITest < ApplicationSystemTestCase
   setup do
-    @admin = User.create!(email: "ui-admin@example.com", password: "password123", role: "admin")
-    @commentor = User.create!(email: "ui-user@example.com", password: "password123", role: "commentor")
+    @admin = User.create!(first_name: "Test", last_name: "Admin", email: "ui-admin@example.com", password: "password123", role: "admin")
+    @commentor = User.create!(first_name: "Test", last_name: "User", email: "ui-user@example.com", password: "password123", role: "commentor")
   end
 
   def login(email:, password:)

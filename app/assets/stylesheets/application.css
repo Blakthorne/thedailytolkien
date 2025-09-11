@@ -8,6 +8,172 @@
 	white-space: nowrap;
 	width: 1px;
 }
+
+/* Admin Responsive Tables CSS */
+
+/* Base responsive table container */
+.responsive-table-container {
+  width: 100%;
+  overflow-x: auto;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  border: 1px solid rgba(139, 115, 85, 0.3);
+  background: #fefcfa;
+}
+
+/* Base table styling */
+.responsive-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  background: #fefcfa;
+  min-width: 600px; /* Ensures horizontal scroll on small screens */
+}
+
+.responsive-table th,
+.responsive-table td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid rgba(139, 115, 85, 0.2);
+  vertical-align: top;
+}
+
+.responsive-table th {
+  background-color: rgba(245, 240, 232, 0.8);
+  font-weight: 600;
+  color: #3d2c1d;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  border-bottom: 2px solid rgba(139, 115, 85, 0.3);
+}
+
+.responsive-table tr:hover {
+  background-color: rgba(245, 240, 232, 0.5);
+}
+
+/* Responsive breakpoints for column priority system */
+@media screen and (max-width: 1024px) {
+  .col-priority-low {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .col-priority-medium {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 576px) {
+  .col-priority-high {
+    display: none;
+  }
+  
+  /* Mobile card layout */
+  .responsive-table-container {
+    border: none;
+    background: transparent;
+  }
+  
+  .responsive-table,
+  .responsive-table thead,
+  .responsive-table tbody,
+  .responsive-table th,
+  .responsive-table td,
+  .responsive-table tr {
+    display: block;
+  }
+  
+  .responsive-table {
+    min-width: auto;
+  }
+  
+  .responsive-table thead {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+  }
+  
+  .responsive-table tr {
+    border: 1px solid rgba(139, 115, 85, 0.3);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    padding: 0.75rem;
+    background: #fefcfa;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .responsive-table td {
+    border: none;
+    border-bottom: 1px solid rgba(139, 115, 85, 0.2);
+    position: relative;
+    padding: 0.5rem 0;
+    text-align: right;
+    width: 100%;
+  }
+  
+  .responsive-table td:before {
+    content: attr(data-label) ": ";
+    position: absolute;
+    left: 0;
+    width: 45%;
+    padding-right: 1rem;
+    white-space: nowrap;
+    font-weight: 600;
+    color: #3d2c1d;
+    text-align: left;
+  }
+  
+  .responsive-table td:last-child {
+    border-bottom: none;
+  }
+}
+
+/* Table badges and status indicators */
+.table-badge {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  background: rgba(139, 115, 85, 0.1);
+  color: #3d2c1d;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.table-badge-admin {
+  background: rgba(139, 69, 19, 0.1);
+  color: #8b4513;
+}
+
+/* Empty state styling */
+.table-empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #8b7355;
+}
+
+.table-empty-state h3 {
+  margin: 0 0 0.5rem 0;
+  color: #3d2c1d;
+}
+
+/* Focus and accessibility enhancements */
+.responsive-table th[tabindex]:focus,
+.responsive-table tr[tabindex]:focus {
+  outline: 2px solid #8b7355;
+  outline-offset: 2px;
+}
+
+.responsive-table tr[data-controller="row-link"] {
+  cursor: pointer;
+}
+
+.responsive-table tr[data-controller="row-link"]:focus {
+  background-color: rgba(139, 115, 85, 0.1);
+}
 /*
  * This is a manifest file that'll be compiled into application.css.
  *
@@ -45,4 +211,226 @@ table[data-controller="sortable-table"] th[aria-sort="descending"]::after {
 table[data-controller="sortable-table"] th:focus {
 	outline: 2px solid #8b7355;
 	outline-offset: 2px;
+}
+
+/* ========================================
+   UNIFIED TABLE STYLING SYSTEM
+   Based on Archive Page Table Design
+   ======================================== */
+
+/* Table Section Container */
+.app-table-section {
+  background: rgba(245, 240, 232, 0.1);
+  backdrop-filter: blur(2px);
+  border-radius: 12px;
+  padding: 2rem;
+  border: 2px solid #8b7355;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  overflow-x: auto;
+}
+
+/* Main Table Class */
+.app-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 8px;
+  overflow: hidden;
+  font-size: 0.9rem;
+}
+
+/* Table Headers */
+.app-table th {
+  background: rgba(139, 115, 85, 0.1);
+  color: #3d2c1d;
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 2px solid rgba(139, 115, 85, 0.3);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  position: relative;
+  outline: none;
+}
+
+.app-table th:focus {
+  outline: 2px solid #8b7355;
+  outline-offset: 2px;
+}
+
+.app-table th:hover {
+  background: rgba(139, 115, 85, 0.2);
+}
+
+/* Sorting indicators for app-table */
+.app-table th[data-type]::after {
+  content: ' ↕';
+  color: rgba(139, 115, 85, 0.5);
+  font-size: 0.8em;
+}
+
+.app-table th[aria-sort="ascending"]::after {
+  content: ' ↑';
+  color: #8b7355;
+}
+
+.app-table th[aria-sort="descending"]::after {
+  content: ' ↓';
+  color: #8b7355;
+}
+
+/* Table Cells */
+.app-table td {
+  padding: 1rem;
+  border-bottom: 1px solid rgba(139, 115, 85, 0.2);
+  color: #3d2c1d;
+  vertical-align: top;
+}
+
+/* Table Rows */
+.app-table tr {
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.app-table tbody tr:hover {
+  background: rgba(139, 115, 85, 0.05);
+}
+
+/* Specialized Cell Types */
+.app-table .date-cell {
+  font-weight: 500;
+  min-width: 150px;
+  width: 150px;
+  white-space: nowrap;
+}
+
+.app-table .quote-preview {
+  max-width: 300px;
+  font-style: italic;
+  line-height: 1.4;
+}
+
+.app-table .content-preview {
+  max-width: 300px;
+  line-height: 1.4;
+}
+
+/* Tag and Badge Styling */
+.app-table .tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.app-table .tag-badge,
+.app-tag-badge {
+  background: rgba(139, 115, 85, 0.15);
+  color: #3d2c1d;
+  padding: 0.15rem 0.5rem;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  border: 1px solid rgba(139, 115, 85, 0.2);
+}
+
+.app-table .tag-more {
+  color: #8b7355;
+  font-size: 0.75rem;
+  font-style: italic;
+}
+
+/* Status Badges */
+.app-table .status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 16px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  background: rgba(139, 115, 85, 0.1);
+  color: #3d2c1d;
+}
+
+.app-table .role-badge {
+  background: rgba(139, 115, 85, 0.1);
+  color: #3d2c1d;
+  padding: 0.125rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+}
+
+.app-table .user-info {
+  font-weight: 500;
+  color: #3d2c1d;
+}
+
+.app-table .secondary-info {
+  color: #8b7355;
+  font-size: 0.875rem;
+}
+
+.app-table .monospace {
+  font-family: monospace;
+  color: #6c757d;
+  font-size: 0.875rem;
+}
+
+/* Empty State */
+.app-table .empty-state {
+  text-align: center;
+  padding: 3rem;
+  color: #8b7355;
+}
+
+.app-table .empty-state h3 {
+  margin: 0 0 1rem 0;
+  color: #3d2c1d;
+  font-family: 'Crimson Text', serif;
+}
+
+.app-table .empty-state p {
+  margin: 0 0 1.5rem 0;
+  font-style: italic;
+}
+
+/* Checkbox Column */
+.app-table .checkbox-cell {
+  width: 40px;
+  padding: 1rem 0.5rem;
+}
+
+/* Action Links */
+.app-table .action-link {
+  color: #8b7355;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.app-table .action-link:hover {
+  color: #3d2c1d;
+  text-decoration: underline;
+}
+
+/* Mobile Responsive Behavior */
+@media (max-width: 768px) {
+  .app-table-section {
+    padding: 1rem;
+    border-radius: 8px;
+  }
+  
+  .app-table {
+    font-size: 0.85rem;
+  }
+  
+  .app-table th,
+  .app-table td {
+    padding: 0.75rem;
+  }
+  
+  .app-table .quote-preview,
+  .app-table .content-preview {
+    max-width: 200px;
+  }
 }

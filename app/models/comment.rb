@@ -5,7 +5,7 @@ class Comment < ApplicationRecord
     stupid idiot moron dumb dumbass retard
   ].freeze
 
-  belongs_to :user
+  belongs_to :user, optional: true
   belongs_to :quote
   belongs_to :parent, class_name: "Comment", optional: true
   has_many :replies, class_name: "Comment", foreign_key: :parent_id, dependent: :destroy
@@ -98,6 +98,28 @@ class Comment < ApplicationRecord
     )
   rescue => e
     Rails.logger.error "Failed to log comment creation: #{e.message}"
+  end
+
+  public
+
+  # Helper methods for handling deleted users
+  def user_display_name
+    return "Deleted User" unless user
+    user.display_name
+  end
+
+  def user_name
+    return "Deleted User" unless user
+    user.name.presence || user.email
+  end
+
+  def user_email
+    return nil unless user
+    user.email
+  end
+
+  def user_deleted?
+    user.nil?
   end
 
   private
