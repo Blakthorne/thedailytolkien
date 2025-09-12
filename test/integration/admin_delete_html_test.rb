@@ -63,5 +63,8 @@ class AdminDeleteHtmlInspectionTest < ActionDispatch::IntegrationTest
     # Look for any JavaScript errors in console (we can't actually see them in tests, but check for error divs)
     error_divs = html.scan(/<div[^>]*error[^>]*>/i)
     puts "⚠️  Error divs found: #{error_divs.length}"
+
+    # Add minimal assertion to verify we got a valid response
+    assert_response :success
   end
 end

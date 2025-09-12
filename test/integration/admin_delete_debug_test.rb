@@ -71,5 +71,8 @@ class AdminUserDeleteDebugTest < ActionDispatch::IntegrationTest
         puts "🤔 Test user gone from database but count unchanged?"
       end
     end
+
+    # Add assertion to prevent test warning
+    assert_response :redirect
   end
 end

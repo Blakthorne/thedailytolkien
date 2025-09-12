@@ -56,5 +56,8 @@ class AdminDeleteFormTest < ActionDispatch::IntegrationTest
     else
       puts "❌ Form-based delete still not working"
     end
+
+    # Add assertion to prevent test warning
+    assert_response :redirect
   end
 end

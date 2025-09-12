@@ -35,10 +35,13 @@ class ConsoleErrorTest < ApplicationSystemTestCase
 
     modules_to_test.each do |module_name|
       begin
-        result = page.evaluate_script("import('#{module_name}').then(() => 'SUCCESS').catch(e => 'ERROR: ' + e.message)")
-        puts "#{module_name}: Checking..."
-        sleep 2 # Give time for async import
-        # Note: The above won't work directly in this context, let me try a different approach
+        # Check if the module is referenced in the page's script tags
+        script_content = page.evaluate_script("document.querySelector('script[type=\"importmap\"]').textContent")
+        if script_content.include?(module_name)
+          puts "#{module_name}: Found in importmap"
+        else
+          puts "#{module_name}: Not found in importmap"
+        end
       rescue => e
         puts "#{module_name}: ERROR - #{e.message}"
       end
@@ -70,16 +73,12 @@ class ConsoleErrorTest < ApplicationSystemTestCase
       (function() {
         try {
           if (typeof window.Stimulus === 'undefined') {
-            // Try to manually load and start stimulus
-            const app = new (await import('@hotwired/stimulus')).Application();
-            app.start();
-            window.Stimulus = app;
-            return 'Manually created Stimulus';
+            return 'Stimulus not available';
           } else {
-            return 'Stimulus already exists';
+            return 'Stimulus already exists: ' + Object.keys(window.Stimulus.router.modulesByIdentifier).length + ' controllers';
           }
         } catch (e) {
-          return 'Error creating manual stimulus: ' + e.message;
+          return 'Error: ' + e.message;
         }
       })()
     """)

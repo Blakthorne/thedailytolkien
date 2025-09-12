@@ -54,5 +54,8 @@ class DebugAuthTest < ApplicationSystemTestCase
     else
       puts "No table element found"
     end
+
+    # Add assertion to prevent test warning
+    assert_equal admin_quotes_path, current_path, "Should be on admin quotes page"
   end
 end

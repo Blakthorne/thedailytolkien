@@ -19,9 +19,13 @@ class ApplicationController < ActionController::Base
     devise_parameter_sanitizer.permit(:account_update, keys: [ :first_name, :last_name, :name, :streak_timezone ])
   end
 
-  # Always redirect to home page after successful sign in
+  # Redirect admin users to admin dashboard, others to home page
   def after_sign_in_path_for(resource)
-    root_path
+    if resource.admin?
+      admin_root_path
+    else
+      root_path
+    end
   end
 
   # Always redirect to home page after successful sign up

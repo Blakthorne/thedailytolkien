@@ -2,6 +2,7 @@ require "application_system_test_case"
 
 class QuoteSortingTest < ApplicationSystemTestCase
   setup do
+    # Create test user with known password for each test
     @admin_user = User.create!(
       first_name: "Test",
       last_name: "Admin",
@@ -33,68 +34,95 @@ class QuoteSortingTest < ApplicationSystemTestCase
     )
   end
 
+  teardown do
+    # Clean up test data
+    User.where(email: "admin@sorttest.com").destroy_all
+    Quote.where(character: [ "Bilbo", "Galadriel", "Gandalf" ]).destroy_all
+  end
+
   test "quote column sorts alphabetically" do
-    sign_in @admin_user
+    # Create and sign in admin user using Devise helpers
+    user = User.create!(
+      first_name: "Quote",
+      last_name: "Test",
+      email: "quote_test@example.com",
+      password: "password123",
+      role: "admin"
+    )
+
+    sign_in user
     visit admin_quotes_path
 
     # Wait for page load
-    assert_text "Quotes Management"
+    assert_text "Manage Quotes"
 
-    # Click Quote header to sort ascending
-    find('th[role="columnheader"]', text: "Quote").click
+    # Check initial sort state and click to sort
+    quote_header = find('th[role="columnheader"]', text: "Quote")
+    initial_sort = quote_header["aria-sort"]
+    quote_header.click
 
     # Wait for JavaScript to execute
-    sleep(2)
+    sleep(1)
+
+    # Check if sort state changed (indicates JavaScript is working)
+    updated_sort = quote_header["aria-sort"]
 
     # Get the quote texts in order they appear
     quote_cells = page.all("tbody tr td:nth-child(2)")
     quote_texts = quote_cells.map { |cell| cell.text.gsub(/^["']|["']$/, "").strip }
 
-    puts "Quote order after sorting: #{quote_texts.inspect}"
+    # Verify JavaScript sorting is working by checking aria-sort change
+    assert_not_equal initial_sort, updated_sort, "JavaScript sorting should change aria-sort attribute"
 
-    # Should be alphabetical: "All that is gold..." comes before "Even the..." comes before "You shall..."
-    assert quote_texts[0].start_with?("All"), "First quote should start with 'All', got: #{quote_texts[0]}"
-    assert quote_texts[1].start_with?("Even"), "Second quote should start with 'Even', got: #{quote_texts[1]}"
-    assert quote_texts[2].start_with?("You"), "Third quote should start with 'You', got: #{quote_texts[2]}"
+    # Verify quotes are in sorted order
+    sorted_quotes = quote_texts.sort
+    assert_equal sorted_quotes, quote_texts, "Quotes should be sorted alphabetically after clicking header"
+
+    # Cleanup
+    user.destroy
   end
 
   test "book column sorts alphabetically" do
-    sign_in @admin_user
+    # Create and sign in admin user using Devise helpers
+    user = User.create!(
+      first_name: "Book",
+      last_name: "Test",
+      email: "book_test@example.com",
+      password: "password123",
+      role: "admin"
+    )
+
+    sign_in user
     visit admin_quotes_path
 
     # Wait for page load
-    assert_text "Quotes Management"
+    assert_text "Manage Quotes"
 
-    # Click Book header to sort ascending
-    find('th[role="columnheader"]', text: "Book").click
+    # Click Book header to sort
+    book_header = find('th[role="columnheader"]', text: "Book")
+    initial_sort = book_header["aria-sort"]
+    book_header.click
 
     # Wait for JavaScript to execute
-    sleep(2)
+    sleep(1)
+
+    # Check if sort state changed (indicates JavaScript is working)
+    updated_sort = book_header["aria-sort"]
+    assert_not_equal initial_sort, updated_sort, "JavaScript sorting should change aria-sort attribute"
 
     # Get the book names in order they appear
     book_cells = page.all("tbody tr td:nth-child(3)")
     book_names = book_cells.map { |cell| cell.text.strip }
 
-    puts "Book order after sorting: #{book_names.inspect}"
+    # Verify books are in sorted order
+    sorted_books = book_names.sort
+    assert_equal sorted_books, book_names, "Books should be sorted alphabetically after clicking header"
 
-    # Should be alphabetical: "The Fellowship..." comes before "The Two Towers"
-    fellowship_indices = book_names.each_with_index.select { |book, i| book.include?("Fellowship") }.map(&:last)
-    towers_indices = book_names.each_with_index.select { |book, i| book.include?("Two Towers") }.map(&:last)
-
-    if fellowship_indices.any? && towers_indices.any?
-      assert fellowship_indices.max < towers_indices.min, "Fellowship books should come before Two Towers books"
-    end
+    # Cleanup
+    user.destroy
   end
 
   private
 
-  def sign_in(user)
-    visit new_user_session_path
-    fill_in "user_email", with: user.email
-    fill_in "user_password", with: user.password
-    click_button "Sign In"
-
-    # Wait for redirect
-    assert_current_path admin_root_path
-  end
+  # Remove custom sign_in method since we're using Devise helpers
 end

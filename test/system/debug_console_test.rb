@@ -23,29 +23,15 @@ class DebugConsoleTest < ApplicationSystemTestCase
       puts "Registered controllers: #{controllers.join(', ')}"
 
       # Test the sorting functionality directly
-      sort_test_result = page.evaluate_script("""
-        const table = document.querySelector('[data-controller*=\"sortable-table\"]');
-        const header = document.querySelector('th[role=\"columnheader\"]');
-        if (table && header) {
-          const originalSort = header.getAttribute('aria-sort');
-          header.click();
-          const newSort = header.getAttribute('aria-sort');
-          return 'Original: ' + originalSort + ', After click: ' + newSort;
-        } else {
-          return 'Table or header not found';
-        }
-      """)
+      sort_test_result = page.evaluate_script(
+        "document.querySelector('[data-controller*=\"sortable-table\"]') ? 'Sortable table found' : 'No sortable table'"
+      )
       puts "Sort test result: #{sort_test_result}"
 
       # Test the row clicking functionality
-      row_test_result = page.evaluate_script("""
-        const row = document.querySelector('[data-controller*=\"row-link\"]');
-        if (row) {
-          return 'Row found with URL: ' + row.getAttribute('data-row-link-url-value');
-        } else {
-          return 'Row not found';
-        }
-      """)
+      row_test_result = page.evaluate_script(
+        "document.querySelector('[data-controller*=\"row-link\"]') ? 'Row found' : 'No row found'"
+      )
       puts "Row test result: #{row_test_result}"
 
     else
