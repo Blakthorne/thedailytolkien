@@ -53,7 +53,7 @@ jobs:
                   host: ${{ secrets.HOST }}
                   username: ${{ secrets.USERNAME }}
                   key: ${{ secrets.SSH_PRIVATE_KEY }}
-                  source: "thedailytolkien.tar.gz,docker-compose.prod.yml,deploy/deploy.sh,deploy/nginx.conf,deploy/nginx-server-blocks.conf"
+                  source: "thedailytolkien.tar.gz,docker-compose.prod.yml,deploy/deploy.sh,deploy/nginx.conf,deploy/nginx-server-blocks.conf,deploy/verify-deployment.sh"
                   target: "/home/${{ secrets.USERNAME }}/thedailytolkien"
 
             - name: Deploy to server
