@@ -36,10 +36,17 @@ check_env_vars() {
     
     if [ -z "$RAILS_MASTER_KEY" ]; then
         log_error "RAILS_MASTER_KEY environment variable is not set!"
+        log_error "Please set it with: export RAILS_MASTER_KEY=your_key_here"
         exit 1
     fi
     
+    # Write the environment file for Docker Compose
+    cat > .env << EOF
+RAILS_MASTER_KEY=${RAILS_MASTER_KEY}
+EOF
+    
     log_info "Environment variables check passed ✅"
+    log_info "RAILS_MASTER_KEY written to .env file for Docker Compose"
 }
 
 # Function to create backup
@@ -126,6 +133,49 @@ verify_deployment() {
     log_info "Deployment verification passed ✅"
 }
 
+# Function to update Nginx configuration for multi-app setup
+update_nginx_config() {
+    log_info "Updating Nginx configuration..."
+    
+    NGINX_SITE_CONFIG="/etc/nginx/sites-available/service-integrator"
+    
+    # Check if the multi-app config file exists
+    if [ ! -f "$NGINX_SITE_CONFIG" ]; then
+        log_warn "Multi-app Nginx config file not found at $NGINX_SITE_CONFIG"
+        log_warn "Creating a new configuration..."
+        
+        # Create the configuration if it doesn't exist
+        sudo cp deploy/nginx.conf "$NGINX_SITE_CONFIG"
+        sudo ln -sf "$NGINX_SITE_CONFIG" /etc/nginx/sites-enabled/
+    else
+        log_info "Found existing multi-app Nginx config at $NGINX_SITE_CONFIG"
+        
+        # Create a backup of the current config
+        sudo cp "$NGINX_SITE_CONFIG" "${NGINX_SITE_CONFIG}.backup.$(date +%Y%m%d_%H%M%S)"
+        
+        # Check if The Daily Tolkien configuration already exists
+        if sudo grep -q "thedailytolkien.davidpolar.com" "$NGINX_SITE_CONFIG"; then
+            log_info "The Daily Tolkien configuration already exists in multi-app config"
+        else
+            log_info "Adding The Daily Tolkien configuration to multi-app config"
+            
+            # Extract just the server blocks from our config and append to the multi-app config
+            sudo bash -c "echo '' >> $NGINX_SITE_CONFIG"
+            sudo bash -c "echo '# The Daily Tolkien Configuration' >> $NGINX_SITE_CONFIG"
+            sudo bash -c "cat deploy/nginx.conf >> $NGINX_SITE_CONFIG"
+        fi
+    fi
+    
+    # Test and reload Nginx
+    if sudo nginx -t; then
+        sudo systemctl reload nginx
+        log_info "Nginx configuration updated and reloaded ✅"
+    else
+        log_error "Nginx configuration test failed!"
+        exit 1
+    fi
+}
+
 # Function to show status
 show_status() {
     log_info "Deployment Status:"
@@ -143,6 +193,7 @@ main() {
     deploy_app
     run_migrations
     verify_deployment
+    update_nginx_config
     show_status
     
     log_info "🎉 Deployment completed successfully!"

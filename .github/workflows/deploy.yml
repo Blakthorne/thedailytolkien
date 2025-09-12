@@ -68,14 +68,9 @@ jobs:
                       # Load the new Docker image
                       docker load < thedailytolkien.tar.gz
 
-                      # Set environment variables
+                      # Set environment variables for the deployment
                       export RAILS_MASTER_KEY="${{ secrets.RAILS_MASTER_KEY }}"
 
-                      # Run deployment script
+                      # Run deployment script (this now handles Nginx config properly)
                       chmod +x deploy/deploy.sh
                       ./deploy/deploy.sh
-
-                      # Update Nginx configuration if needed
-                      sudo cp deploy/nginx.conf /etc/nginx/sites-available/thedailytolkien.davidpolar.com
-                      sudo ln -sf /etc/nginx/sites-available/thedailytolkien.davidpolar.com /etc/nginx/sites-enabled/
-                      sudo nginx -t && sudo systemctl reload nginx

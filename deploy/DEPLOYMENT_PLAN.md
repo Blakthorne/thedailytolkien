@@ -153,46 +153,70 @@ export RAILS_MASTER_KEY="your-master-key-here"
 
 ## Phase 5: Multi-App Nginx Configuration
 
-Since you mentioned another app runs on the same server, here's how to configure multiple apps:
+**IMPORTANT:** This deployment is designed to work with existing multi-app server setups. The deployment script will NOT overwrite your existing Nginx configuration.
 
-### Example Nginx Configuration for Multiple Apps
+### Current Multi-App Setup
 
-```nginx
-# /etc/nginx/sites-available/multiple-apps.conf
+Your server uses:
+- **Main Nginx config file:** `/etc/nginx/sites-available/service-integrator`
+- **Enabled sites:** `/etc/nginx/sites-enabled/service-integrator` (symlinked)
 
-# App 1: The Daily Tolkien
-upstream thedailytolkien_backend {
-    server 127.0.0.1:3001;
-}
+### How The Daily Tolkien Integrates
 
-# App 2: Another Application (example)
-upstream otherapp_backend {
-    server 127.0.0.1:3000;
-}
+The deployment script will:
+1. **Check** if your multi-app config exists at `/etc/nginx/sites-available/service-integrator`
+2. **Backup** your current configuration before making changes
+3. **Append** The Daily Tolkien configuration to your existing config (if not already present)
+4. **Test** and **reload** Nginx safely
 
-# The Daily Tolkien configuration (existing)
-server {
-    listen 443 ssl http2;
-    server_name thedailytolkien.davidpolar.com;
-    # ... (rest of configuration from deploy/nginx.conf)
-}
+### Manual Nginx Configuration (if needed)
 
-# Another App configuration
-server {
-    listen 443 ssl http2;
-    server_name anotherapp.davidpolar.com;
+If you need to manually add The Daily Tolkien to your multi-app configuration:
 
-    ssl_certificate /etc/letsencrypt/live/anotherapp.davidpolar.com/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/anotherapp.davidpolar.com/privkey.pem;
+```bash
+# 1. Backup your current config
+sudo cp /etc/nginx/sites-available/service-integrator /etc/nginx/sites-available/service-integrator.backup
 
-    location / {
-        proxy_pass http://otherapp_backend;
-        # ... (similar proxy settings)
-    }
-}
+# 2. Add The Daily Tolkien configuration
+sudo cat ~/thedailytolkien/deploy/nginx-snippet.conf >> /etc/nginx/sites-available/service-integrator
+
+# 3. Test and reload
+sudo nginx -t && sudo systemctl reload nginx
 ```
 
-## Phase 6: Monitoring and Maintenance
+### Nginx Configuration Details
+
+The Daily Tolkien uses:
+- **Upstream backend:** `127.0.0.1:3001` (Docker container)
+- **Domain:** `thedailytolkien.davidpolar.com`
+- **SSL certificates:** `/etc/letsencrypt/live/thedailytolkien.davidpolar.com/`
+- **Rate limiting:** 10 requests/second with burst of 20
+
+This configuration is designed to coexist with your other applications without conflicts.
+
+## Phase 6: Environment Variable Management
+
+### RAILS_MASTER_KEY Setup
+
+The deployment now properly handles the Rails master key:
+
+1. **GitHub Actions** passes the key via secrets
+2. **Deployment script** creates a `.env` file for Docker Compose
+3. **Docker container** receives the environment variable correctly
+
+### Verifying Environment Variables
+
+```bash
+# Check if RAILS_MASTER_KEY is set in the container
+docker-compose -f ~/thedailytolkien/docker-compose.prod.yml exec web env | grep RAILS_MASTER_KEY
+
+# Check Docker Compose environment file
+cat ~/thedailytolkien/.env
+```
+
+## Phase 7: Troubleshooting Deployment Issues
+
+## Phase 8: Monitoring and Maintenance
 
 ### Log Monitoring
 
@@ -206,6 +230,9 @@ sudo tail -f /var/log/nginx/thedailytolkien.error.log
 
 # System logs
 journalctl -u docker -f
+
+# Check environment variables in container
+docker-compose -f ~/thedailytolkien/docker-compose.prod.yml exec web env | grep RAILS_MASTER_KEY
 ```
 
 ### Health Checks
@@ -242,7 +269,97 @@ docker-compose -f docker-compose.prod.yml pull
 docker-compose -f docker-compose.prod.yml up -d
 ```
 
-## Troubleshooting
+## Troubleshooting Legacy Issues
+
+### Common Issues
+
+## Phase 7: Troubleshooting Deployment Issues
+
+### Common Issues and Solutions
+
+#### 1. "Welcome to nginx!" Default Page
+
+**Symptoms:** Browser shows default Nginx page instead of The Daily Tolkien
+**Cause:** Nginx configuration not properly applied or site not enabled
+
+**Solution:**
+```bash
+# Check if The Daily Tolkien config is in the multi-app config
+sudo grep -n "thedailytolkien.davidpolar.com" /etc/nginx/sites-available/service-integrator
+
+# Test Nginx configuration
+sudo nginx -t
+
+# Reload Nginx if test passes
+sudo systemctl reload nginx
+
+# Check if site is enabled
+ls -la /etc/nginx/sites-enabled/
+
+# If needed, enable the site manually
+sudo ln -sf /etc/nginx/sites-available/service-integrator /etc/nginx/sites-enabled/
+```
+
+#### 2. RAILS_MASTER_KEY Warning in Logs
+
+**Symptoms:** Docker logs show "WARN[0000] The 'RAILS_MASTER_KEY' variable is not set"
+**Cause:** Environment variable not properly passed to Docker container
+
+**Solution:**
+```bash
+# Check if .env file exists and contains the key
+cat ~/thedailytolkien/.env
+
+# If missing, create it manually
+echo "RAILS_MASTER_KEY=your_actual_master_key_here" > ~/thedailytolkien/.env
+
+# Restart the container
+cd ~/thedailytolkien
+docker-compose -f docker-compose.prod.yml down
+docker-compose -f docker-compose.prod.yml up -d
+
+# Verify the key is now available in the container
+docker-compose -f docker-compose.prod.yml exec web env | grep RAILS_MASTER_KEY
+```
+
+#### 3. Container Not Starting
+
+**Symptoms:** Docker container fails to start or health checks fail
+**Cause:** Various issues including environment, ports, or application errors
+
+**Solution:**
+```bash
+# Check container status
+docker-compose -f ~/thedailytolkien/docker-compose.prod.yml ps
+
+# View container logs
+docker-compose -f ~/thedailytolkien/docker-compose.prod.yml logs web
+
+# Check if port 3001 is in use
+sudo netstat -tlnp | grep :3001
+
+# Restart containers
+docker-compose -f ~/thedailytolkien/docker-compose.prod.yml restart
+```
+
+#### 4. SSL Certificate Issues
+
+**Symptoms:** HTTPS not working or certificate warnings
+**Cause:** SSL certificates not properly configured for the domain
+
+**Solution:**
+```bash
+# Check certificate status
+sudo certbot certificates
+
+# Renew certificate if needed
+sudo certbot renew --dry-run
+
+# If certificate doesn't exist, create it
+sudo certbot --nginx -d thedailytolkien.davidpolar.com
+```
+
+## Phase 8: Monitoring and Maintenance
 
 ### Common Issues
 
