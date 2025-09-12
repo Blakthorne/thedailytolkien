@@ -1,0 +1,81 @@
+name: Deploy to Production
+
+on:
+    push:
+        branches: [main]
+    workflow_dispatch:
+
+jobs:
+    test:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Set up Ruby
+              uses: ruby/setup-ruby@v1
+              with:
+                  ruby-version: .ruby-version
+                  bundler-cache: true
+
+            - name: Run security scans
+              run: |
+                  bin/brakeman --no-pager
+                  bin/importmap audit
+
+            - name: Run linting
+              run: bin/rubocop
+
+            - name: Run tests
+              run: bin/rails test
+
+    deploy:
+        needs: test
+        runs-on: ubuntu-latest
+        if: github.ref == 'refs/heads/main'
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Set up Docker Buildx
+              uses: docker/setup-buildx-action@v3
+
+            - name: Build Docker image
+              run: |
+                  docker build -t thedailytolkien:latest .
+                  docker save thedailytolkien:latest | gzip > thedailytolkien.tar.gz
+
+            - name: Copy files to server
+              uses: appleboy/scp-action@v0.1.7
+              with:
+                  host: ${{ secrets.HOST }}
+                  username: ${{ secrets.USERNAME }}
+                  key: ${{ secrets.SSH_PRIVATE_KEY }}
+                  source: "thedailytolkien.tar.gz,docker-compose.prod.yml,deploy/deploy.sh,deploy/nginx.conf"
+                  target: "/home/${{ secrets.USERNAME }}/thedailytolkien"
+
+            - name: Deploy to server
+              uses: appleboy/ssh-action@v1.0.3
+              with:
+                  host: ${{ secrets.HOST }}
+                  username: ${{ secrets.USERNAME }}
+                  key: ${{ secrets.SSH_PRIVATE_KEY }}
+                  script: |
+                      cd /home/${{ secrets.USERNAME }}/thedailytolkien
+
+                      # Load the new Docker image
+                      docker load < thedailytolkien.tar.gz
+
+                      # Set environment variables
+                      export RAILS_MASTER_KEY="${{ secrets.RAILS_MASTER_KEY }}"
+
+                      # Run deployment script
+                      chmod +x deploy/deploy.sh
+                      ./deploy/deploy.sh
+
+                      # Update Nginx configuration if needed
+                      sudo cp deploy/nginx.conf /etc/nginx/sites-available/thedailytolkien.davidpolar.com
+                      sudo ln -sf /etc/nginx/sites-available/thedailytolkien.davidpolar.com /etc/nginx/sites-enabled/
+                      sudo nginx -t && sudo systemctl reload nginx

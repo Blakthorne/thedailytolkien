@@ -163,7 +163,7 @@ configure_firewall() {
     sudo ufw allow 'Nginx Full'
     
     # Allow Docker port for application (internal only)
-    sudo ufw allow from 127.0.0.1 to any port 3000
+    sudo ufw allow from 127.0.0.1 to any port 3001
     
     # Show status
     sudo ufw status

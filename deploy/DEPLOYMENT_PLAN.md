@@ -109,12 +109,12 @@ The application uses:
 
 -   **docker-compose.prod.yml** for production orchestration
 -   **Dockerfile** optimized for production
--   Port mapping: Container 80 → Host 3000
+-   Port mapping: Container 80 → Host 3001
 -   Persistent volumes for database, storage, and logs
 
 ### Nginx Configuration
 
--   **Reverse proxy** from port 443 (HTTPS) to port 3000 (app)
+-   **Reverse proxy** from port 443 (HTTPS) to port 3001 (app)
 -   **SSL termination** with Let's Encrypt certificates
 -   **Security headers** and rate limiting
 -   **Gzip compression** for static assets
@@ -162,12 +162,12 @@ Since you mentioned another app runs on the same server, here's how to configure
 
 # App 1: The Daily Tolkien
 upstream thedailytolkien_backend {
-    server 127.0.0.1:3000;
+    server 127.0.0.1:3001;
 }
 
 # App 2: Another Application (example)
 upstream otherapp_backend {
-    server 127.0.0.1:3001;
+    server 127.0.0.1:3000;
 }
 
 # The Daily Tolkien configuration (existing)
@@ -246,7 +246,7 @@ docker-compose -f docker-compose.prod.yml up -d
 
 ### Common Issues
 
-1. **Port conflicts:** Ensure port 3000 is available for the application
+1. **Port conflicts:** Ensure port 3001 is available for the application
 2. **SSL issues:** Verify domain points to server and certificates are valid
 3. **Docker permissions:** Ensure user is in docker group
 4. **Firewall issues:** Check UFW rules allow necessary ports
@@ -267,7 +267,7 @@ sudo nginx -t
 openssl s_client -connect thedailytolkien.davidpolar.com:443
 
 # Test internal connectivity
-curl -f http://localhost:3000/up
+curl -f http://localhost:3001/up
 ```
 
 ## Security Considerations
