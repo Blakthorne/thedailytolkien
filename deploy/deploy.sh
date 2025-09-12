@@ -159,10 +159,10 @@ update_nginx_config() {
         else
             log_info "Adding The Daily Tolkien configuration to multi-app config"
             
-            # Extract just the server blocks from our config and append to the multi-app config
+            # Use server-blocks-only config to avoid duplicate global directives
             sudo bash -c "echo '' >> $NGINX_SITE_CONFIG"
             sudo bash -c "echo '# The Daily Tolkien Configuration' >> $NGINX_SITE_CONFIG"
-            sudo bash -c "cat deploy/nginx.conf >> $NGINX_SITE_CONFIG"
+            sudo bash -c "cat deploy/nginx-server-blocks.conf >> $NGINX_SITE_CONFIG"
         fi
     fi
     
