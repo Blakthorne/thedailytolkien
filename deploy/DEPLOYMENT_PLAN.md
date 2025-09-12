@@ -158,12 +158,14 @@ export RAILS_MASTER_KEY="your-master-key-here"
 ### Current Multi-App Setup
 
 Your server uses:
-- **Main Nginx config file:** `/etc/nginx/sites-available/service-integrator`
-- **Enabled sites:** `/etc/nginx/sites-enabled/service-integrator` (symlinked)
+
+-   **Main Nginx config file:** `/etc/nginx/sites-available/service-integrator`
+-   **Enabled sites:** `/etc/nginx/sites-enabled/service-integrator` (symlinked)
 
 ### How The Daily Tolkien Integrates
 
 The deployment script will:
+
 1. **Check** if your multi-app config exists at `/etc/nginx/sites-available/service-integrator`
 2. **Backup** your current configuration before making changes
 3. **Append** The Daily Tolkien configuration to your existing config (if not already present)
@@ -187,10 +189,11 @@ sudo nginx -t && sudo systemctl reload nginx
 ### Nginx Configuration Details
 
 The Daily Tolkien uses:
-- **Upstream backend:** `127.0.0.1:3001` (Docker container)
-- **Domain:** `thedailytolkien.davidpolar.com`
-- **SSL certificates:** `/etc/letsencrypt/live/thedailytolkien.davidpolar.com/`
-- **Rate limiting:** 10 requests/second with burst of 20
+
+-   **Upstream backend:** `127.0.0.1:3001` (Docker container)
+-   **Domain:** `thedailytolkien.davidpolar.com`
+-   **SSL certificates:** `/etc/letsencrypt/live/thedailytolkien.davidpolar.com/`
+-   **Rate limiting:** 10 requests/second with burst of 20
 
 This configuration is designed to coexist with your other applications without conflicts.
 
@@ -283,6 +286,7 @@ docker-compose -f docker-compose.prod.yml up -d
 **Cause:** Nginx configuration not properly applied or site not enabled
 
 **Solution:**
+
 ```bash
 # Check if The Daily Tolkien config is in the multi-app config
 sudo grep -n "thedailytolkien.davidpolar.com" /etc/nginx/sites-available/service-integrator
@@ -306,6 +310,7 @@ sudo ln -sf /etc/nginx/sites-available/service-integrator /etc/nginx/sites-enabl
 **Cause:** Environment variable not properly passed to Docker container
 
 **Solution:**
+
 ```bash
 # Check if .env file exists and contains the key
 cat ~/thedailytolkien/.env
@@ -328,6 +333,7 @@ docker-compose -f docker-compose.prod.yml exec web env | grep RAILS_MASTER_KEY
 **Cause:** Various issues including environment, ports, or application errors
 
 **Solution:**
+
 ```bash
 # Check container status
 docker-compose -f ~/thedailytolkien/docker-compose.prod.yml ps
@@ -348,6 +354,7 @@ docker-compose -f ~/thedailytolkien/docker-compose.prod.yml restart
 **Cause:** SSL certificates not properly configured for the domain
 
 **Solution:**
+
 ```bash
 # Check certificate status
 sudo certbot certificates
