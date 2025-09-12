@@ -36,6 +36,33 @@ check_root() {
     fi
 }
 
+# Function to clean up problematic repositories
+cleanup_repositories() {
+    log_step "Cleaning up problematic repositories..."
+    
+    # Remove problematic Certbot PPA if it exists
+    if [[ -f /etc/apt/sources.list.d/certbot-ubuntu-certbot-*.list ]]; then
+        log_info "Removing problematic Certbot PPA..."
+        sudo rm -f /etc/apt/sources.list.d/certbot-ubuntu-certbot-*.list
+    fi
+    
+    # Remove any other problematic PPAs that might exist
+    sudo find /etc/apt/sources.list.d/ -name "*certbot*" -delete 2>/dev/null || true
+    
+    # Clean up GPG keys for removed repositories
+    sudo apt-key del 2048R/A2C794A6 2>/dev/null || true
+    
+    # Update package lists after cleanup
+    sudo apt update || {
+        log_warn "Initial apt update failed, attempting to fix..."
+        sudo apt --fix-broken install -y
+        sudo dpkg --configure -a
+        sudo apt update
+    }
+    
+    log_info "Repository cleanup completed ✅"
+}
+
 # Function to update system packages
 update_system() {
     log_step "Updating system packages..."
@@ -53,18 +80,25 @@ install_docker() {
     # Install dependencies
     sudo apt install -y apt-transport-https ca-certificates curl gnupg lsb-release
     
+    # Create keyrings directory if it doesn't exist
+    sudo mkdir -p /usr/share/keyrings
+    
     # Add Docker's official GPG key
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
     
     # Set up the stable repository
     echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
     
-    # Install Docker Engine
+    # Update package lists and install Docker
     sudo apt update
     sudo apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
     
     # Add current user to docker group
     sudo usermod -aG docker $USER
+    
+    # Start and enable Docker service
+    sudo systemctl start docker
+    sudo systemctl enable docker
     
     log_info "Docker installed ✅"
     log_warn "Please log out and back in for Docker group changes to take effect"
@@ -101,7 +135,16 @@ install_nginx() {
 install_certbot() {
     log_step "Installing Certbot for SSL certificates..."
     
+    # Use official Ubuntu packages instead of PPAs for better compatibility
     sudo apt install -y certbot python3-certbot-nginx
+    
+    # Verify Certbot installation
+    if command -v certbot &> /dev/null; then
+        log_info "Certbot installed successfully (version: $(certbot --version 2>&1 | head -n1))"
+    else
+        log_error "Certbot installation failed"
+        exit 1
+    fi
     
     log_info "Certbot installed ✅"
 }
@@ -218,6 +261,7 @@ main() {
     echo ""
     
     check_root
+    cleanup_repositories
     update_system
     install_docker
     install_docker_compose
