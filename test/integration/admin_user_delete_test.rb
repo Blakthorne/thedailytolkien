@@ -53,9 +53,12 @@ class AdminUserDeleteTest < ActionDispatch::IntegrationTest
     get admin_user_path(@test_user)
     assert_response :success
 
-    # Check for correct Turbo attributes
-    assert_select 'a[data-turbo-method="delete"]', text: "Delete"
-    assert_select "a[data-turbo-confirm]"
+    # Check for correct form-based delete
+    assert_select 'form[method="post"]' do
+      assert_select 'input[name="_method"][value="delete"]'
+      assert_select 'input[type="submit"][value="Delete"]'
+    end
+    assert_select "form[data-turbo-confirm]"
   end
 
   private

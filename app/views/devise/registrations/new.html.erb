@@ -568,7 +568,6 @@ document.addEventListener('DOMContentLoaded', function() {
       if (timezoneField) {
         const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
         timezoneField.value = detectedTimezone;
-        console.log('Timezone detected and set for registration:', detectedTimezone);
       }
     });
   </script>

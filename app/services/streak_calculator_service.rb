@@ -37,9 +37,10 @@ class StreakCalculatorService
       }
     else
       # Streak broken - reset to 1
+      new_longest = [ 1, @user.longest_streak ].max
       {
         current_streak: 1,
-        longest_streak: @user.longest_streak,
+        longest_streak: new_longest,
         last_login_date: user_date,
         streak_continued: false,
         streak_broken: @user.current_streak > 0

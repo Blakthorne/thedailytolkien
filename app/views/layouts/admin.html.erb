@@ -21,12 +21,9 @@
     <script>
       // Inline JavaScript fallback for admin functionality
       document.addEventListener('DOMContentLoaded', function() {
-        console.log('Inline admin JavaScript loaded');
-        
         // Row clicking functionality
         function setupRowClicking() {
           const rows = document.querySelectorAll('[data-controller*="row-link"]');
-          console.log('Found ' + rows.length + ' clickable rows');
           rows.forEach(row => {
             const url = row.getAttribute('data-row-link-url-value');
             if (url) {
@@ -43,7 +40,6 @@
                 if (e.target.closest('a, button, input, select, textarea, label')) {
                   return;
                 }
-                console.log('Row clicked, navigating to:', url);
                 window.location = url;
               });
             }
@@ -56,7 +52,6 @@
       
       // Also run on Turbo page loads
       document.addEventListener('turbo:load', function() {
-        console.log('Turbo load detected, re-running setup');
         // Small delay to ensure DOM is ready
         setTimeout(function() {
           const event = new Event('DOMContentLoaded');

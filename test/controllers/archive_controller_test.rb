@@ -2,12 +2,17 @@ require "test_helper"
 
 class ArchiveControllerTest < ActionDispatch::IntegrationTest
   def setup
+    # Create a quote with a timestamp that falls within a UTC day range
+    # Use yesterday at noon UTC to ensure it's within the day range
+    test_date = 1.day.ago.to_date
+    test_timestamp = test_date.beginning_of_day.in_time_zone('UTC').to_i + 12.hours
+    
     @quote = Quote.create!(
       text: "Test quote for archive controller testing",
       book: "Test Book",
       character: "Test Character",
-      last_date_displayed: 1.day.ago.to_i,
-      first_date_displayed: 1.day.ago.to_i
+      last_date_displayed: test_timestamp,
+      first_date_displayed: test_timestamp
     )
 
     @user = User.create!(

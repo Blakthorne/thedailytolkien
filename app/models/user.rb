@@ -98,7 +98,7 @@ class User < ApplicationRecord
   def streak_emoji
     case current_streak
     when 0
-      ""
+      "📅"
     when 1..7
       "🔥"
     when 8..30

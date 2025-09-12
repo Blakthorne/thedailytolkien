@@ -238,11 +238,15 @@ class AdminComprehensiveTest < ActionDispatch::IntegrationTest
   test "admin handles errors gracefully" do
     # Test accessing non-existent quote
     get admin_quote_path(999999)
-    assert_response :not_found
+    assert_response :redirect
+    assert_redirected_to admin_quotes_path
+    assert_match(/Quote not found/, flash[:alert])
 
     # Test accessing non-existent user
     get admin_user_path(999999)
-    assert_response :not_found
+    assert_response :redirect
+    assert_redirected_to admin_users_path
+    assert_match(/User not found/, flash[:alert])
 
     # Test invalid quote creation
     post admin_quotes_path, params: {

@@ -755,14 +755,50 @@
 
 <!-- JavaScript for Real-time Interactions -->
 <script>
+// Define updateEngagementUI in global scope so ActionCable can access it
+function updateEngagementUI(data) {
+  // Update like button
+  const likeBtn = document.querySelector('.like-btn');
+  const dislikeBtn = document.querySelector('.dislike-btn');
+  
+  // Check if buttons exist before trying to update them
+  if (!likeBtn || !dislikeBtn) {
+    console.error('Like or dislike buttons not found');
+    return;
+  }
+  
+  // Reset active states
+  likeBtn.classList.remove('like-active');
+  dislikeBtn.classList.remove('dislike-active');
+  
+  // Update counts
+  const likeCount = likeBtn.querySelector('.count');
+  const dislikeCount = dislikeBtn.querySelector('.count');
+  
+  if (likeCount) likeCount.textContent = data.likes_count;
+  if (dislikeCount) dislikeCount.textContent = data.dislikes_count;
+  
+  // Set active state based on user's current preference
+  if (data.user_like_status === 'like') {
+    likeBtn.classList.add('like-active');
+  } else if (data.user_like_status === 'dislike') {
+    dislikeBtn.classList.add('dislike-active');
+  }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
   // Like/Dislike AJAX functionality
   const engagementButtons = document.querySelectorAll('.engagement-btn[data-type]');
   
+  console.log('Found engagement buttons:', engagementButtons.length);
+  
   engagementButtons.forEach(button => {
+    console.log('Adding click listener to button:', button);
     button.addEventListener('click', function() {
+      console.log('Button clicked:', this);
       const quoteId = this.dataset.quoteId;
       const type = this.dataset.type;
+      console.log('Quote ID:', quoteId, 'Type:', type);
       
       // Add loading state
       this.classList.add('loading');
@@ -790,27 +826,6 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     });
   });
-  
-  function updateEngagementUI(data) {
-    // Update like button
-    const likeBtn = document.querySelector('.like-btn');
-    const dislikeBtn = document.querySelector('.dislike-btn');
-    
-    // Reset active states
-    likeBtn.classList.remove('like-active');
-    dislikeBtn.classList.remove('dislike-active');
-    
-    // Update counts
-    likeBtn.querySelector('.count').textContent = data.likes_count;
-    dislikeBtn.querySelector('.count').textContent = data.dislikes_count;
-    
-    // Set active state based on user's current preference
-    if (data.user_like_status === 'like') {
-      likeBtn.classList.add('like-active');
-    } else if (data.user_like_status === 'dislike') {
-      dislikeBtn.classList.add('dislike-active');
-    }
-  }
   
   // Comment form AJAX
   const commentForm = document.getElementById('comment-form');
@@ -1119,13 +1134,19 @@ document.addEventListener('DOMContentLoaded', function() {
 document.addEventListener('DOMContentLoaded', function() {
   <% if @quote %>
   // Subscribe to quote interaction updates
-  App.quoteChannel = App.cable.subscriptions.create({
-    channel: "QuoteInteractionChannel",
-    quote_id: <%= @quote.id %>
-  }, {
-    received: function(data) {
-      console.log('Received real-time update:', data);
-      
+  if (typeof window.App === 'undefined') {
+    window.App = {};
+  }
+  if (typeof window.App.cable === 'undefined' && typeof ActionCable !== 'undefined') {
+    window.App.cable = ActionCable.createConsumer();
+  }
+  
+  if (window.App.cable) {
+    App.quoteChannel = window.App.cable.subscriptions.create({
+      channel: "QuoteInteractionChannel",
+      quote_id: <%= @quote.id %>
+    }, {
+      received: function(data) {
       if (data.type === 'like_update') {
         // Update like/dislike counts from other users
         updateEngagementUI(data);
@@ -1147,7 +1168,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       }
     }
-  });
+    });
+  }
   <% end %>
 });
 </script>

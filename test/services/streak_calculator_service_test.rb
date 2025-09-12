@@ -13,6 +13,10 @@ class StreakCalculatorServiceTest < ActiveSupport::TestCase
 
   test "should initialize new user streak correctly" do
     login_time = Time.zone.parse("2024-01-15 10:00:00 EST")
+    
+    # Clear the last_login_date to simulate a truly new user
+    @user.update_column(:last_login_date, nil)
+    
     service = StreakCalculatorService.new(@user, login_time)
 
     result = service.calculate_streak
@@ -120,6 +124,9 @@ class StreakCalculatorServiceTest < ActiveSupport::TestCase
     current_time = Time.current.in_time_zone(@user.streak_timezone)
     user_date = current_time.to_date
 
+    # Clear the last_login_date to simulate a truly new user
+    @user.update_column(:last_login_date, nil)
+    
     service = StreakCalculatorService.new(@user, current_time)
     assert_equal :new_user, service.streak_status
 
