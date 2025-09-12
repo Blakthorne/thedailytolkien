@@ -152,7 +152,7 @@ class AdminSortingVerificationTest < ApplicationSystemTestCase
     fill_in "Email", with: user.email
     fill_in "Password", with: "password123"
     click_button "Sign In"
-    assert_text "Welcome, #{user.email}"
+    assert_text "Welcome, #{user.display_name}"
   end
 
   def teardown

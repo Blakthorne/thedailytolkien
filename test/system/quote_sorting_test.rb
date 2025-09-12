@@ -95,6 +95,6 @@ class QuoteSortingTest < ApplicationSystemTestCase
     click_button "Sign In"
 
     # Wait for redirect
-    assert_current_path admin_dashboard_path
+    assert_current_path admin_root_path
   end
 end

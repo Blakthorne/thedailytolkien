@@ -552,6 +552,12 @@
             <span class="metadata-value"><%= @quote.chapter %></span>
           </div>
         <% end %>
+        <% if @quote.context.present? %>
+          <div class="metadata-item">
+            <span class="metadata-label">Context</span>
+            <span class="metadata-value"><%= @quote.context %></span>
+          </div>
+        <% end %>
         <% if @quote.character.present? %>
           <div class="metadata-item">
             <span class="metadata-label">Character</span>

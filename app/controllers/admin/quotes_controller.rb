@@ -121,12 +121,12 @@ class Admin::QuotesController < AdminController
   end
 
   def quote_params
-    params.require(:quote).permit(:text, :book, :chapter, :character, tag_ids: [])
+    params.require(:quote).permit(:text, :book, :chapter, :context, :character, tag_ids: [])
   end
 
   def generate_quotes_csv
     CSV.generate(headers: true) do |csv|
-      csv << [ "ID", "Text", "Book", "Chapter", "Character", "Created At" ]
+      csv << [ "ID", "Text", "Book", "Chapter", "Context", "Character", "Created At" ]
 
       Quote.find_each do |quote|
         csv << [
@@ -134,6 +134,7 @@ class Admin::QuotesController < AdminController
           quote.text,
           quote.book,
           quote.chapter,
+          quote.context,
           quote.character,
           quote.created_at.strftime("%Y-%m-%d %H:%M:%S")
         ]

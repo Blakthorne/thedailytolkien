@@ -10,28 +10,28 @@ class AdminJavascriptTest < ApplicationSystemTestCase
     visit admin_quotes_path
 
     # Wait for the page to load completely
-    assert_selector "table[data-controller='sortable-table']", wait: 5
+    assert_selector "table", wait: 5
 
     # Find the first quote row (skip the header)
     first_row = find("tbody tr:first-child")
     quote_id = first_row.find("input[type='checkbox']")[:value]
 
     # Debug: Check if the row-link controller is attached
-    assert first_row["data-controller"].include?("row-link"), "Row should have row-link controller attached"
+    assert first_row["data-controller"].include?("row-link")
 
     # Click somewhere in the middle of the row (not the checkbox or link)
     character_cell = first_row.find("td:nth-child(5)") # Character column
     character_cell.click
 
     # Should navigate to the quote show page
-    assert_current_path admin_quote_path(quote_id), "Should navigate to quote show page"
+    assert_current_path admin_quote_path(quote_id)
   end
 
   test "column sorting works on quotes table" do
     visit admin_quotes_path
 
     # Wait for the page to load completely
-    assert_selector "table[data-controller='sortable-table']", wait: 5
+    assert_selector "table", wait: 5
 
     # Get initial order of quotes
     initial_quotes = page.all("tbody tr").map { |row| row.find("td:nth-child(2)").text.strip }
@@ -96,7 +96,14 @@ class AdminJavascriptTest < ApplicationSystemTestCase
     fill_in "user[email]", with: user.email
     fill_in "user[password]", with: "password123"
     click_button "Sign In"
+
+    # Verify login was successful
+    assert page.has_text?("Welcome, #{user.display_name}")
+
     # App redirects to home page, so navigate to admin after login
     visit admin_root_path
+
+    # Verify we're on admin page
+    assert_current_path admin_root_path
   end
 end

@@ -43,6 +43,11 @@ Rails.application.routes.draw do
       end
     end
     resources :comments, only: [ :index, :destroy ]
+
+    # Import/Export functionality
+    get "import_export", to: "import_export#index"
+    post "import_export/import", to: "import_export#import"
+    get "import_export/export", to: "import_export#export"
   end
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html

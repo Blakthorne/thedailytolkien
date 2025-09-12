@@ -9,14 +9,14 @@ class ArchiveSystemTest < ApplicationSystemTestCase
     # Create a quote with a timestamp that falls within a UTC day range
     # Use yesterday at noon UTC to ensure it's within the day range
     test_date = 1.day.ago.to_date
-    test_timestamp = test_date.beginning_of_day.in_time_zone('UTC').to_i + 12.hours
+    test_timestamp = test_date.beginning_of_day.in_time_zone("UTC").to_i + 12.hours
 
     @quote = Quote.create!(
       text: "A test quote for system testing functionality",
       book: "The Fellowship of the Ring",
       character: "Gandalf_Test",
       last_date_displayed: test_timestamp,
-      first_date_displayed: (test_date - 1.week).beginning_of_day.in_time_zone('UTC').to_i + 12.hours
+      first_date_displayed: (test_date - 1.week).beginning_of_day.in_time_zone("UTC").to_i + 12.hours
     )
 
     @tag = Tag.create!(name: "wisdom_#{Time.current.to_i}")

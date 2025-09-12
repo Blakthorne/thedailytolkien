@@ -27,6 +27,9 @@
       <% if @quote.chapter %>
         <br>Chapter <%= @quote.chapter %>
       <% end %>
+      <% if @quote.context %>
+        <br>Context: <%= @quote.context %>
+      <% end %>
       <% if @quote.character %>
         <br>Spoken by <%= @quote.character %>
       <% end %>
@@ -53,6 +56,11 @@
       <div style="display: grid; grid-template-columns: 150px 1fr; gap: 1rem; margin-bottom: 1rem;">
         <strong style="color: #3d2c1d;">Chapter:</strong>
         <span style="color: #3d2c1d;"><%= @quote.chapter || "Not specified" %></span>
+      </div>
+      
+      <div style="display: grid; grid-template-columns: 150px 1fr; gap: 1rem; margin-bottom: 1rem;">
+        <strong style="color: #3d2c1d;">Context:</strong>
+        <span style="color: #3d2c1d;"><%= @quote.context || "Not specified" %></span>
       </div>
       
       <div style="display: grid; grid-template-columns: 150px 1fr; gap: 1rem; margin-bottom: 1rem;">

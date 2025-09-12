@@ -12,7 +12,8 @@ class AdminRoleChangeUITest < ApplicationSystemTestCase
     fill_in "Password", with: password
   click_on "Sign In"
   # Wait for login to complete and the header to show the signed-in user
-  assert_text "Welcome, #{email}"
+  user = User.find_by(email: email)
+  assert_text "Welcome, #{user.display_name}"
   end
 
   test "admin can promote and demote a user via UI buttons using PATCH" do

@@ -52,6 +52,13 @@
       </div>
 
       <div>
+        <%= f.label :context, style: "display: block; margin-bottom: 0.5rem; font-weight: 500; color: #3d2c1d;" %>
+        <%= f.text_field :context, 
+            placeholder: "Context or situation for the quote (optional)",
+            style: "width: 100%; padding: 0.75rem; border: 1px solid #8b7355; border-radius: 4px; background: #fefcfa;" %>
+      </div>
+
+      <div>
         <%= f.label :character, style: "display: block; margin-bottom: 0.5rem; font-weight: 500; color: #3d2c1d;" %>
         <%= f.text_field :character, 
             placeholder: "Character who said the quote (optional)",

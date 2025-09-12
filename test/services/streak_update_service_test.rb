@@ -13,7 +13,7 @@ class StreakUpdateServiceTest < ActiveSupport::TestCase
 
   test "should update user streak on first login" do
     login_time = Time.zone.parse("2024-01-15 10:00:00 UTC")
-    
+
     # Clear the last_login_date to simulate a truly new user
     @user.update_column(:last_login_date, nil)
 
