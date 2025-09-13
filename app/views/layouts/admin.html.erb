@@ -205,6 +205,7 @@
         background: rgba(139, 115, 85, 0.1);
         color: #3d2c1d;
         border: 1px solid #8b7355;
+        text-wrap: nowrap;
       }
       
       .admin-nav-link:hover,
@@ -216,9 +217,10 @@
       
       /* Container */
       .container {
-        max-width: 1440px;
+        max-width: 1200px;
         margin: 0 auto;
         padding: 0 2rem;
+        width: 100%;
       }
       
       /* Alert styles using parchment colors */
@@ -247,11 +249,34 @@
         background-color: rgba(139, 115, 85, 0.15);
         border-color: #8b7355;
       }
+
+      /* Removed admin-container class to ensure consistency - all pages use main .container class */
+      
+      /* Admin Content Standardization - Unified Width Strategy */
+      .admin-content-wrapper {
+        width: 100%;
+        max-width: none; /* Use full container width */
+      }
+      
+      /* Ensure consistent content width utilization across all admin pages */
+      .admin-section,
+      .app-table-section,
+      .admin-stats-grid,
+      .admin-content-grid {
+        width: 100%;
+        max-width: none; /* Remove any constraining max-widths */
+      }
+      
+      /* Override any inline max-width styles */
+      .admin-content > * {
+        max-width: none !important;
+      }
       
       /* Admin content area */
       .admin-content {
         min-height: 60vh;
         flex: 1;
+        width: 100%;
       }
       
       /* Breadcrumb using parchment theme */
@@ -418,7 +443,6 @@
           <%= link_to "Tags", admin_tags_path, class: "admin-nav-link #{'active' if controller_path == 'admin/tags'}" %>
           <%= link_to "Comments", admin_comments_path, class: "admin-nav-link #{'active' if controller_path == 'admin/comments'}" %>
           <%= link_to "Import/Export", admin_import_export_path, class: "admin-nav-link #{'active' if controller_path == 'admin/import_export'}" %>
-          <%= link_to "Analytics", admin_analytics_path, class: "admin-nav-link #{'active' if controller_path == 'admin/analytics'}" %>
           <%= link_to "Activity Log", admin_activity_logs_path, class: "admin-nav-link #{'active' if controller_path == 'admin/activity_logs'}" %>
         </div>
       </nav>

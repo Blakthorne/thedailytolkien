@@ -7,7 +7,7 @@
 
 <h1 style="color: #3d2c1d;">Edit Quote #<%= @quote.id %></h1>
 
-<div style="max-width: 800px;">
+<div>
   <%= form_with model: [:admin, @quote], local: true do |f| %>
     <% if @quote.errors.any? %>
       <div style="background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; padding: 1rem; border-radius: 4px; margin-bottom: 1rem;">
@@ -111,7 +111,7 @@
 </div>
 
 <!-- Quote Preview -->
-<div style="margin-top: 2rem; max-width: 800px;">
+<div style="margin-top: 2rem;">
   <div class="admin-section">
     <div style="background: #f0ebe4; padding: 1rem; border-bottom: 1px solid #8b7355; margin: -1rem -1rem 1rem -1rem;">
       <h3 style="margin: 0; color: #3d2c1d;">Current Quote Preview</h3>

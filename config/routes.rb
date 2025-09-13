@@ -34,7 +34,6 @@ Rails.application.routes.draw do
         post :bulk_action
       end
     end
-    resources :analytics, only: [ :index ]
     resources :activity_logs, only: [ :index, :show ]
     resources :tags do
       member do

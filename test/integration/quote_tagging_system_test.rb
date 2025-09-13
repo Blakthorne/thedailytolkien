@@ -147,22 +147,6 @@ class QuoteTaggingSystemTest < ActionDispatch::IntegrationTest
     assert_equal 1, json_data[:recent_usage]  # Quote was just created, so it's recent
   end
 
-  test "admin analytics includes tag statistics" do
-    # Create some test data
-    tag1 = Tag.create!(name: "hope")
-    tag2 = Tag.create!(name: "strength")
-
-    tag1.quotes << @quote
-    tag1.quotes << quotes(:two_towers_quote)
-    tag2.quotes << quotes(:return_king_quote)
-
-    get admin_analytics_path
-    assert_response :success
-
-    # Check that analytics data is present (this would need to be enhanced based on view implementation)
-    assert_match "analytics", response.body.downcase
-  end
-
   test "non-admin cannot access tag management" do
     sign_out @admin
     sign_in users(:commentor)

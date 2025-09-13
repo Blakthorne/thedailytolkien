@@ -1,0 +1,58 @@
+#!/bin/bash
+
+# Hot Reload Development Setup for The Daily Tolkien
+# This script starts the Rails server with live reload functionality
+
+echo "🔥 Starting Hot Reload Development Environment..."
+echo ""
+
+# Check if bundle is up to date
+echo "📦 Checking bundle..."
+bundle check || bundle install
+
+echo ""
+echo "🚀 Starting Rails server with hot reload..."
+echo "   Server will be available at: http://localhost:3000"
+echo "   Admin panel: http://localhost:3000/admin"
+echo ""
+echo "🔄 Live reload is enabled - your browser will automatically refresh when you make changes to:"
+echo "   • View templates (.erb, .haml, .slim)"
+echo "   • Stylesheets (.css, .scss, .sass)"
+echo "   • JavaScript files (.js, .coffee)"
+echo "   • Helper files (.rb)"
+echo "   • Locale files (.yml)"
+echo ""
+echo "💡 To enable live reload in your browser:"
+echo "   • Open your browser to http://localhost:3000"
+echo "   • The page will automatically refresh when files change"
+echo ""
+echo "📝 To stop the server: Press Ctrl+C"
+echo ""
+
+# Start Guard in the background for live reload
+echo "Starting Guard for file watching..."
+bundle exec guard start --no-interactions &
+GUARD_PID=$!
+
+# Function to cleanup processes when script exits
+cleanup() {
+    echo ""
+    echo "🛑 Stopping development server..."
+    kill $GUARD_PID 2>/dev/null
+    pkill -f "rails server" 2>/dev/null
+    echo "✅ Development environment stopped"
+    exit 0
+}
+
+# Set trap to cleanup on script exit
+trap cleanup SIGINT SIGTERM
+
+# Wait a moment for Guard to start
+sleep 2
+
+# Start Rails server
+echo "Starting Rails server..."
+bundle exec rails server
+
+# If Rails server exits, cleanup
+cleanup

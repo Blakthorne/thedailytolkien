@@ -253,12 +253,8 @@
         z-index: var(--z-mobile-toggle);
       }
 
-      .mobile-menu-toggle:hover {
-        background: rgba(139, 115, 85, 0.1);
-      }
-
       .mobile-menu-toggle:focus {
-        outline: 2px solid var(--border-color);
+        outline: none;
         outline-offset: 2px;
       }
 
@@ -373,8 +369,7 @@
       }
 
       .mobile-drawer-close:focus {
-        outline: 2px solid var(--border-color);
-        outline-offset: 2px;
+        outline: none;
       }
 
       .close-icon {
@@ -644,6 +639,7 @@
 
         .mobile-menu-toggle {
           display: flex;
+          outline: none;
         }
 
         .header-right,

@@ -6,7 +6,7 @@ class Admin::ActivityLogsController < AdminController
     @activities = @activities.where(user_id: params[:user_id]) if params[:user_id].present?
 
     # Filter by action if specified
-    @activities = @activities.where(action: params[:action]) if params[:action].present?
+    @activities = @activities.where(action: params[:activity_action]) if params[:activity_action].present?
 
     # Filter by date range if specified
     if params[:start_date].present?
@@ -16,13 +16,15 @@ class Admin::ActivityLogsController < AdminController
       @activities = @activities.where("created_at <= ?", Date.parse(params[:end_date]).end_of_day)
     end
 
-    @activities = @activities.order(created_at: :desc).limit(200)
-
-    # Get filter options
+    # Get filter options first
     @users = User.joins(:activity_logs).distinct.order(:email)
     # Only show actions that exist in database AND are defined in the model
     existing_actions = ActivityLog.distinct.pluck(:action).compact
     @actions = (ActivityLog::ACTIONS & existing_actions).sort
+
+    # CRITICAL: Filter activities to only show those with valid actions
+    @activities = @activities.where(action: @actions)
+    @activities = @activities.order(created_at: :desc).limit(200)
 
     # Activity logging removed for activity logs view per user request
   end

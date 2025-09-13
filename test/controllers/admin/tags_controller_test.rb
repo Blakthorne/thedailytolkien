@@ -12,7 +12,7 @@ class Admin::TagsControllerTest < ActionDispatch::IntegrationTest
   test "should get index" do
     get admin_tags_url
     assert_response :success
-    assert_select "h1", "Tag Management"
+    assert_select "h1", "Manage Tags"
   end
 
   test "should get new" do

@@ -23,7 +23,6 @@ class AdminComprehensiveTest < ActionDispatch::IntegrationTest
     # Check for quick action links
     assert_select "a[href='#{new_admin_quote_path}']", text: "Add New Quote"
     assert_select "a[href='#{admin_users_path}']", text: "Manage Users"
-    assert_select "a[href='#{admin_analytics_path}']", text: "View Analytics"
     assert_select "a[href='#{admin_quotes_path(format: :csv)}']", text: "Export Data"
   end
 
@@ -167,19 +166,6 @@ class AdminComprehensiveTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  # Test analytics functionality
-  test "analytics page loads and displays data" do
-    get admin_analytics_path
-    assert_response :success
-    assert_select "h1", text: "Analytics & Reports"
-
-    # Check for stats sections
-    assert_select ".admin-stat-card"
-
-    # Check for any charts or data visualization elements
-    assert_select "div[style*='background']" # Chart elements should have background styles
-  end
-
   # Test bulk operations
   test "bulk delete operations work correctly" do
     # Create test quotes for bulk deletion
@@ -216,8 +202,7 @@ class AdminComprehensiveTest < ActionDispatch::IntegrationTest
       admin_root_path,
       admin_quotes_path,
       admin_users_path,
-      admin_activity_logs_path,
-      admin_analytics_path
+      admin_activity_logs_path
     ]
 
     admin_paths.each do |path|

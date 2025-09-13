@@ -69,6 +69,15 @@
     z-index: 10;
   }
 
+  .quote-engagement-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+  }
+
   .engagement-btn {
     display: flex;
     align-items: center;
@@ -689,22 +698,28 @@
             </button>
           </div>
         <% else %>
-          <div class="quote-engagement">
-            <div class="engagement-btn">
-              <span class="thumb-icon">
-                <svg viewBox="0 0 24 24">
-                  <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
-                </svg>
-              </span>
-              <span class="count"><%= @likes_count %></span>
-            </div>
-            <div class="engagement-btn">
-              <span class="thumb-icon">
-                <svg viewBox="0 0 24 24">
-                  <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path>
-                </svg>
-              </span>
-              <span class="count"><%= @dislikes_count %></span>
+          <div class="quote-engagement-wrapper">
+            <p class="empty-message" style="text-align: center; margin-bottom: 0.5rem; font-size: 0.9rem;">
+              <%= link_to "Sign in", new_user_session_path, style: "color: #8b7355; text-decoration: underline;" %> 
+              to like/dislike
+            </p>
+            <div class="quote-engagement">
+              <div class="engagement-btn">
+                <span class="thumb-icon">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
+                  </svg>
+                </span>
+                <span class="count"><%= @likes_count %></span>
+              </div>
+              <div class="engagement-btn">
+                <span class="thumb-icon">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path>
+                  </svg>
+                </span>
+                <span class="count"><%= @dislikes_count %></span>
+              </div>
             </div>
           </div>
         <% end %>
@@ -873,7 +888,7 @@ document.addEventListener('DOMContentLoaded', function() {
           // Update comment count in title
           const commentsTitle = document.querySelector('.comments-section .section-title');
           if (commentsTitle) {
-            commentsTitle.innerHTML = `💬 Comments (${data.comments_count})`;
+            commentsTitle.innerHTML = `Comments (${data.comments_count})`;
           }
         } else {
           const errorMessage = data.errors ? data.errors.join(', ') : (data.error || 'Error posting comment. Please try again.');

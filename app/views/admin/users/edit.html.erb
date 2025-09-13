@@ -7,7 +7,7 @@
 
 <h1 style="color: #3d2c1d;">Edit User</h1>
 
-<div style="max-width: 600px;">
+<div>
   <%= form_with model: [:admin, @user], local: true do |f| %>
     <% if @user.errors.any? %>
       <div style="background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; padding: 1rem; border-radius: 4px; margin-bottom: 1rem;">
@@ -53,7 +53,7 @@
 
 <!-- Role Management Section -->
 <% if current_user.admin? %>
-<div style="margin-top: 2rem; max-width: 600px;">
+<div style="margin-top: 2rem;">
   <div class="admin-section">
     <div style="background: #f0ebe4; padding: 1rem; border-bottom: 1px solid #8b7355; margin: -1rem -1rem 1rem -1rem;">
       <h3 style="margin: 0; color: #3d2c1d;">Role Management</h3>
@@ -110,10 +110,10 @@
 <% end %>
 
 <!-- Current User Info -->
-<div style="margin-top: 2rem; max-width: 600px;">
+<div style="margin-top: 2rem;">
   <div class="admin-section">
     <div style="background: #f0ebe4; padding: 1rem; border-bottom: 1px solid #8b7355; margin: -1rem -1rem 1rem -1rem;">
-      <h3 style="margin: 0; color: #3d2c1d;">Current User Information</h3>
+      <h3 style="margin: 0; color: #3d2c1d;">Streak Management</h3>
     </div>
     
     <div style="display: grid; grid-template-columns: 120px 1fr; gap: 1rem; margin-bottom: 1rem;">
@@ -159,7 +159,7 @@
 </div>
 
 <% if @user == current_user %>
-  <div style="background: #f0ebe4; border: 1px solid #8b7355; color: #3d2c1d; padding: 1rem; border-radius: 4px; margin-top: 1rem; max-width: 600px;">
+  <div style="background: #f0ebe4; border: 1px solid #8b7355; color: #3d2c1d; padding: 1rem; border-radius: 4px; margin-top: 1rem;">
     <strong>Note:</strong> You are editing your own user account. Be careful when changing your role or email address.
   </div>
 <% end %>

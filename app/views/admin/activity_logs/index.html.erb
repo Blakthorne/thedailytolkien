@@ -2,7 +2,7 @@
   <%= link_to "Dashboard", admin_root_path %> > <strong>Activity Log</strong>
 <% end %>
 
-<div style="max-width: 1200px;">
+<div>
   <h1>Activity Log</h1>
 
   <!-- Filters -->
@@ -30,9 +30,9 @@
       </div>
       
       <div>
-        <%= f.label :action, "Filter by Action", style: "display: block; margin-bottom: 0.5rem; font-weight: 500; color: #3d2c1d;" %>
-        <%= f.select :action, 
-            options_for_select(@actions.map { |action| [action.humanize, action] }, params[:action]),
+        <%= f.label :activity_action, "Filter by Action", style: "display: block; margin-bottom: 0.5rem; font-weight: 500; color: #3d2c1d;" %>
+        <%= f.select :activity_action, 
+            options_for_select(@actions.map { |action| [action.humanize, action] }, params[:activity_action]),
             { prompt: "All actions" },
             { style: "width: 100%; padding: 0.5rem; border: 1px solid #8b7355; border-radius: 4px; background: #fefcfa;" } %>
       </div>
@@ -54,7 +54,7 @@
     
     <div style="display: flex; gap: 1rem;">
       <%= f.submit "Apply Filters", class: "admin-nav-link" %>
-      <% if params.slice(:user_id, :action, :start_date, :end_date).values.any?(&:present?) %>
+      <% if params.slice(:user_id, :activity_action, :start_date, :end_date).values.any?(&:present?) %>
         <%= link_to "Clear Filters", admin_activity_logs_path, class: "admin-nav-link" %>
       <% end %>
     </div>
@@ -113,7 +113,7 @@
     <tbody>
       <% if @activities.any? %>
         <% @activities.each do |activity| %>
-          <tr data-controller="row-link" data-row-link-url-value="<%= admin_activity_log_path(activity) %>" tabindex="0" aria-label="Activity: <%= activity.action_description %>">
+          <tr data-controller="row-link" data-row-link-url-value="<%= h(admin_activity_log_path(activity)) %>" tabindex="0" aria-label="<%= h("Activity: #{activity.action_description}") %>">
             <td class="date-cell" data-sort-value="<%= activity.created_at.iso8601 %>">
               <div class="user-info"><%= activity.created_at.strftime("%b %d, %Y") %></div>
               <div class="secondary-info"><%= activity.created_at.strftime("%I:%M %p") %></div>
@@ -154,7 +154,7 @@
       <% else %>
         <tr>
           <td colspan="6" class="empty-state">
-            <% if params.slice(:user_id, :action, :start_date, :end_date).values.any?(&:present?) %>
+            <% if params.slice(:user_id, :activity_action, :start_date, :end_date).values.any?(&:present?) %>
               <h3>No activity found</h3>
               <p>No activity found matching your filters</p>
               <%= link_to "Clear filters", admin_activity_logs_path, class: "action-link" %>

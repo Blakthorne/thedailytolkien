@@ -65,6 +65,13 @@ end
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
+
+  # Better file watching for reloading
+  gem "listen", "~> 3.8"
+
+  # Live reload functionality for automatic browser refresh
+  gem "guard-livereload", "~> 2.5", require: false
+  gem "rack-livereload"
 end
 
 group :test do

@@ -6,6 +6,9 @@ Rails.application.configure do
   # Make code changes take effect immediately without server restart.
   config.enable_reloading = true
 
+  # Add live reload middleware for automatic browser refresh
+  config.middleware.insert_after ActionDispatch::Static, Rack::LiveReload
+
   # Do not eager load code on boot.
   config.eager_load = false
 
@@ -63,6 +66,9 @@ Rails.application.configure do
 
   # Annotate rendered view with file names.
   config.action_view.annotate_rendered_view_with_filenames = true
+
+  # Configure file watcher for better reloading
+  config.file_watcher = ActiveSupport::EventedFileUpdateChecker
 
   # Uncomment if you wish to allow Action Cable access from any origin.
   # config.action_cable.disable_request_forgery_protection = true
