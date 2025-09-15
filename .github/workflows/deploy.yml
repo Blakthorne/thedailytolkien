@@ -48,7 +48,7 @@ jobs:
                   docker save thedailytolkien:latest | gzip > thedailytolkien.tar.gz
 
             - name: Copy files to server
-              uses: appleboy/scp-action@v0.1.7
+              uses: appleboy/scp-action@v1.0.0
               with:
                   host: ${{ secrets.HOST }}
                   username: ${{ secrets.USERNAME }}
