@@ -1,0 +1,114 @@
+/* ========================================
+   CSS CUSTOM PROPERTIES & GLOBAL CONSTANTS
+   ======================================== */
+:root {
+  --parchment-bg: #f5f0e8;
+  --parchment-overlay: rgba(245, 240, 232, 0.95);
+  --text-primary: #3d2c1d;
+  --text-secondary: #8b7355;
+  --border-color: #8b7355;
+  --border-subtle: rgba(139, 115, 85, 0.2);
+  --gold-gradient: linear-gradient(135deg, #ffd700, #ffa500);
+  --transition-fast: 0.2s ease;
+  --transition-medium: 0.3s ease;
+  --header-height: 60px;
+  --mobile-header-height: 56px;
+  --border-radius: 6px;
+  --z-mobile-drawer: 999999;
+  --z-mobile-toggle: 1000000;
+}
+
+/* ========================================
+   GLOBAL RESET & BASE STYLES
+   ======================================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  font-family: 'Source Sans Pro', sans-serif;
+  background-color: var(--parchment-bg);
+  /* Use logical path; Propshaft will rewrite to digested asset */
+  background-image: url('/scholarly-background-v4.svg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  color: var(--text-primary);
+  min-height: 100vh;
+  line-height: 1.6;
+  position: relative;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  padding-top: 0;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(245, 240, 232, 0.1);
+  z-index: -1;
+}
+
+/* ========================================
+   GLOBAL RESET & BASE STYLES
+   ======================================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  font-family: 'Source Sans Pro', sans-serif;
+  background-color: var(--parchment-bg);
+  background-image: url('scholarly-background-v4.svg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  color: var(--text-primary);
+  min-height: 100vh;
+  line-height: 1.6;
+  position: relative;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  padding-top: 0;
+}
+
+.page-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(245, 240, 232, 0.1);
+  z-index: -1;
+}
+
+.page-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}

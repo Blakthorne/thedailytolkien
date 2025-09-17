@@ -1,0 +1,121 @@
+/* ========================================
+   RESPONSIVE DESIGN & MEDIA QUERIES
+   ======================================== */
+
+/* Mobile Breakpoint (768px and below) */
+@media (max-width: 768px) {
+  .app-header {
+    padding: 1rem 1.5rem;
+  }
+
+  .header-content {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .mobile-menu-toggle {
+    display: flex;
+    outline: none;
+  }
+
+  .header-right,
+  .desktop-only {
+    display: none;
+  }
+
+  .auth-links {
+    justify-content: center;
+  }
+
+  .user-section {
+    align-items: center;
+    text-align: center;
+  }
+
+  .streak-display {
+    font-size: 0.9rem;
+  }
+
+  .streak-text {
+    font-size: 0.8rem;
+  }
+
+  .app-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .header {
+    padding: 2rem 1rem;
+  }
+
+  .header .nav-link {
+    position: static;
+    margin-bottom: 1rem;
+    display: inline-block;
+  }
+
+  .header h1 {
+    font-size: 1.875rem;
+  }
+
+  .footer-content {
+    flex-direction: column;
+    text-align: center;
+    justify-content: center;
+    gap: 0;
+    height: 100%;
+    padding: 0;
+  }
+
+  .footer-nav {
+    justify-content: center;
+    gap: 1rem;
+  }
+
+  .mobile-drawer-header {
+    padding: 1.25rem 1rem;
+  }
+}
+
+/* Small Mobile Breakpoint (480px and below) */
+@media (max-width: 480px) {
+  .app-header {
+    padding: 0.75rem 1rem;
+  }
+
+  .app-header h1 {
+    font-size: 1.2rem;
+  }
+
+  .mobile-drawer-header {
+    padding: 1rem 1rem;
+  }
+
+  .mobile-drawer-content {
+    width: 100%;
+    max-width: 100vw;
+  }
+
+  .mobile-drawer-body {
+    padding: 1.5rem 1rem;
+  }
+}
+
+/* ========================================
+   ACCESSIBILITY & MOTION PREFERENCES
+   ======================================== */
+@media (prefers-reduced-motion: reduce) {
+  .mobile-drawer-content,
+  .hamburger-line,
+  .mobile-menu-toggle,
+  .mobile-drawer,
+  .header-title-link,
+  .auth-link,
+  .mobile-auth-btn,
+  .footer-link {
+    transition: none;
+  }
+}

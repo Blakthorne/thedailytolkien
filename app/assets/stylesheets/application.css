@@ -1,3 +1,21 @@
+/*
+ * This is a manifest file that'll be compiled into application.css, which will include all the files
+ * listed below.
+ *
+ * With Propshaft (Rails 8 default), we use CSS @import statements instead of Sprockets manifest syntax.
+ * These @import statements will be processed by the browser directly.
+ */
+
+/* Import all modular CSS files in order */
+@import url("./00_base.css");
+@import url("./01_header.css");
+@import url("./02_mobile_navigation.css");
+@import url("./03_footer.css");
+@import url("./04_legacy_header.css");
+@import url("./05_responsive.css");
+@import url("./06_quotes.css");
+@import url("./07_archive.css");
+
 /* Visually hidden but focusable when targeted (for skip links & captions) */
 .sr-only:not(:focus):not(:active) {
 	clip: rect(0 0 0 0);

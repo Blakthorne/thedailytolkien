@@ -1,0 +1,134 @@
+/* ========================================
+   APP HEADER STYLES
+   ======================================== */
+.app-header {
+  background: rgba(245, 240, 232);
+  padding: 1.5rem 2rem;
+  border-bottom: 2px solid var(--border-color);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.app-header h1 {
+  font-size: 1.75rem;
+  color: var(--text-primary);
+  margin: 0;
+  letter-spacing: -0.025em;
+}
+
+.header-title-link {
+  font-family: 'Crimson Text', serif;
+  color: inherit;
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.header-title-link:hover {
+  color: var(--text-secondary);
+}
+
+/* ========================================
+   AUTHENTICATION & USER SECTION STYLES
+   ======================================== */
+.auth-links {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.user-info {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  font-weight: 500;
+  opacity: 0.8;
+  font-family: 'Source Sans Pro', sans-serif;
+}
+
+.auth-link {
+  padding: 0.5rem 1rem;
+  border-radius: var(--border-radius);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all var(--transition-fast);
+  opacity: 0.8;
+  font-family: 'Source Sans Pro', sans-serif;
+}
+
+.login-link {
+  background: rgba(139, 115, 85, 0.1);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.login-link:hover {
+  background: rgba(139, 115, 85, 0.2);
+  color: var(--text-primary);
+  opacity: 1;
+}
+
+.logout-link {
+  background: rgba(61, 44, 29, 0.1);
+  color: var(--text-primary);
+  border: 1px solid var(--text-primary);
+  cursor: pointer;
+}
+
+.logout-link:hover {
+  background: rgba(61, 44, 29, 0.2);
+  color: var(--text-primary);
+  opacity: 1;
+}
+
+/* ========================================
+   STREAK DISPLAY STYLES
+   ======================================== */
+.user-section {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.streak-display {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(139, 115, 85, 0.1);
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  border: 1px solid var(--border-subtle);
+}
+
+.streak-emoji {
+  font-size: 1.1rem;
+}
+
+.streak-text {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-family: 'Source Sans Pro', sans-serif;
+}
+
+.record-badge {
+  background: var(--gold-gradient);
+  color: var(--text-primary);
+  padding: 0.1rem 0.4rem;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border: 1px solid #ffd700;
+  cursor: help;
+}
