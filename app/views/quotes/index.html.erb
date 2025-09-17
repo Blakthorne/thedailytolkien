@@ -182,24 +182,22 @@ function updateEngagementUI(data) {
   }
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-  // Like/Dislike AJAX functionality
-  const engagementButtons = document.querySelectorAll('.engagement-btn[data-type]');
-  
-  console.log('Found engagement buttons:', engagementButtons.length);
-  
-  engagementButtons.forEach(button => {
-    console.log('Adding click listener to button:', button);
-    button.addEventListener('click', function() {
-      console.log('Button clicked:', this);
-      const quoteId = this.dataset.quoteId;
-      const type = this.dataset.type;
-      console.log('Quote ID:', quoteId, 'Type:', type);
-      
+// Attach handlers on Turbo lifecycle to survive Turbo navigations
+document.addEventListener('turbo:load', function() {
+  // Like/Dislike AJAX functionality via event delegation
+  const container = document.querySelector('.quote-engagement-section');
+  if (container) {
+    container.addEventListener('click', function(e) {
+      const button = e.target.closest('.engagement-btn[data-type]');
+      if (!button) return;
+
+      const quoteId = button.dataset.quoteId;
+      const type = button.dataset.type;
+      if (!quoteId || !type) return;
+
       // Add loading state
-      this.classList.add('loading');
-      
-      // Make AJAX request
+      button.classList.add('loading');
+
       fetch(`/quotes/${quoteId}/likes`, {
         method: 'POST',
         headers: {
@@ -210,18 +208,16 @@ document.addEventListener('DOMContentLoaded', function() {
       })
       .then(response => response.json())
       .then(data => {
-        // Update UI based on response
         updateEngagementUI(data);
-        this.classList.remove('loading');
+        button.classList.remove('loading');
       })
       .catch(error => {
         console.error('Error:', error);
-        this.classList.remove('loading');
-        // Show error message
+        button.classList.remove('loading');
         alert('Sorry, there was an error processing your request. Please try again.');
       });
-    });
-  });
+    }, { capture: false });
+  }
   
   // Comment form AJAX
   const commentForm = document.getElementById('comment-form');
@@ -526,8 +522,8 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 
-// ActionCable setup for real-time updates
-document.addEventListener('DOMContentLoaded', function() {
+// ActionCable setup for real-time updates on Turbo lifecycle
+document.addEventListener('turbo:load', function() {
   <% if @quote %>
   // Subscribe to quote interaction updates
   if (typeof window.App === 'undefined') {
@@ -538,6 +534,11 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   
   if (window.App.cable) {
+    // Unsubscribe existing channel if present to avoid duplicates across navigations
+    if (App.quoteChannel && typeof App.quoteChannel.unsubscribe === 'function') {
+      try { App.quoteChannel.unsubscribe(); } catch(e) { /* no-op */ }
+    }
+
     App.quoteChannel = window.App.cable.subscriptions.create({
       channel: "QuoteInteractionChannel",
       quote_id: <%= @quote.id %>

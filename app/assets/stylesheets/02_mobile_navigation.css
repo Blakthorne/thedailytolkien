@@ -53,10 +53,14 @@
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  /* Cover full viewport including dynamic browser UI */
+  inset: 0;
+  width: 100vw;
+  height: 100dvh; /* modern browsers */
+  min-height: 100vh; /* fallback */
   z-index: var(--z-mobile-drawer);
   display: none;
+  overflow: hidden; /* contain panel scroll inside */
 }
 
 .mobile-drawer.active {
@@ -67,8 +71,8 @@
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100dvh;
   background: rgba(0, 0, 0, 0.5);
   z-index: 1;
 }
@@ -79,8 +83,11 @@
   right: 0;
   width: 320px;
   max-width: 85vw;
-  height: 100%;
+  height: 100dvh;
+  min-height: 100vh;
+  /* Ensure fully opaque background for the slide-out panel */
   background: var(--parchment-bg);
+  background-color: var(--parchment-bg);
   border-left: 2px solid var(--border-color);
   box-shadow: -4px 0 20px rgba(0, 0, 0, 0.3);
   transform: translateX(100%);
@@ -88,6 +95,11 @@
   display: flex;
   flex-direction: column;
   z-index: 2;
+  /* Prevent any inherited or platform backdrop effects from making it appear translucent */
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  overflow-y: auto; /* scroll content inside the drawer */
+  -webkit-overflow-scrolling: touch; /* smooth scroll on iOS */
 }
 
 .mobile-drawer.active .mobile-drawer-content {
@@ -101,7 +113,11 @@
   align-items: center;
   padding: 1.5rem;
   border-bottom: 1px solid var(--border-subtle);
-  background: rgba(139, 115, 85, 0.05);
+  /* Use solid background to avoid transparent appearance over page */
+  background: var(--parchment-bg);
+  background-color: var(--parchment-bg);
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
 }
 
 .mobile-menu-title {
@@ -151,6 +167,13 @@
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  /* Match the drawer panel's solid background */
+  background: var(--parchment-bg);
+  background-color: var(--parchment-bg);
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  /* Respect safe area on devices with a home indicator */
+  padding-bottom: calc(2rem + env(safe-area-inset-bottom, 0));
 }
 
 /* Mobile User Info Section */

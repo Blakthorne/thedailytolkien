@@ -17,7 +17,7 @@
 
 .quote-card {
   background: rgba(245, 240, 232, 0.1); /* Semi-transparent parchment */
-  backdrop-filter: blur(2px);
+  /* backdrop-filter is expensive on mobile; disabled below via media query */
   border-radius: 12px;
   padding: 3rem 2rem;
   margin-bottom: 2rem;
@@ -96,7 +96,7 @@
   font-size: 0.875rem;
   color: #8b7355;
   font-weight: 500;
-  backdrop-filter: blur(8px);
+  /* backdrop-filter is expensive on mobile; disabled below via media query */
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   min-width: 3rem;
 }
@@ -147,6 +147,8 @@
 .engagement-btn.loading {
   opacity: 0.6;
   cursor: not-allowed;
+  /* Prevent additional clicks while request in flight, but only for the button */
+  pointer-events: none;
 }
 
 .quote-text {
@@ -555,13 +557,22 @@
 }
 
 /* Loading states */
-.loading {
-  opacity: 0.6;
-  pointer-events: none;
-}
+/* NOTE: Avoid global `.loading` to prevent accidental click blocking.
+   Loading visuals are scoped to specific components like `.engagement-btn.loading`. */
 
 /* Responsive */
 @media (max-width: 768px) {
+  /* Reduce GPU-heavy effects on mobile for smoother scrolling */
+  .quote-card,
+  .interaction-card {
+    backdrop-filter: none !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  }
+
+  .engagement-btn {
+    backdrop-filter: none !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  }
   .main-content {
     padding: 0 1rem;
     width: 100%;
@@ -622,9 +633,27 @@
   .comment[data-depth="4"] { margin-left: 6rem !important; }
 }
 
+/* On touch devices, do not show hover styles; use pressed active feedback instead */
+@media (hover: none) and (pointer: coarse) {
+  .engagement-btn.like-btn:hover,
+  .engagement-btn.dislike-btn:hover {
+    /* Neutralize hover on touch to avoid sticky states */
+    background: rgba(245, 240, 232, 0.95);
+    border-color: rgba(139, 115, 85, 0.3);
+    transform: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .engagement-btn:active {
+    transform: translateY(1px);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+    transition-duration: 0.05s; /* snappier press feedback */
+  }
+}
+
 @media (max-width: 480px) {
   .quote-text {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
   }
 
   .quote-card, .interaction-card {

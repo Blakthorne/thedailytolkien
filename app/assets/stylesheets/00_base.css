@@ -38,6 +38,7 @@ body {
   background-image: url('/scholarly-background-v4.svg');
   background-size: cover;
   background-position: center;
+  /* Fixed backgrounds cause jank on mobile; overridden in mobile media query below */
   background-attachment: fixed;
   color: var(--text-primary);
   min-height: 100vh;
@@ -60,55 +61,23 @@ body::before {
   z-index: -1;
 }
 
-/* ========================================
-   GLOBAL RESET & BASE STYLES
-   ======================================== */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-html {
-  font-size: 16px;
-}
-
-body {
-  font-family: 'Source Sans Pro', sans-serif;
-  background-color: var(--parchment-bg);
-  background-image: url('scholarly-background-v4.svg');
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
-  color: var(--text-primary);
-  min-height: 100vh;
-  line-height: 1.6;
-  position: relative;
-  overflow-x: hidden;
-  display: flex;
-  flex-direction: column;
-  padding-top: 0;
-}
-
 .page-content {
   flex: 1;
   display: flex;
   flex-direction: column;
+  /* Smooth momentum scroll on iOS overflow containers */
+  -webkit-overflow-scrolling: touch;
 }
 
-body::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(245, 240, 232, 0.1);
-  z-index: -1;
-}
-
-.page-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
+/* Mobile performance tweaks */
+@media (max-width: 1024px), (pointer: coarse) {
+  body {
+    /* Avoid jank on mobile by not using fixed background */
+    background-attachment: scroll;
+    background-position: center top;
+  }
+  body::before {
+    /* Disable extra overlay layer on mobile to reduce paint cost */
+    display: none;
+  }
 }

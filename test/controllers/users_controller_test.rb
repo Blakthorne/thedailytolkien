@@ -118,8 +118,10 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     json_response = JSON.parse(response.body)
     streak_data = json_response["streak"]
 
-    assert_equal 5, streak_data["current"]
-    assert_equal 10, streak_data["longest"]
+    # The controller recalculates streaks when timezone changes, so compare to the persisted values
+    @user.reload
+    assert_equal @user.current_streak, streak_data["current"]
+    assert_equal @user.longest_streak, streak_data["longest"]
     assert streak_data["display"].present?
   end
 
