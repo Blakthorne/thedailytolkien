@@ -1,6 +1,9 @@
 class QuoteLikesController < ApplicationController
   before_action :authenticate_user!
   before_action :set_quote
+  before_action :validate_like_type
+  rescue_from ActiveRecord::RecordInvalid, with: :render_unprocessable
+  rescue_from ActiveRecord::RecordNotFound, with: :render_not_found
 
   # POST /quote_likes
   def create
@@ -34,16 +37,12 @@ class QuoteLikesController < ApplicationController
       user_like_status: like_status
     })
 
-    respond_to do |format|
-      format.json do
-        render json: {
-          success: true,
-          likes_count: @quote.likes_count,
-          dislikes_count: @quote.dislikes_count,
-          user_like_status: like_status
-        }
-      end
-    end
+    render json: {
+      success: true,
+      likes_count: @quote.likes_count,
+      dislikes_count: @quote.dislikes_count,
+      user_like_status: like_status
+    }
   end
 
   private
@@ -52,8 +51,23 @@ class QuoteLikesController < ApplicationController
     @quote = Quote.find(params[:quote_id])
   end
 
+  def validate_like_type
+    lt = params[:like_type]
+    unless %w[like dislike].include?(lt)
+      render json: { success: false, error: "Invalid like_type. Must be 'like' or 'dislike'." }, status: :unprocessable_entity
+    end
+  end
+
   def log_like_activity(like_status)
     # Activity logging removed for quote likes/dislikes per user request
     # No longer logging: quote_liked, quote_disliked, quote_like_removed
+  end
+
+  def render_unprocessable(exception)
+    render json: { success: false, error: exception.record.errors.full_messages.join(", ") }, status: :unprocessable_entity
+  end
+
+  def render_not_found(_exception)
+    render json: { success: false, error: "Quote not found" }, status: :not_found
   end
 end

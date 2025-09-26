@@ -1,5 +1,5 @@
 // Timezone Detection and Management
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('turbo:load', function() {
   // Detect user's timezone on page load
   detectAndStoreTimezone();
   
@@ -28,6 +28,13 @@ function detectAndStoreTimezone() {
       timezoneField.value = browserTimezone;
     }
     
+    // If user is not signed in, store a cookie for guest timezone (7 days)
+    var hasUser = !!document.querySelector('[data-user-timezone]');
+    if (!hasUser && browserTimezone) {
+      var expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toUTCString();
+      document.cookie = `guest_tz=${encodeURIComponent(browserTimezone)}; expires=${expires}; path=/; SameSite=Lax`;
+    }
+
     // Send timezone info to server for new users
     sendTimezoneToServer(browserTimezone, timezoneOffset);
     

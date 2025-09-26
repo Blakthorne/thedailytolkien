@@ -1,6 +1,8 @@
 # The QuotesController handles the display of Tolkien quotes on the website.
 # It provides an index action that shows a daily quote with full interaction capabilities.
 class QuotesController < ApplicationController
+  before_action :set_request_timezone
+  after_action :reset_request_timezone
   before_action :set_quote, only: [ :index ]
 
   # The index action is responsible for displaying the daily Tolkien quote
@@ -22,10 +24,30 @@ class QuotesController < ApplicationController
 
   private
 
+  # Set the request timezone based on signed-in user's preference or a guest cookie
+  def set_request_timezone
+    @previous_time_zone = Time.zone
+    tz = if current_user&.streak_timezone.present?
+      current_user.streak_timezone
+    else
+      # Validate guest timezone cookie (IANA or Rails name)
+      guest_tz = cookies[:guest_tz]
+      TimezoneDetectionService.validate_timezone(guest_tz)
+    end
+
+    @request_timezone = tz || "UTC"
+    Time.zone = @request_timezone
+  end
+
+  def reset_request_timezone
+    Time.zone = @previous_time_zone
+  end
+
   def set_quote
-    # Get today's date as a Unix timestamp (start of day)
-    today_start = Time.now.beginning_of_day.to_i
-    tomorrow_start = Time.now.beginning_of_day.tomorrow.to_i
+    # Get today's date as a Unix timestamp (start of day) in the request timezone
+    now_in_tz = Time.zone ? Time.zone.now : Time.current
+    today_start = now_in_tz.beginning_of_day.to_i
+    tomorrow_start = now_in_tz.beginning_of_day.tomorrow.to_i
 
     # Find if there's already a quote selected for today
     @quote = Quote.includes(:quote_likes, :comments, :tags)

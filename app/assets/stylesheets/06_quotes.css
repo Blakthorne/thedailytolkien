@@ -92,21 +92,13 @@
   border-radius: 50px;
   padding: 0.75rem 1rem;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
   font-size: 0.875rem;
   color: #8b7355;
   font-weight: 500;
   /* backdrop-filter is expensive on mobile; disabled below via media query */
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   min-width: 3rem;
-}
-
-.engagement-btn.like-btn:hover,
-.engagement-btn.dislike-btn:hover {
-  background: rgba(245, 240, 232, 1);
-  border-color: rgba(139, 115, 85, 0.5);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
 
 .engagement-btn.like-active {
@@ -149,6 +141,12 @@
   cursor: not-allowed;
   /* Prevent additional clicks while request in flight, but only for the button */
   pointer-events: none;
+}
+
+/* Keyboard focus visibility */
+.engagement-btn:focus-visible {
+  outline: 3px solid rgba(139, 115, 85, 0.5);
+  outline-offset: 2px;
 }
 
 .quote-text {
@@ -631,24 +629,6 @@
   .comment[data-depth="2"] { margin-left: 3rem !important; }
   .comment[data-depth="3"] { margin-left: 4.5rem !important; }
   .comment[data-depth="4"] { margin-left: 6rem !important; }
-}
-
-/* On touch devices, do not show hover styles; use pressed active feedback instead */
-@media (hover: none) and (pointer: coarse) {
-  .engagement-btn.like-btn:hover,
-  .engagement-btn.dislike-btn:hover {
-    /* Neutralize hover on touch to avoid sticky states */
-    background: rgba(245, 240, 232, 0.95);
-    border-color: rgba(139, 115, 85, 0.3);
-    transform: none;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  }
-
-  .engagement-btn:active {
-    transform: translateY(1px);
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
-    transition-duration: 0.05s; /* snappier press feedback */
-  }
 }
 
 @media (max-width: 480px) {

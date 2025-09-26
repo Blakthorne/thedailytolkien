@@ -5,9 +5,10 @@ class UsersController < ApplicationController
   # PATCH /users/update_timezone
   def update_timezone
     timezone = params[:timezone]
+    offset = params[:offset]
 
     # Validate timezone
-    validated_timezone = TimezoneDetectionService.validate_timezone(timezone)
+    validated_timezone = TimezoneDetectionService.validate_timezone(timezone, offset)
 
     if current_user.update(streak_timezone: validated_timezone)
       # Recalculate streak with new timezone

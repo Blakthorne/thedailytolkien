@@ -35,6 +35,15 @@ class TimezoneDetectionServiceTest < ActiveSupport::TestCase
     assert_includes ActiveSupport::TimeZone.all.map(&:name), timezone
   end
 
+  test "validate_timezone should accept IANA identifier and map to Rails name" do
+    timezone = TimezoneDetectionService.validate_timezone("America/New_York")
+    assert_equal "Eastern Time (US & Canada)", timezone
+
+    timezone = TimezoneDetectionService.validate_timezone("Europe/London")
+    # London maps to "London" in Rails time zone names
+    assert_equal "London", timezone
+  end
+
   test "validate_timezone should return UTC for invalid timezone" do
     timezone = TimezoneDetectionService.validate_timezone("Invalid/Timezone")
     assert_equal "UTC", timezone

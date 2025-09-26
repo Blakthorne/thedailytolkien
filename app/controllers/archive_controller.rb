@@ -3,6 +3,7 @@
 # and individual show views for specific dates showing read-only quote interactions
 class ArchiveController < ApplicationController
   before_action :set_user_timezone
+  after_action :reset_user_timezone
 
   # Archive index - displays paginated table of all displayed quotes with filtering/sorting
   def index
@@ -96,6 +97,11 @@ class ArchiveController < ApplicationController
   # Set user timezone for proper date display
   def set_user_timezone
     @user_timezone = current_user&.streak_timezone || "UTC"
+    @previous_time_zone = Time.zone
     Time.zone = @user_timezone
+  end
+
+  def reset_user_timezone
+    Time.zone = @previous_time_zone
   end
 end

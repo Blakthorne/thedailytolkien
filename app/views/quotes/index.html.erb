@@ -36,7 +36,7 @@
       </div>
 
       <!-- Engagement and Tags Section (unified layout) -->
-      <div class="quote-engagement-section">
+      <div class="quote-engagement-section" data-quote-engagement data-quote-id="<%= @quote.id %>">
         <!-- Tags (left side) -->
         <% if @tags.any? %>
           <div class="quote-tags">
@@ -52,7 +52,9 @@
         <% if user_signed_in? %>
           <div class="quote-engagement" data-quote-id="<%= @quote.id %>">
             <button class="engagement-btn like-btn <%= 'like-active' if @user_like_status == 'like' %>"
-                    data-type="like" data-quote-id="<%= @quote.id %>">
+                    data-type="like" data-quote-id="<%= @quote.id %>"
+                    aria-label="Like this quote"
+                    aria-pressed="<%= (@user_like_status == 'like') ? 'true' : 'false' %>">
               <span class="thumb-icon">
                 <svg viewBox="0 0 24 24">
                   <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
@@ -62,7 +64,9 @@
             </button>
             
             <button class="engagement-btn dislike-btn <%= 'dislike-active' if @user_like_status == 'dislike' %>"
-                    data-type="dislike" data-quote-id="<%= @quote.id %>">
+                    data-type="dislike" data-quote-id="<%= @quote.id %>"
+                    aria-label="Dislike this quote"
+                    aria-pressed="<%= (@user_like_status == 'dislike') ? 'true' : 'false' %>">
               <span class="thumb-icon">
                 <svg viewBox="0 0 24 24">
                   <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path>
@@ -151,378 +155,506 @@
 
 <!-- JavaScript for Real-time Interactions -->
 <script>
-// Define updateEngagementUI in global scope so ActionCable can access it
-function updateEngagementUI(data) {
-  // Update like button
-  const likeBtn = document.querySelector('.like-btn');
-  const dislikeBtn = document.querySelector('.dislike-btn');
-  
-  // Check if buttons exist before trying to update them
-  if (!likeBtn || !dislikeBtn) {
-    console.error('Like or dislike buttons not found');
-    return;
-  }
-  
-  // Reset active states
-  likeBtn.classList.remove('like-active');
-  dislikeBtn.classList.remove('dislike-active');
-  
-  // Update counts
-  const likeCount = likeBtn.querySelector('.count');
-  const dislikeCount = dislikeBtn.querySelector('.count');
-  
-  if (likeCount) likeCount.textContent = data.likes_count;
-  if (dislikeCount) dislikeCount.textContent = data.dislikes_count;
-  
-  // Set active state based on user's current preference
-  if (data.user_like_status === 'like') {
-    likeBtn.classList.add('like-active');
-  } else if (data.user_like_status === 'dislike') {
-    dislikeBtn.classList.add('dislike-active');
-  }
-}
+/**
+ * Quote Engagement Module - Handles like/dislike functionality
+ * Optimized for Turbo navigation with proper cleanup
+ */
+const QuoteEngagement = {
+  initialized: false,
+  boundHandleClick: null,
 
-// Attach handlers on Turbo lifecycle to survive Turbo navigations
-document.addEventListener('turbo:load', function() {
-  // Like/Dislike AJAX functionality via event delegation
-  const container = document.querySelector('.quote-engagement-section');
-  if (container) {
-    container.addEventListener('click', function(e) {
-      const button = e.target.closest('.engagement-btn[data-type]');
-      if (!button) return;
+  /**
+   * Initialize the engagement system
+   */
+  init() {
+    if (this.initialized) return;
+    
+    // Bind the click handler once to preserve reference for cleanup
+    this.boundHandleClick = this.handleClick.bind(this);
+    document.addEventListener('click', this.boundHandleClick);
+    
+    this.initialized = true;
+  },
 
-      const quoteId = button.dataset.quoteId;
-      const type = button.dataset.type;
-      if (!quoteId || !type) return;
+  /**
+   * Clean up event listeners (called before Turbo caches the page)
+   */
+  destroy() {
+    if (!this.initialized) return;
+    
+    if (this.boundHandleClick) {
+      document.removeEventListener('click', this.boundHandleClick);
+    }
+    
+    this.initialized = false;
+  },
 
-      // Add loading state
-      button.classList.add('loading');
+  /**
+   * Handle click events on engagement buttons
+   */
+  handleClick(event) {
+    // Use event delegation to find engagement buttons
+    const button = event.target.closest('[data-quote-engagement] .engagement-btn[data-type]');
+    if (!button) return;
 
-      fetch(`/quotes/${quoteId}/likes`, {
+    event.preventDefault();
+    
+    const quoteId = button.closest('[data-quote-engagement]').dataset.quoteId;
+    const type = button.dataset.type;
+    
+    if (!quoteId || !type) return;
+    
+    this.submitLike(button, quoteId, type);
+  },
+
+  /**
+   * Submit like/dislike via AJAX
+   */
+  async submitLike(button, quoteId, type) {
+    // Prevent double-clicks
+    if (button.disabled) return;
+    
+    this.setButtonLoading(button, true);
+
+    try {
+      const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+      if (!csrfToken) {
+        throw new Error('CSRF token not found');
+      }
+
+      const response = await fetch(`/quotes/${quoteId}/likes`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+          'Accept': 'application/json',
+          'X-CSRF-Token': csrfToken,
+          'X-Requested-With': 'XMLHttpRequest'
         },
+        credentials: 'same-origin',
         body: JSON.stringify({ like_type: type })
-      })
-      .then(response => response.json())
-      .then(data => {
-        updateEngagementUI(data);
-        button.classList.remove('loading');
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        button.classList.remove('loading');
-        alert('Sorry, there was an error processing your request. Please try again.');
       });
-    }, { capture: false });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          alert('Please sign in to like or dislike quotes.');
+          return;
+        } else if (response.status === 422) {
+          alert('Session expired. Refreshing page...');
+          window.location.reload();
+          return;
+        }
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      if (data.success) {
+        this.updateEngagementUI(data);
+      } else {
+        const errorMsg = data.error || 'An error occurred';
+        alert(errorMsg);
+      }
+
+    } catch (error) {
+      console.error('Engagement error:', error);
+      alert('Network error. Please try again.');
+    } finally {
+      this.setButtonLoading(button, false);
+    }
+  },
+
+  /**
+   * Update the engagement UI with new data
+   */
+  updateEngagementUI(data) {
+    const container = document.querySelector('[data-quote-engagement]');
+    if (!container) return;
+
+    const likeBtn = container.querySelector('.like-btn');
+    const dislikeBtn = container.querySelector('.dislike-btn');
+    
+    if (!likeBtn || !dislikeBtn) return;
+
+    // Reset active states
+    likeBtn.classList.remove('like-active');
+    dislikeBtn.classList.remove('dislike-active');
+
+    // Update counts
+    const likeCount = likeBtn.querySelector('.count');
+    const dislikeCount = dislikeBtn.querySelector('.count');
+    
+    if (likeCount && typeof data.likes_count !== 'undefined') {
+      likeCount.textContent = data.likes_count;
+    }
+    if (dislikeCount && typeof data.dislikes_count !== 'undefined') {
+      dislikeCount.textContent = data.dislikes_count;
+    }
+
+    // Set active state and ARIA attributes
+    const isLiked = data.user_like_status === 'like';
+    const isDisliked = data.user_like_status === 'dislike';
+
+    if (isLiked) {
+      likeBtn.classList.add('like-active');
+    } else if (isDisliked) {
+      dislikeBtn.classList.add('dislike-active');
+    }
+
+    likeBtn.setAttribute('aria-pressed', isLiked.toString());
+    dislikeBtn.setAttribute('aria-pressed', isDisliked.toString());
+  },
+
+  /**
+   * Update only counts (for ActionCable broadcasts)
+   */
+  updateEngagementCounts(data) {
+    const container = document.querySelector('[data-quote-engagement]');
+    if (!container) return;
+
+    const likeCount = container.querySelector('.like-btn .count');
+    const dislikeCount = container.querySelector('.dislike-btn .count');
+
+    if (likeCount && typeof data.likes_count !== 'undefined') {
+      likeCount.textContent = data.likes_count;
+    }
+    if (dislikeCount && typeof data.dislikes_count !== 'undefined') {
+      dislikeCount.textContent = data.dislikes_count;
+    }
+  },
+
+  /**
+   * Set button loading state
+   */
+  setButtonLoading(button, loading) {
+    button.disabled = loading;
+    if (loading) {
+      button.classList.add('loading');
+    } else {
+      button.classList.remove('loading');
+    }
   }
-  
-  // Comment form AJAX
-  const commentForm = document.getElementById('comment-form');
-  if (commentForm) {
-    commentForm.addEventListener('submit', function(e) {
-      e.preventDefault();
-      
-      const formData = new FormData(this);
-      const submitBtn = this.querySelector('.btn-primary');
-      
-      // Add loading state
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Posting...';
-      
-      fetch(this.action, {
-        method: 'POST',
-        body: formData,
-        headers: {
-          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        }
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          // Clear form
-          document.getElementById('comment_content').value = '';
-          
-          // Add new comment to list (or reload comments section)
-          if (data.html) {
-            const commentsList = document.getElementById('comments-list');
-            if (commentsList.innerHTML.includes('No comments yet')) {
-              commentsList.innerHTML = data.html;
-            } else {
-              commentsList.insertAdjacentHTML('beforeend', data.html);
-            }
-          }
-          
-          // Update comment count in title
-          const commentsTitle = document.querySelector('.comments-section .section-title');
-          if (commentsTitle) {
-            commentsTitle.innerHTML = `Comments (${data.comments_count})`;
-          }
-        } else {
-          const errorMessage = data.errors ? data.errors.join(', ') : (data.error || 'Error posting comment. Please try again.');
-          alert(errorMessage);
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('Error posting comment. Please try again.');
-      })
-      .finally(() => {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Post Comment';
-      });
-    });
-  }
-  
-  // Reply functionality
-  document.addEventListener('click', function(e) {
-    // Handle reply button clicks
-    if (e.target.classList.contains('reply-btn')) {
-      const commentId = e.target.dataset.commentId;
-      const replyForm = document.getElementById(`reply-form-${commentId}`);
-      
-      // Hide all other reply forms
-      document.querySelectorAll('.reply-form').forEach(form => {
-        if (form.id !== `reply-form-${commentId}`) {
-          form.style.display = 'none';
-        }
-      });
-      
-      // Toggle this reply form
-      replyForm.style.display = replyForm.style.display === 'none' ? 'block' : 'none';
-      
-      // Focus on textarea if showing
-      if (replyForm.style.display === 'block') {
-        const textarea = replyForm.querySelector('textarea');
-        setTimeout(() => textarea.focus(), 100);
+};
+
+// Global function for ActionCable (maintains backward compatibility)
+function updateEngagementCounts(data) {
+  QuoteEngagement.updateEngagementCounts(data);
+}
+
+// Comment functionality module
+const QuoteComments = {
+  init() {
+    this.bindCommentFormSubmission();
+    this.bindCommentInteractions();
+    this.bindReplyForms();
+    this.bindEditForms();
+    this.bindDeleteButtons();
+  },
+
+  bindCommentFormSubmission() {
+    const commentForm = document.getElementById('comment-form');
+    if (commentForm) {
+      commentForm.addEventListener('submit', this.handleCommentSubmission.bind(this));
+    }
+  },
+
+  bindCommentInteractions() {
+    document.addEventListener('click', this.handleCommentClick.bind(this));
+  },
+
+  bindReplyForms() {
+    document.addEventListener('submit', this.handleReplySubmission.bind(this));
+  },
+
+  bindEditForms() {
+    document.addEventListener('submit', this.handleEditSubmission.bind(this));
+  },
+
+  bindDeleteButtons() {
+    document.addEventListener('click', this.handleDeleteClick.bind(this));
+  },
+
+  handleCommentSubmission(e) {
+    e.preventDefault();
+    
+    const form = e.target;
+    const formData = new FormData(form);
+    const submitBtn = form.querySelector('.btn-primary');
+    
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Posting...';
+    
+    fetch(form.action, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
       }
-    }
-    
-    // Handle cancel reply button clicks
-    if (e.target.classList.contains('cancel-reply-btn')) {
-      const commentId = e.target.dataset.commentId;
-      const replyForm = document.getElementById(`reply-form-${commentId}`);
-      replyForm.style.display = 'none';
-      
-      // Clear the form
-      const textarea = replyForm.querySelector('textarea');
-      textarea.value = '';
-    }
-    
-    // Handle edit button clicks
-    if (e.target.classList.contains('edit-btn')) {
-      const commentId = e.target.dataset.commentId;
-      const editForm = document.getElementById(`edit-form-${commentId}`);
-      const commentContent = document.querySelector(`[data-comment-id="${commentId}"] .comment-content`);
-      
-      // Hide all other edit forms
-      document.querySelectorAll('.edit-form').forEach(form => {
-        if (form.id !== `edit-form-${commentId}`) {
-          form.style.display = 'none';
-        }
-      });
-      
-      // Hide comment content and show edit form
-      if (commentContent && editForm) {
-        commentContent.style.display = 'none';
-        editForm.style.display = 'block';
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        document.getElementById('comment_content').value = '';
         
-        // Focus on textarea
-        const textarea = editForm.querySelector('textarea');
-        setTimeout(() => textarea.focus(), 100);
-      }
-    }
-    
-    // Handle cancel edit button clicks
-    if (e.target.classList.contains('cancel-edit-btn')) {
-      const commentId = e.target.dataset.commentId;
-      const editForm = document.getElementById(`edit-form-${commentId}`);
-      const commentContent = document.querySelector(`[data-comment-id="${commentId}"] .comment-content`);
-      
-      if (editForm && commentContent) {
-        editForm.style.display = 'none';
-        commentContent.style.display = 'block';
-      }
-    }
-  });
-  
-  // Handle reply form submissions
-  document.addEventListener('submit', function(e) {
-    if (e.target.classList.contains('reply-form-inner')) {
-      e.preventDefault();
-      
-      const form = e.target;
-      const formData = new FormData(form);
-      const submitBtn = form.querySelector('.btn-primary');
-      const commentId = form.dataset.commentId;
-      
-      // Add loading state
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Posting...';
-      
-      fetch(form.action, {
-        method: 'POST',
-        body: formData,
-        headers: {
-          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        }
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          // Hide and clear the reply form
-          const replyForm = document.getElementById(`reply-form-${commentId}`);
-          replyForm.style.display = 'none';
-          form.querySelector('textarea').value = '';
-          
-          // Refresh the comments section to show the new reply
-          // In a more sophisticated implementation, you could append the new reply directly
-          location.reload();
-        } else {
-          const errorMessage = data.errors ? data.errors.join(', ') : (data.error || 'Error posting reply. Please try again.');
-          alert(errorMessage);
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('Error posting reply. Please try again.');
-      })
-      .finally(() => {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Post Reply';
-      });
-    }
-  });
-  
-  // Handle edit form submissions
-  document.addEventListener('submit', function(e) {
-    if (e.target.classList.contains('edit-form-inner')) {
-      e.preventDefault();
-      
-      const form = e.target;
-      const formData = new FormData(form);
-      const submitBtn = form.querySelector('.btn-primary');
-      const commentId = form.dataset.commentId;
-      
-      // Add loading state
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Saving...';
-      
-      fetch(form.action, {
-        method: 'PATCH',
-        body: formData,
-        headers: {
-          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        }
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          // Update the comment content
-          const commentContent = document.querySelector(`[data-comment-id="${commentId}"] .comment-content`);
-          const editForm = document.getElementById(`edit-form-${commentId}`);
-          const textarea = form.querySelector('textarea');
-          
-          if (commentContent && editForm) {
-            // Update content with new text (simple format - preserve whitespace and line breaks)
-            const simpleFormatted = textarea.value
-              .replace(/&/g, '&amp;')
-              .replace(/</g, '&lt;')
-              .replace(/>/g, '&gt;')
-              .replace(/\n\s*\n/g, '</p><p>')
-              .replace(/\n/g, '<br>')
-              .replace(/^/, '<p>')
-              .replace(/$/, '</p>')
-              .replace(/<p><\/p>/g, '');
-            commentContent.innerHTML = simpleFormatted;
-            
-            // Add/update edit indicator
-            let editIndicator = document.querySelector(`[data-comment-id="${commentId}"] .edit-indicator`);
-            if (!editIndicator) {
-              editIndicator = document.createElement('span');
-              editIndicator.className = 'edit-indicator';
-              document.querySelector(`[data-comment-id="${commentId}"] .comment-actions`).appendChild(editIndicator);
-            }
-            editIndicator.textContent = `(edited just now)`;
-            
-            // Hide edit form, show content
-            editForm.style.display = 'none';
-            commentContent.style.display = 'block';
-          }
-        } else {
-          const errorMessage = data.errors ? data.errors.join(', ') : (data.error || 'Error saving changes. Please try again.');
-          alert(errorMessage);
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('Error saving changes. Please try again.');
-      })
-      .finally(() => {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Save Changes';
-      });
-    }
-  });
-  
-  // Handle delete button clicks
-  document.addEventListener('click', function(e) {
-    if (e.target.classList.contains('delete-btn')) {
-      const commentId = e.target.dataset.commentId;
-      const confirmMessage = e.target.dataset.turboConfirm;
-      
-      if (confirm(confirmMessage)) {
-        // Add loading state
-        e.target.disabled = true;
-        e.target.textContent = 'Deleting...';
-        
-        fetch(`/comments/${commentId}`, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-            'Accept': 'application/json'
-          }
-        })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            // Remove the comment from the DOM
-            const commentElement = document.querySelector(`[data-comment-id="${commentId}"]`);
-            if (commentElement) {
-              commentElement.remove();
-            }
-            
-            // Update comment count if available
-            if (data.total_count !== undefined) {
-              const commentsTitle = document.querySelector('.comments-section .section-title');
-              if (commentsTitle) {
-                commentsTitle.innerHTML = `Comments (${data.total_count})`;
-              }
-            }
+        if (data.html) {
+          const commentsList = document.getElementById('comments-list');
+          if (commentsList.innerHTML.includes('No comments yet')) {
+            commentsList.innerHTML = data.html;
           } else {
-            const errorMessage = data.error || 'Error deleting comment. Please try again.';
-            alert(errorMessage);
-            // Restore button state
-            e.target.disabled = false;
-            e.target.textContent = e.target.textContent.includes('Admin') ? 'Delete (Admin)' : 'Delete';
+            commentsList.insertAdjacentHTML('beforeend', data.html);
           }
-        })
-        .catch(error => {
-          console.error('Error:', error);
-          alert('Error deleting comment. Please try again.');
-          // Restore button state
+        }
+        
+        const commentsTitle = document.querySelector('.comments-section .section-title');
+        if (commentsTitle) {
+          commentsTitle.innerHTML = `Comments (${data.comments_count})`;
+        }
+      } else {
+        const errorMessage = data.errors ? data.errors.join(', ') : (data.error || 'Error posting comment. Please try again.');
+        alert(errorMessage);
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Error posting comment. Please try again.');
+    })
+    .finally(() => {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Post Comment';
+    });
+  },
+
+  handleCommentClick(e) {
+    if (e.target.classList.contains('reply-btn')) {
+      this.toggleReplyForm(e.target.dataset.commentId);
+    } else if (e.target.classList.contains('cancel-reply-btn')) {
+      this.hideReplyForm(e.target.dataset.commentId);
+    } else if (e.target.classList.contains('edit-btn')) {
+      this.showEditForm(e.target.dataset.commentId);
+    } else if (e.target.classList.contains('cancel-edit-btn')) {
+      this.hideEditForm(e.target.dataset.commentId);
+    }
+  },
+
+  toggleReplyForm(commentId) {
+    const replyForm = document.getElementById(`reply-form-${commentId}`);
+    
+    document.querySelectorAll('.reply-form').forEach(form => {
+      if (form.id !== `reply-form-${commentId}`) {
+        form.style.display = 'none';
+      }
+    });
+    
+    replyForm.style.display = replyForm.style.display === 'none' ? 'block' : 'none';
+    
+    if (replyForm.style.display === 'block') {
+      const textarea = replyForm.querySelector('textarea');
+      setTimeout(() => textarea.focus(), 100);
+    }
+  },
+
+  hideReplyForm(commentId) {
+    const replyForm = document.getElementById(`reply-form-${commentId}`);
+    replyForm.style.display = 'none';
+    replyForm.querySelector('textarea').value = '';
+  },
+
+  showEditForm(commentId) {
+    const editForm = document.getElementById(`edit-form-${commentId}`);
+    const commentContent = document.querySelector(`[data-comment-id="${commentId}"] .comment-content`);
+    
+    document.querySelectorAll('.edit-form').forEach(form => {
+      if (form.id !== `edit-form-${commentId}`) {
+        form.style.display = 'none';
+      }
+    });
+    
+    if (commentContent && editForm) {
+      commentContent.style.display = 'none';
+      editForm.style.display = 'block';
+      
+      const textarea = editForm.querySelector('textarea');
+      setTimeout(() => textarea.focus(), 100);
+    }
+  },
+
+  hideEditForm(commentId) {
+    const editForm = document.getElementById(`edit-form-${commentId}`);
+    const commentContent = document.querySelector(`[data-comment-id="${commentId}"] .comment-content`);
+    
+    if (editForm && commentContent) {
+      editForm.style.display = 'none';
+      commentContent.style.display = 'block';
+    }
+  },
+
+  handleReplySubmission(e) {
+    if (!e.target.classList.contains('reply-form-inner')) return;
+    
+    e.preventDefault();
+    
+    const form = e.target;
+    const formData = new FormData(form);
+    const submitBtn = form.querySelector('.btn-primary');
+    const commentId = form.dataset.commentId;
+    
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Posting...';
+    
+    fetch(form.action, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        const replyForm = document.getElementById(`reply-form-${commentId}`);
+        replyForm.style.display = 'none';
+        form.querySelector('textarea').value = '';
+        location.reload();
+      } else {
+        const errorMessage = data.errors ? data.errors.join(', ') : (data.error || 'Error posting reply. Please try again.');
+        alert(errorMessage);
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Error posting reply. Please try again.');
+    })
+    .finally(() => {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Post Reply';
+    });
+  },
+
+  handleEditSubmission(e) {
+    if (!e.target.classList.contains('edit-form-inner')) return;
+    
+    e.preventDefault();
+    
+    const form = e.target;
+    const formData = new FormData(form);
+    const submitBtn = form.querySelector('.btn-primary');
+    const commentId = form.dataset.commentId;
+    
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Saving...';
+    
+    fetch(form.action, {
+      method: 'PATCH',
+      body: formData,
+      headers: {
+        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        const commentContent = document.querySelector(`[data-comment-id="${commentId}"] .comment-content`);
+        const editForm = document.getElementById(`edit-form-${commentId}`);
+        const textarea = form.querySelector('textarea');
+        
+        if (commentContent && editForm) {
+          const simpleFormatted = textarea.value
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/\n\s*\n/g, '</p><p>')
+            .replace(/\n/g, '<br>')
+            .replace(/^/, '<p>')
+            .replace(/$/, '</p>')
+            .replace(/<p><\/p>/g, '');
+          commentContent.innerHTML = simpleFormatted;
+          
+          let editIndicator = document.querySelector(`[data-comment-id="${commentId}"] .edit-indicator`);
+          if (!editIndicator) {
+            editIndicator = document.createElement('span');
+            editIndicator.className = 'edit-indicator';
+            document.querySelector(`[data-comment-id="${commentId}"] .comment-actions`).appendChild(editIndicator);
+          }
+          editIndicator.textContent = `(edited just now)`;
+          
+          editForm.style.display = 'none';
+          commentContent.style.display = 'block';
+        }
+      } else {
+        const errorMessage = data.errors ? data.errors.join(', ') : (data.error || 'Error saving changes. Please try again.');
+        alert(errorMessage);
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Error saving changes. Please try again.');
+    })
+    .finally(() => {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Save Changes';
+    });
+  },
+
+  handleDeleteClick(e) {
+    if (!e.target.classList.contains('delete-btn')) return;
+    
+    const commentId = e.target.dataset.commentId;
+    const confirmMessage = e.target.dataset.turboConfirm;
+    
+    if (confirm(confirmMessage)) {
+      e.target.disabled = true;
+      e.target.textContent = 'Deleting...';
+      
+      fetch(`/comments/${commentId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+          'Accept': 'application/json'
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          const commentElement = document.querySelector(`[data-comment-id="${commentId}"]`);
+          if (commentElement) {
+            commentElement.remove();
+          }
+          
+          if (data.total_count !== undefined) {
+            const commentsTitle = document.querySelector('.comments-section .section-title');
+            if (commentsTitle) {
+              commentsTitle.innerHTML = `Comments (${data.total_count})`;
+            }
+          }
+        } else {
+          const errorMessage = data.error || 'Error deleting comment. Please try again.';
+          alert(errorMessage);
           e.target.disabled = false;
           e.target.textContent = e.target.textContent.includes('Admin') ? 'Delete (Admin)' : 'Delete';
-        });
-      }
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Error deleting comment. Please try again.');
+        e.target.disabled = false;
+        e.target.textContent = e.target.textContent.includes('Admin') ? 'Delete (Admin)' : 'Delete';
+      });
     }
-  });
+  }
+};
+
+// Turbo lifecycle integration for all modules
+document.addEventListener('turbo:load', () => {
+  QuoteEngagement.init();
+  QuoteComments.init();
 });
 
-// ActionCable setup for real-time updates on Turbo lifecycle
+document.addEventListener('turbo:before-cache', () => {
+  QuoteEngagement.destroy();
+  // Comments module doesn't need cleanup as it uses document-level listeners
+});
+
+// ActionCable setup for real-time updates
 document.addEventListener('turbo:load', function() {
   <% if @quote %>
   // Subscribe to quote interaction updates
@@ -534,9 +666,9 @@ document.addEventListener('turbo:load', function() {
   }
   
   if (window.App.cable) {
-    // Unsubscribe existing channel if present to avoid duplicates across navigations
-    if (App.quoteChannel && typeof App.quoteChannel.unsubscribe === 'function') {
-      try { App.quoteChannel.unsubscribe(); } catch(e) { /* no-op */ }
+    // Clean up existing subscription
+    if (App.quoteChannel?.unsubscribe) {
+      try { App.quoteChannel.unsubscribe(); } catch(e) { /* ignore */ }
     }
 
     App.quoteChannel = window.App.cable.subscriptions.create({
@@ -544,27 +676,26 @@ document.addEventListener('turbo:load', function() {
       quote_id: <%= @quote.id %>
     }, {
       received: function(data) {
-      if (data.type === 'like_update') {
-        // Update like/dislike counts from other users
-        updateEngagementUI(data);
-      } else if (data.type === 'comment_update') {
-        // Handle new comments from other users
-        if (data.html) {
-          const commentsList = document.getElementById('comments-list');
-          if (commentsList.innerHTML.includes('No comments yet')) {
-            commentsList.innerHTML = data.html;
-          } else {
-            commentsList.insertAdjacentHTML('beforeend', data.html);
+        if (data.type === 'like_update') {
+          // Update counts only (preserve user's active state)
+          updateEngagementCounts(data);
+        } else if (data.type === 'comment_update') {
+          // Handle comment updates
+          if (data.html) {
+            const commentsList = document.getElementById('comments-list');
+            if (commentsList?.innerHTML.includes('No comments yet')) {
+              commentsList.innerHTML = data.html;
+            } else if (commentsList) {
+              commentsList.insertAdjacentHTML('beforeend', data.html);
+            }
+          }
+          
+          const commentsTitle = document.querySelector('.comments-section .section-title');
+          if (commentsTitle) {
+            commentsTitle.innerHTML = `Comments (${data.comments_count})`;
           }
         }
-        
-        // Update comment count
-        const commentsTitle = document.querySelector('.comments-section .section-title');
-        if (commentsTitle) {
-          commentsTitle.innerHTML = `Comments (${data.comments_count})`;
-        }
       }
-    }
     });
   }
   <% end %>

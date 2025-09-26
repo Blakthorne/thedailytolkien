@@ -13,34 +13,69 @@ class TimezoneDetectionService
     "Sydney"
   ].freeze
 
+  # Map a numeric offset (in minutes) to a representative Rails timezone name.
+  # Note: Offsets are not unique across timezones and can vary with DST.
+  # This should only be used as a last-resort fallback when no IANA name is available.
   def self.detect_from_browser(timezone_offset_minutes)
     return "UTC" if timezone_offset_minutes.nil?
 
-    # Convert offset minutes to hours (browser gives negative offset)
-    offset_hours = -(timezone_offset_minutes.to_i / 60.0)
+    # Convert offset minutes to seconds (browser gives negative offset for locations behind UTC)
+    offset_seconds = -(timezone_offset_minutes.to_i * 60)
 
-    # Find matching timezone
+    # Find a Rails timezone that currently matches the given offset
     matching_timezone = ActiveSupport::TimeZone.all.find do |tz|
-      tz.utc_offset / 3600.0 == offset_hours
+      tz.utc_offset == offset_seconds
     end
 
     matching_timezone&.name || "UTC"
   end
 
-  def self.validate_timezone(timezone_name)
-    return "UTC" if timezone_name.blank?
-
-    if ActiveSupport::TimeZone.all.map(&:name).include?(timezone_name)
-      timezone_name
-    else
-      "UTC"
+  # Resolve and validate a timezone from a possibly-IANA identifier or Rails name,
+  # with an optional numeric offset (minutes) as a fallback.
+  def self.validate_timezone(timezone_name, fallback_offset_minutes = nil)
+    # Prefer explicit name if present
+    if timezone_name.present?
+      # Time.find_zone accepts IANA identifiers (e.g., "America/New_York") and Rails names
+      tz = Time.find_zone(timezone_name)
+      if tz
+        # If an IANA identifier was provided, map back to Rails-friendly name when possible
+        # Example: "America/New_York" => "Eastern Time (US & Canada)"
+        iana = tz.tzinfo&.identifier || timezone_name
+        rails_name = preferred_rails_name_for_iana(iana) || tz.name
+        return rails_name
+      end
     end
+
+    # Fallback: try to guess from offset
+    if fallback_offset_minutes
+      return detect_from_browser(fallback_offset_minutes)
+    end
+
+    # Default safe fallback
+    "UTC"
+  end
+
+  # Choose a deterministic, human-friendly Rails name when multiple aliases
+  # point to the same IANA zone (e.g., Europe/London => ["Edinburgh", "London", "Dublin"]).
+  def self.preferred_rails_name_for_iana(iana_identifier)
+    candidates = ActiveSupport::TimeZone::MAPPING.select { |_, v| v == iana_identifier }.keys
+    return nil if candidates.empty?
+
+    # Preference list for well-known ambiguous mappings
+    preference = [
+      "Eastern Time (US & Canada)",
+      "Central Time (US & Canada)",
+      "Mountain Time (US & Canada)",
+      "Pacific Time (US & Canada)",
+      "London"
+    ]
+
+    preferred = (candidates & preference).first
+    preferred || candidates.first
   end
 
   def self.user_friendly_timezones
-    ActiveSupport::TimeZone.all.map do |tz|
-      [ tz.to_s, tz.name ]
-    end.sort_by(&:first)
+    ActiveSupport::TimeZone.all.map { |tz| [ tz.to_s, tz.name ] }.sort_by(&:first)
   end
 
   def self.common_timezones

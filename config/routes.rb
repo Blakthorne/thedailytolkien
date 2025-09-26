@@ -66,7 +66,7 @@ Rails.application.routes.draw do
 
   # Quote interaction routes
   resources :quotes, only: [] do
-    resources :quote_likes, only: [ :create ], path: "likes"
+    resources :quote_likes, only: [ :create ], path: "likes", defaults: { format: :json }
     resources :comments, only: [ :index, :create ]
   end
 

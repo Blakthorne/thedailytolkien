@@ -70,10 +70,11 @@ class ApplicationController < ActionController::Base
   end
 
   def render_422
-    respond_to do |format|
-      format.html { render file: Rails.public_path.join("422.html"), status: :unprocessable_entity, layout: false }
-      format.json { render json: { error: "Unprocessable entity" }, status: :unprocessable_entity }
-      format.any { head :unprocessable_entity }
+    # Prefer JSON when this is an XHR/JSON request to avoid returning HTML that breaks fetch handlers
+    if request.xhr? || request.format.json? || request.headers["Accept"].to_s.include?("application/json")
+      render json: { error: "Unprocessable entity" }, status: :unprocessable_entity
+    else
+      render file: Rails.public_path.join("422.html"), status: :unprocessable_entity, layout: false
     end
   end
 
