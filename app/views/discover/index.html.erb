@@ -1,0 +1,157 @@
+<% content_for :title, "Discover" %>
+
+
+
+<main class="main-content">
+    <!-- Discover Header -->
+  <div class="discover-header">
+    <h1>Discover Quotes</h1>
+    <p class="discover-subtitle">Browse quotes from The Daily Tolkien collection</p>
+    <%= link_to "← Back to Today's Quote", root_path, class: "back-to-home" %>
+  </div>
+
+  <!-- Search and Filter Section -->
+  <div class="search-section">
+    <div class="search-header">
+      <h2>Search & Filter Quotes</h2>
+    </div>
+    
+    <%= form_with url: discover_index_path, method: :get, local: true, class: "search-form", id: "discover-filter-form" do |form| %>
+      <div class="form-group">
+        <%= form.label :search, "Search:", class: "form-label" %>
+        <%= form.text_field :search, value: params[:search], placeholder: "Search quotes, books, characters...", class: "form-input" %>
+      </div>
+      
+      <div class="form-group">
+        <%= form.label :book, "Book:", class: "form-label" %>
+        <%= form.select :book, options_for_select(@books.map { |book| [book, book] }, params[:book]), 
+            { prompt: "All books" }, { class: "form-select" } %>
+      </div>
+      
+      <div class="form-group">
+        <%= form.label :character, "Character:", class: "form-label" %>
+        <%= form.select :character, options_for_select(@characters.map { |char| [char, char] }, params[:character]), 
+            { prompt: "All characters" }, { class: "form-select" } %>
+      </div>
+      
+      <div class="form-group">
+        <%= form.label :tag_id, "Tag:", class: "form-label" %>
+        <%= form.select :tag_id, options_from_collection_for_select(@tags, :id, :name, params[:tag_id]), 
+            { prompt: "All tags" }, { class: "form-select" } %>
+      </div>
+    <% end %>
+    
+    <div class="search-controls">
+      <%= submit_tag "Filter", class: "btn btn-primary", form: "discover-filter-form" %>
+      <%= link_to "Clear All", discover_index_path, class: "btn btn-secondary" %>
+    </div>
+    
+    <% if params[:search].present? || params[:book].present? || params[:character].present? || params[:tag_id].present? %>
+      <div class="active-filter">
+        <p class="filter-info">
+          <strong>Active filters:</strong>
+          <% if params[:search].present? %>
+            <span class="filter-tag">Search: "<%= params[:search] %>"</span>
+          <% end %>
+          <% if params[:book].present? %>
+            <span class="filter-tag">Book: <%= params[:book] %></span>
+          <% end %>
+          <% if params[:character].present? %>
+            <span class="filter-tag">Character: <%= params[:character] %></span>
+          <% end %>
+          <% if params[:tag_id].present? && @tags.find_by(id: params[:tag_id]) %>
+            <span class="filter-tag">Tag: <%= @tags.find(params[:tag_id]).name %></span>
+          <% end %>
+        </p>
+        <%= link_to "Clear all filters", discover_index_path, class: "clear-filter-link" %>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Cards Section -->
+  <div class="discover-cards-container">
+    <% if @quotes.any? %>
+      <% @quotes.each do |quote| %>
+        <div class="quote-card discover-card" onclick="window.location.href='<%= discover_path(quote.id) %>'" role="button" tabindex="0" aria-label="View quote: <%= quote.discover_snippet(50) %>">
+          <blockquote class="quote-text">
+            "<%= quote.discover_snippet(100) %>"
+          </blockquote>
+
+          <div class="metadata-section">
+            <% if quote.book.present? %>
+              <div class="metadata-item">
+                <span class="metadata-label">Book</span>
+                <span class="metadata-value"><%= quote.book %></span>
+              </div>
+            <% end %>
+            <% if quote.character.present? %>
+              <div class="metadata-item">
+                <span class="metadata-label">Character</span>
+                <span class="metadata-value"><%= quote.character %></span>
+              </div>
+            <% end %>
+          </div>
+
+          <!-- Tags Section -->
+          <% if quote.tags.any? %>
+            <div class="quote-tags">
+              <% quote.tags.limit(3).each do |tag| %>
+                <span class="tag-badge"><%= tag.name %></span>
+              <% end %>
+              <% if quote.tags.count > 3 %>
+                <span class="tag-more">+<%= quote.tags.count - 3 %> more</span>
+              <% end %>
+            </div>
+          <% end %>
+
+          <!-- Last Displayed Date -->
+          <div class="discover-date">
+            Last featured on <%= Time.at(quote.last_date_displayed).in_time_zone(@user_timezone).strftime('%B %d, %Y') %>
+          </div>
+        </div>
+      <% end %>
+    <% else %>
+      <div class="empty-state">
+        <h3>
+          <% if params[:search].present? || params[:book].present? || params[:character].present? || params[:tag_id].present? %>
+            No quotes found matching your filters
+          <% else %>
+            No discovered quotes found
+          <% end %>
+        </h3>
+        <p>
+          <% if params[:search].present? || params[:book].present? || params[:character].present? || params[:tag_id].present? %>
+            Try adjusting your search criteria or filters
+          <% else %>
+            Check back once quotes have been discovered
+          <% end %>
+        </p>
+        <%= link_to "← View Today's Quote", root_path, class: "btn btn-primary" %>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Pagination Section -->
+  <% if @quotes.respond_to?(:current_page) %>
+    <div class="pagination-section">
+      <div class="pagination">
+        <% if @quotes.prev_page %>
+          <%= link_to "‹ Previous", discover_index_path(page: @quotes.prev_page, **request.query_parameters.except(:page)), 
+              class: "pagination-btn" %>
+        <% end %>
+        
+        <span class="pagination-info">
+          Page <%= @quotes.current_page %> of <%= @quotes.total_pages %>
+          (<%= @quotes.total_count %> total quotes)
+        </span>
+        
+        <% if @quotes.next_page %>
+          <%= link_to "Next ›", discover_index_path(page: @quotes.next_page, **request.query_parameters.except(:page)), 
+              class: "pagination-btn" %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</main>
+
+

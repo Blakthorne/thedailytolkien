@@ -1,5 +1,5 @@
 /* ========================================
-   ARCHIVE PAGE STYLES
+   DISCOVER PAGE STYLES
    ======================================== */
 
 /* Main layout consistent with home page */
@@ -15,8 +15,8 @@
   flex: 1;
 }
 
-/* Archive header */
-.archive-header {
+/* Discover header */
+.discover-header {
   background: rgba(245, 240, 232, 0.95);
   border: 2px solid #8b7355;
   border-radius: 12px;
@@ -32,7 +32,7 @@
   z-index: 90;
 }
 
-.archive-header h1 {
+.discover-header h1 {
   margin: 0 0 1rem 0;
   color: #3d2c1d;
   font-size: 2.5rem;
@@ -40,7 +40,7 @@
   font-weight: 600;
 }
 
-.archive-subtitle {
+.discover-subtitle {
   color: #8b7355;
   font-style: italic;
   margin-bottom: 1.5rem;
@@ -262,11 +262,11 @@
     padding: 1rem;
   }
 
-  .archive-header {
+  .discover-header {
     padding: 1.5rem;
   }
 
-  .archive-header h1 {
+  .discover-header h1 {
     font-size: 2rem;
   }
 
@@ -296,7 +296,7 @@
 }
 
 @media (max-width: 480px) {
-  .archive-header h1 {
+  .discover-header h1 {
     font-size: 1.75rem;
   }
 
@@ -306,5 +306,110 @@
 
   .quote-preview {
     max-width: 150px;
+  }
+}
+
+/* ========================================
+   DISCOVER CARDS LAYOUT STYLES
+   ======================================== */
+
+/* Container for discover cards */
+.discover-cards-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin: 2rem 0;
+}
+
+/* Discover-specific card styling */
+.discover-card {
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  margin-bottom: 0; /* Override default quote-card margin */
+  width: 100%;
+}
+
+.discover-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+.discover-card:focus {
+  outline: 2px solid #ff6b35;
+  outline-offset: 2px;
+}
+
+/* Last displayed date styling */
+.discover-date {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(139, 115, 85, 0.2);
+  font-size: 0.875rem;
+  color: #8b7355;
+  text-align: center;
+  font-style: italic;
+}
+
+/* Tag styling adjustments for discover cards */
+.discover-card .quote-tags {
+  margin-top: 1rem;
+  justify-content: flex-start;
+}
+
+.discover-card .tag-more {
+  background: rgba(139, 115, 85, 0.1);
+  color: #8b7355;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border: 1px solid rgba(139, 115, 85, 0.2);
+  white-space: nowrap;
+}
+
+/* Empty state styling for cards */
+.discover-cards-container .empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: rgba(245, 240, 232, 0.1);
+  border: 2px dashed rgba(139, 115, 85, 0.3);
+  border-radius: 12px;
+  color: #8b7355;
+}
+
+.discover-cards-container .empty-state h3 {
+  color: #3d2c1d;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.discover-cards-container .empty-state p {
+  margin-bottom: 2rem;
+  font-size: 1rem;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  .discover-cards-container {
+    gap: 1.5rem;
+  }
+  
+  .discover-card {
+    padding: 2rem 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .discover-cards-container {
+    gap: 1rem;
+  }
+  
+  .discover-card {
+    padding: 1.5rem 1rem;
+  }
+  
+  .discover-date {
+    font-size: 0.8rem;
   }
 }

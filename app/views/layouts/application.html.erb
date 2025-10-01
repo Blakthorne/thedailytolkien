@@ -131,7 +131,7 @@
         <p>&copy; <%= Date.current.year %> David Polar. All rights reserved.</p>
         <nav class="footer-nav">
           <a href="/" class="footer-link">Home</a>
-          <a href="/archive" class="footer-link">Archive</a>
+          <%= link_to "Discover", discover_index_path, class: "footer-link" %>
           <a href="/philosophy" class="footer-link">Philosophy</a>
           <% if user_signed_in? && current_user.admin? %>
             <%= link_to "Admin", admin_root_path, class: "footer-link" %>

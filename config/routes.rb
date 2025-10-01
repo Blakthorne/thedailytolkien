@@ -59,9 +59,9 @@ Rails.application.routes.draw do
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
-  # Archive routes for browsing historical quotes
-  resources :archive, only: [ :index, :show ], param: :date, constraints: {
-    date: /\d{4}-\d{2}-\d{2}/  # YYYY-MM-DD format validation
+  # Discover routes for browsing historical quotes
+  resources :discover, only: [ :index, :show ], param: :id, constraints: {
+    id: /\d+/  # Numeric ID validation
   }
 
   # Quote interaction routes

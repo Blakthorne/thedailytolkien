@@ -51,7 +51,7 @@ class AllDeleteConfirmationsTest < ActionDispatch::IntegrationTest
       "app/views/admin/tags/show.html.erb",
       "app/views/admin/tags/index.html.erb",
       "app/views/comments/_comment.html.erb",
-      "app/views/archive/_archive_comment_with_replies.html.erb"
+      "app/views/discover/_discover_comment_with_replies.html.erb"
     ]
 
     files_to_check.each do |file_path|

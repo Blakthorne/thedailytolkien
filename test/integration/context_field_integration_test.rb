@@ -34,12 +34,21 @@ class ContextFieldIntegrationTest < ActionDispatch::IntegrationTest
   end
 
   test "context field displays on main quote page" do
-    # Clear any current quotes and set this one as current
-    Quote.update_all(days_displayed: 0, last_date_displayed: nil, first_date_displayed: nil)
+    # Completely clear out all existing quotes to avoid conflicts
+    Quote.destroy_all
 
-    # Set our test quote as the only current quote using exact same logic as controller
+    # Create only our test quote
+    test_quote = Quote.create!(
+      text: "This is a test quote with context",
+      book: "Test Book",
+      chapter: "Test Chapter",
+      context: "This is test context information",
+      character: "Test Character"
+    )
+
+    # Set our test quote as the current quote for today using exact same logic as controller
     today_start = Time.now.beginning_of_day.to_i
-    @quote.update!(
+    test_quote.update!(
       days_displayed: 1,
       last_date_displayed: today_start,
       first_date_displayed: today_start
@@ -51,16 +60,15 @@ class ContextFieldIntegrationTest < ActionDispatch::IntegrationTest
     assert_match "This is test context information", response.body
   end
 
-  test "context field displays on archive page" do
-    # Set up quote with a specific date for archive URL
+  test "context field displays on discover page" do
+    # Set up quote with a specific date for discover display
     @quote.update!(
       days_displayed: 1,
       last_date_displayed: 1.day.ago.to_time.to_i,
       first_date_displayed: 1.day.ago.to_time.to_i
     )
 
-    archive_date = 1.day.ago.strftime("%Y-%m-%d")
-    get archive_path(date: archive_date)
+    get discover_path(@quote.id)
     assert_response :success
     assert_match "This is test context information", response.body
   end

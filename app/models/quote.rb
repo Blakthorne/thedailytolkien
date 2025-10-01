@@ -60,7 +60,7 @@ class Quote < ApplicationRecord
     quote_like&.like_type
   end
 
-  # Archive-specific methods for quote archive system
+  # Discover-specific methods for quote discover system
 
   # Class method to find quotes displayed on a specific date
   def self.displayed_on_date(date)
@@ -70,13 +70,13 @@ class Quote < ApplicationRecord
   end
 
   # Instance method returning formatted display date from last_date_displayed
-  def archive_date
+  def discover_date
     return nil unless last_date_displayed
     Time.at(last_date_displayed).to_date
   end
 
-  # Instance method for truncated quote text for archive snippets
-  def archive_snippet(length = 100)
+  # Instance method for truncated quote text for discover snippets
+  def discover_snippet(length = 100)
     return text if text.nil? || text.length <= length
     truncated = text[0, length]
     last_space = truncated.rindex(" ")

@@ -1,6 +1,6 @@
 require "test_helper"
 
-class QuoteArchiveTest < ActiveSupport::TestCase
+class QuoteDiscoverTest < ActiveSupport::TestCase
   def setup
     # Create a quote with a timestamp that falls within a UTC day range
     # Use yesterday at noon UTC to ensure it's within the day range
@@ -22,37 +22,37 @@ class QuoteArchiveTest < ActiveSupport::TestCase
     assert_includes quotes, @quote
   end
 
-  test "archive_date should return formatted date" do
+  test "discover_date should return formatted date" do
     expected_date = Time.at(@quote.last_date_displayed).to_date
-    assert_equal expected_date, @quote.archive_date
+    assert_equal expected_date, @quote.discover_date
   end
 
-  test "archive_date should return nil for quotes without display date" do
+  test "discover_date should return nil for quotes without display date" do
     quote = Quote.create!(text: "Undisplayed quote", book: "Test Book")
-    assert_nil quote.archive_date
+    assert_nil quote.discover_date
   end
 
-  test "archive_snippet should truncate long quotes" do
+  test "discover_snippet should truncate long quotes" do
     long_text = "A" * 200
     quote = Quote.create!(text: long_text, book: "Test Book")
 
-    snippet = quote.archive_snippet(100)
+    snippet = quote.discover_snippet(100)
     assert snippet.length <= 103  # 100 + "..."
     assert snippet.end_with?("...")
   end
 
-  test "archive_snippet should preserve short quotes" do
+  test "discover_snippet should preserve short quotes" do
     short_text = "Short quote"
     quote = Quote.create!(text: short_text, book: "Test Book")
 
-    assert_equal short_text, quote.archive_snippet(100)
+    assert_equal short_text, quote.discover_snippet(100)
   end
 
-  test "archive_snippet should break at word boundaries" do
+  test "discover_snippet should break at word boundaries" do
     text = "This is a test quote that should be truncated properly at word boundaries"
     quote = Quote.create!(text: text, book: "Test Book")
 
-    snippet = quote.archive_snippet(30)
+    snippet = quote.discover_snippet(30)
     refute snippet.include?(" boundaries")  # Should not include partial word
     assert snippet.end_with?("...")
   end

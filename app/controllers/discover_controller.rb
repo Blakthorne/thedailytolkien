@@ -1,11 +1,11 @@
-# Archive Controller for The Daily Tolkien quote archive system
+# Discover Controller for The Daily Tolkien quote discovery system
 # Provides both an index view showing a table of all historical quotes
-# and individual show views for specific dates showing read-only quote interactions
-class ArchiveController < ApplicationController
+# and individual show views for specific dates with full quote interactions
+class DiscoverController < ApplicationController
   before_action :set_user_timezone
   after_action :reset_user_timezone
 
-  # Archive index - displays paginated table of all displayed quotes with filtering/sorting
+  # Discover index - displays paginated table of all displayed quotes with filtering/sorting
   def index
     @quotes = Quote.displayed.includes(:tags, :quote_likes, :comments)
 
@@ -46,49 +46,48 @@ class ArchiveController < ApplicationController
     @quotes = @quotes.page(params[:page]).per(25)
 
     # Load filter options
-    load_archive_filters
+    load_discover_filters
   end
 
-  # Archive show - displays a specific quote from a given date (read-only)
+  # Discover show - displays a specific quote by ID with full interactivity
   def show
-    date = convert_date_to_timestamp(params[:date])
+    @quote = Quote.find_by(id: params[:id])
 
-    if date.nil?
-      redirect_to archive_index_path, alert: "Invalid date format. Please use YYYY-MM-DD."
+    if @quote.nil?
+      render :show
       return
     end
 
-    @quote = Quote.displayed_on_date(date.to_date).first
-    @archive_date = date.to_date
+    # Calculate the discover date from the quote's last display date
+    @discover_date = Time.at(@quote.last_date_displayed).in_time_zone(@user_timezone || "UTC").to_date
 
     if @quote
-      # Load all interaction data for read-only display
+      # Load all interaction data for full interactivity (like quotes#index)
       @quote_likes = @quote.quote_likes.includes(:user)
       @comments = @quote.comments.includes(:user, replies: :user).where(parent_id: nil).order(:created_at)
       @user_like_status = current_user ? @quote.user_like_status(current_user) : nil
+
+      # Set up data for interactive functionality (matching quotes controller)
+      @likes_count = @quote.likes_count
+      @dislikes_count = @quote.dislikes_count
+      @comments_count = @quote.comments_count
+
+      # Load tags for display (matching quotes controller pattern)
+      @tags = @quote.tags
     end
   end
 
   private
 
-  # Permit archive filtering and search parameters
-  def archive_params
+  # Permit discover filtering and search parameters
+  def discover_params
     params.permit(:search, :book, :character, :tag_id, :sort_by, :sort_direction, :page)
   end
 
-  # Convert date string (YYYY-MM-DD) to Unix timestamp for database queries
-  def convert_date_to_timestamp(date_string)
-    return nil unless date_string&.match?(/^\d{4}-\d{2}-\d{2}$/)
 
-    begin
-      Date.parse(date_string).in_time_zone(@user_timezone || "UTC")
-    rescue ArgumentError
-      nil
-    end
-  end
 
-  # Set up filter options for archive index dropdowns
-  def load_archive_filters
+  # Set up filter options for discover index dropdowns
+  def load_discover_filters
     @books = Quote.displayed.distinct.pluck(:book).compact.sort
     @characters = Quote.displayed.distinct.pluck(:character).compact.sort
     @tags = Tag.joins(:quotes).where(quotes: { id: Quote.displayed.select(:id) }).distinct.order(:name)

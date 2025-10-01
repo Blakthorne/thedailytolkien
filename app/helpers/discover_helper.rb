@@ -1,16 +1,16 @@
-# Archive Helper for The Daily Tolkien
-# Provides helper methods for archive functionality including date formatting,
+# Discover Helper for The Daily Tolkien
+# Provides helper methods for discover functionality including date formatting,
 # quote snippets, navigation, and pagination information
-module ArchiveHelper
-  # Format Unix timestamp for archive date display with timezone support
-  def format_archive_date(timestamp, timezone = "UTC")
+module DiscoverHelper
+  # Format Unix timestamp for discover date display with timezone support
+  def format_discover_date(timestamp, timezone = "UTC")
     return nil unless timestamp
 
     Time.at(timestamp).in_time_zone(timezone).strftime("%B %d, %Y")
   end
 
-  # Smart truncation preserving words for archive quote snippets
-  def archive_quote_snippet(quote, length = 100)
+  # Smart truncation preserving words for discover quote snippets
+  def discover_quote_snippet(quote, length = 100)
     return "" unless quote&.text
 
     text = quote.text
@@ -27,15 +27,15 @@ module ArchiveHelper
     text[0, last_space] + "..."
   end
 
-  # Generate link to specific archived date
-  def archive_date_link(date, options = {})
+  # Generate link to specific discovered date
+  def discover_date_link(date, options = {})
     return "#" unless date
 
     date_string = date.is_a?(String) ? date : date.strftime("%Y-%m-%d")
-    link_to(options[:text] || date_string, archive_path(date_string), options.except(:text))
+    link_to(options[:text] || date_string, discover_path(date_string), options.except(:text))
   end
 
-  # Format tags with "+X more" logic for archive display
+  # Format tags with "+X more" logic for discover display
   def readable_tag_list(tags, limit = 3)
     return content_tag(:span, "—", style: "color: #8b7355; font-style: italic;") if tags.blank?
 
@@ -58,8 +58,8 @@ module ArchiveHelper
     content
   end
 
-  # Pagination description text for archive
-  def archive_pagination_info(collection)
+  # Pagination description text for discover
+  def discover_pagination_info(collection)
     return "" unless collection.respond_to?(:current_page)
 
     start_item = (collection.current_page - 1) * collection.limit_value + 1
@@ -68,16 +68,16 @@ module ArchiveHelper
     "Showing #{start_item}-#{end_item} of #{collection.total_count} quotes"
   end
 
-  # Convert Date object to archive URL path
-  def date_to_archive_path(date)
-    return archive_index_path unless date
+  # Convert Date object to discover URL path
+  def date_to_discover_path(date)
+    return discover_index_path unless date
 
     date_string = date.is_a?(String) ? date : date.strftime("%Y-%m-%d")
-    archive_path(date_string)
+    discover_path(date_string)
   end
 
-  # Validate YYYY-MM-DD format for archive dates
-  def valid_archive_date?(date_string)
+  # Validate YYYY-MM-DD format for discover dates
+  def valid_discover_date?(date_string)
     return false unless date_string.is_a?(String)
     return false unless date_string.match?(/^\d{4}-\d{2}-\d{2}$/)
 
@@ -89,8 +89,8 @@ module ArchiveHelper
     end
   end
 
-  # Get min/max dates for archive date range
-  def archive_date_range
+  # Get min/max dates for discover date range
+  def discover_date_range
     quotes = Quote.displayed
     return [ nil, nil ] if quotes.empty?
 
@@ -103,8 +103,8 @@ module ArchiveHelper
     [ min_date, max_date ]
   end
 
-  # Format archive header date with day of week
-  def archive_header_date(date, timezone = "UTC")
+  # Format discover header date with day of week
+  def discover_header_date(date, timezone = "UTC")
     return "Unknown Date" unless date
 
     formatted_date = date.is_a?(Date) ? date : Date.parse(date.to_s)
@@ -114,11 +114,11 @@ module ArchiveHelper
     { formatted: formatted, day_of_week: day_of_week }
   end
 
-  # Generate breadcrumb navigation for archive pages
-  def archive_breadcrumb(current_date = nil)
+  # Generate breadcrumb navigation for discover pages
+  def discover_breadcrumb(current_date = nil)
     breadcrumbs = [
       link_to("Home", root_path),
-      current_date ? link_to("Archive", archive_index_path) : "Archive"
+      current_date ? link_to("Discover", discover_index_path) : "Discover"
     ]
 
     if current_date
@@ -131,15 +131,15 @@ module ArchiveHelper
     safe_join(breadcrumbs, " › ")
   end
 
-  # Check if date has archived quote
-  def archive_date_has_quote?(date)
+  # Check if date has discovered quote
+  def discover_date_has_quote?(date)
     return false unless date
 
     Quote.displayed_on_date(date).exists?
   end
 
-  # Get previous/next archive dates for navigation
-  def archive_navigation_dates(current_date)
+  # Get previous/next discover dates for navigation
+  def discover_navigation_dates(current_date)
     return [ nil, nil ] unless current_date
 
     current_timestamp = current_date.beginning_of_day.to_i

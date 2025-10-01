@@ -1,0 +1,128 @@
+<%
+  # Recursive partial for displaying comments and their nested replies (Fully Interactive for Discover)
+  max_depth = 4
+  indent_size = 3 # rem units for each level of nesting (increased from 1.5)
+  
+  # Calculate depth-based styling
+  depth_class = "comment-depth-#{[depth, 4].min}"
+  border_left_width = depth > 0 ? 3 : 0
+  margin_left = depth * indent_size
+  
+  # Background opacity increases with depth
+  background_opacity = 0.2 + (depth * 0.1)
+  background_color = "rgba(245, 240, 232, #{[background_opacity, 0.8].min})"
+%>
+
+<div class="comment <%= depth_class %>" 
+     data-comment-id="<%= comment.id %>" 
+     data-depth="<%= depth %>"
+     style="margin-left: <%= margin_left %>rem; 
+            <%= depth > 0 ? "border-left: #{border_left_width}px solid rgba(139, 115, 85, 0.4);" : '' %>
+            <%= depth > 0 ? "background: #{background_color};" : '' %>
+            <%= depth > 0 ? "padding-left: 1rem;" : '' %>">
+  <div class="comment-header">
+    <span class="comment-author">
+      <%= comment.user_display_name %>
+    </span>
+    <span class="comment-date">
+      <%= time_ago_in_words(comment.created_at) %> ago
+    </span>
+    <% if depth > 0 %>
+      <span class="comment-depth-indicator">
+        └ Reply
+      </span>
+    <% end %>
+  </div>
+  
+  <div class="comment-content">
+    <%= simple_format(comment.filtered_content) %>
+  </div>
+  
+  <div class="comment-actions">
+    <% if user_signed_in? %>
+      <!-- Reply button (only show if not at max depth) -->
+      <% if depth < max_depth %>
+        <button type="button" class="comment-action reply-btn" data-comment-id="<%= comment.id %>">
+          Reply
+        </button>
+      <% end %>
+      
+      <!-- Edit button (only for comment author within time limit) -->
+      <% if current_user && comment.can_be_edited_by?(current_user) %>
+        <button type="button" class="comment-action edit-btn" data-comment-id="<%= comment.id %>">
+          Edit
+        </button>
+      <% end %>
+      
+      <!-- Delete button -->
+      <% if current_user && comment.user && current_user == comment.user %>
+        <button type="button" class="comment-action danger delete-btn" 
+                data-comment-id="<%= comment.id %>"
+                data-turbo-confirm="Are you sure you want to delete this comment?">
+          Delete
+        </button>
+      <% elsif current_user&.admin? %>
+        <button type="button" class="comment-action danger delete-btn" 
+                data-comment-id="<%= comment.id %>"
+                data-turbo-confirm="Are you sure you want to delete this comment?">
+          Delete (Admin)
+        </button>
+      <% end %>
+    <% end %>
+    
+    <!-- Show edit indicator -->
+    <% if comment.edited? %>
+      <span class="edit-indicator">
+        (edited <%= time_ago_in_words(comment.edited_at) %> ago)
+      </span>
+    <% end %>
+  </div>
+  
+  <!-- Edit form (initially hidden) -->
+  <% if user_signed_in? && current_user && comment.can_be_edited_by?(current_user) %>
+    <div class="edit-form" id="edit-form-<%= comment.id %>" style="display: none; margin-top: 1rem; padding: 1rem; background: rgba(245, 240, 232, 0.7); border-radius: 8px; border-left: 3px solid #8b7355;">
+      <%= form_with model: comment, url: comment_path(comment), method: :patch, local: false, 
+                    class: "edit-form-inner", data: { comment_id: comment.id } do |f| %>
+        <div class="form-group">
+          <label for="edit_content_<%= comment.id %>">Edit your comment:</label>
+          <%= f.text_area :content, class: "form-control", id: "edit_content_#{comment.id}", 
+                          rows: 3, value: comment.content %>
+        </div>
+        <div class="edit-form-actions">
+          <%= f.submit "Save Changes", class: "btn btn-primary btn-sm" %>
+          <button type="button" class="btn btn-secondary btn-sm cancel-edit-btn" data-comment-id="<%= comment.id %>">
+            Cancel
+          </button>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+  
+  <!-- Reply form (initially hidden) -->
+  <% if user_signed_in? && depth < max_depth %>
+    <div class="reply-form" id="reply-form-<%= comment.id %>" style="display: none; margin-top: 1rem; padding: 1rem; background: rgba(245, 240, 232, 0.7); border-radius: 8px; border-left: 3px solid #8b7355;">
+      <%= form_with model: [comment.quote, Comment.new], url: quote_comments_path(comment.quote), method: :post, local: false, 
+                    class: "reply-form-inner", data: { comment_id: comment.id } do |f| %>
+        <%= f.hidden_field :parent_id, value: comment.id %>
+        <div class="form-group">
+          <label for="reply_content_<%= comment.id %>">Reply to <%= comment.user_display_name %>:</label>
+          <%= f.text_area :content, class: "form-control", id: "reply_content_#{comment.id}", 
+                          rows: 3, placeholder: "Share your thoughts..." %>
+        </div>
+        <div class="reply-form-actions">
+          <%= f.submit "Post Reply", class: "btn btn-primary btn-sm" %>
+          <button type="button" class="btn btn-secondary btn-sm cancel-reply-btn" data-comment-id="<%= comment.id %>">
+            Cancel
+          </button>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+
+<!-- Render replies recursively -->
+<% if comment.replies.any? && depth < max_depth %>
+  <% comment.replies.order(:created_at).each do |reply| %>
+    <%= render 'discover_comment_with_replies', comment: reply, depth: depth + 1 %>
+  <% end %>
+<% end %>
