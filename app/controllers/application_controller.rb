@@ -4,7 +4,7 @@ class ApplicationController < ActionController::Base
 
   before_action :configure_permitted_parameters, if: :devise_controller?
   before_action :store_current_ip
-  after_action :update_user_streak, if: :user_signed_in?
+  before_action :update_user_streak_if_needed, if: :user_signed_in?
 
   # Handle routing errors and show custom error pages
   rescue_from ActionController::RoutingError, with: :render_404
@@ -39,23 +39,27 @@ class ApplicationController < ActionController::Base
     RequestStore.store[:current_ip] = request.remote_ip
   end
 
-  def update_user_streak
-    # Only update streak on actual sign-in, not on every page load
-    return unless should_update_streak_for_request?
+  def update_user_streak_if_needed
+    # Smart day-boundary detection: only update when we cross into a new day
+    # in the user's timezone, providing immediate updates at midnight
+    user_timezone = Time.find_zone(current_user.streak_timezone)
+    current_date_in_user_tz = Time.current.in_time_zone(user_timezone).to_date
 
-    current_user.update_login_streak
+    # Only update if user hasn't been seen today in their timezone
+    last_login_date = current_user.last_login_date
+
+    if last_login_date.nil? || last_login_date < current_date_in_user_tz
+      current_user.update_login_streak
+    end
   rescue StandardError => e
     Rails.logger.error "Failed to update streak for user #{current_user.id}: #{e.message}"
     # Don't let streak update failure break the user experience
   end
 
   def should_update_streak_for_request?
-    # Update streak only on sign-in or if user hasn't been updated recently
-    session[:just_signed_in] ||
-      current_user.updated_at < 1.hour.ago
-  ensure
-    # Clear the flag after checking
-    session.delete(:just_signed_in)
+    # Legacy method - kept for compatibility but no longer used
+    # New logic is in update_user_streak_if_needed
+    false
   end
 
   public

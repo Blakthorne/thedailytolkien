@@ -36,19 +36,11 @@ class StreakUpdateService
   private
 
   def should_update_streak?
-    # Always update for new users or if enough time has passed
-    user.last_login_date.nil? ||
-      time_since_last_update > minimum_update_interval
-  end
+    # Always allow streak calculation - removed rate limiting
+    # Exception: Always allow updates for users who have never logged in (new users)
+    return true if user.last_login_date.nil?
 
-  def time_since_last_update
-    return Float::INFINITY if user.updated_at.nil?
-    Time.current - user.updated_at
-  end
-
-  def minimum_update_interval
-    # Prevent excessive updates - only update once per hour
-    1.hour
+    true
   end
 
   def update_user_streak(streak_data)

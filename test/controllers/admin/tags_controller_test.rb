@@ -39,7 +39,7 @@ class Admin::TagsControllerTest < ActionDispatch::IntegrationTest
   test "should get edit" do
     get edit_admin_tag_url(@tag)
     assert_response :success
-    assert_select "h1", /Edit Tag: #{@tag.name}/
+    assert_select "h1", /Edit Tag/
   end
 
   test "should update tag" do

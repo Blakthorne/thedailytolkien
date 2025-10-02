@@ -143,7 +143,25 @@ class User < ApplicationRecord
   end
 
   def set_default_timezone
-    self.streak_timezone ||= "UTC"
+    # If timezone is blank or invalid, set default
+    if streak_timezone.blank?
+      self.streak_timezone = "UTC"
+    else
+      # Convert IANA timezone identifier to Rails timezone name if needed
+      converted_timezone = convert_iana_to_rails_timezone(streak_timezone)
+      self.streak_timezone = converted_timezone
+    end
+  end
+
+  def convert_iana_to_rails_timezone(timezone_identifier)
+    # Return as-is if it's already a valid Rails timezone name
+    return timezone_identifier if ActiveSupport::TimeZone.all.map(&:name).include?(timezone_identifier)
+
+    # Try to find Rails timezone by IANA identifier
+    rails_timezone = ActiveSupport::TimeZone.all.find { |tz| tz.tzinfo.identifier == timezone_identifier }
+
+    # Return the Rails name if found, otherwise default to UTC
+    rails_timezone ? rails_timezone.name : "UTC"
   end
 
   def initialize_streak_data

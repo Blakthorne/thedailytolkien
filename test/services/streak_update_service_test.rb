@@ -69,7 +69,7 @@ class StreakUpdateServiceTest < ActiveSupport::TestCase
     assert result[:streak_broken] == true
   end
 
-  test "should not update if not enough time has passed" do
+  test "should always update when called (rate limiting removed)" do
     @user.update(
       current_streak: 3,
       longest_streak: 5,
@@ -79,10 +79,12 @@ class StreakUpdateServiceTest < ActiveSupport::TestCase
 
     login_time = Time.zone.parse("2024-01-16 10:00:00 UTC")
 
-    # Should not update due to rate limiting
+    # Should always update - rate limiting has been removed per user requirements
     result = StreakUpdateService.new(@user, login_time).call
 
-    assert_nil result # No update performed
+    assert_not_nil result # Update should always be performed
+    assert_equal 4, result[:current_streak] # Streak should continue to next day
+    assert_equal Date.new(2024, 1, 16), result[:last_login_date]
   end
 
   test "should handle validation errors gracefully" do
