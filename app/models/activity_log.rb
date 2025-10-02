@@ -17,35 +17,27 @@ class ActivityLog < ApplicationRecord
 
   # Common actions for admin activities
   ACTIONS = %w[
-    create update destroy
-    bulk_update bulk_destroy
-    promote_user demote_user
-    export_data view_details
-    login_admin_area
-    activity_logs_view
     comment_created
-    dashboard_view
-    page_view
-    quote_disliked
-    quote_edit_view
-    quote_like_removed
-    quote_liked
+    comment_moderated
+    quote_create
+    quote_delete
     quote_update
-    quote_view
     quotes_bulk_delete
     quotes_csv_import
-    quotes_export_csv_enhanced
-    record_not_found
+    quotes_csv_import_error
+    tag_created
     tag_deleted
+    tag_updated
+    tag_added_to_quote
+    tag_removed_from_quote
     unauthorized_access_attempt
     user_delete
-    user_edit_view
     user_role_change
     user_streak_manual_update
-    user_streak_recalculated
-    user_streak_reset
     user_update
-    user_view
+    users_bulk_delete
+    users_bulk_role_change
+    users_bulk_streak_reset
   ].freeze
 
   # Helper methods
@@ -69,74 +61,48 @@ class ActivityLog < ApplicationRecord
   # Human-friendly description of the action (keeps target details out so views can append them)
   def action_description
     case action.to_s
-    when "create"
-      "created"
-    when "update"
-      "updated"
-    when "destroy"
-      "deleted"
-    when "bulk_update"
-      "performed a bulk update"
-    when "bulk_destroy"
-      "performed a bulk delete"
-    when "promote_user"
-      "promoted a user"
-    when "demote_user"
-      "demoted a user"
-    when "export_data"
-      "exported data"
-    when "view_details"
-      "viewed details"
-    when "login_admin_area"
-      "logged into the admin area"
-    when "activity_logs_view"
-      "viewed activity logs"
     when "comment_created"
       "created a comment"
-    when "dashboard_view"
-      "viewed dashboard"
-    when "page_view"
-      "viewed page"
-    when "quote_disliked"
-      "disliked quote"
-    when "quote_edit_view"
-      "viewed quote edit page"
-    when "quote_like_removed"
-      "removed quote like"
-    when "quote_liked"
-      "liked quote"
+    when "comment_moderated"
+      "moderated a comment"
+    when "quote_create"
+      "created a quote"
+    when "quote_delete"
+      "deleted a quote"
     when "quote_update"
       "updated quote"
-    when "quote_view"
-      "viewed quote"
     when "quotes_bulk_delete"
       "performed bulk quote delete"
     when "quotes_csv_import"
       "imported quotes from CSV"
-    when "quotes_export_csv_enhanced"
-      "exported quotes to CSV"
-    when "record_not_found"
-      "attempted to access non-existent record"
+    when "quotes_csv_import_error"
+      "failed to import quotes from CSV"
+    when "tag_created"
+      "created a tag"
     when "tag_deleted"
       "deleted tag"
+    when "tag_updated"
+      "updated tag"
+    when "tag_added_to_quote"
+      "added tag to quote"
+    when "tag_removed_from_quote"
+      "removed tag from quote"
     when "unauthorized_access_attempt"
       "attempted unauthorized access"
     when "user_delete"
       "deleted user"
-    when "user_edit_view"
-      "viewed user edit page"
     when "user_role_change"
       "changed user role"
     when "user_streak_manual_update"
       "manually updated user streak"
-    when "user_streak_recalculated"
-      "recalculated user streak"
-    when "user_streak_reset"
-      "reset user streak"
     when "user_update"
       "updated user"
-    when "user_view"
-      "viewed user"
+    when "users_bulk_delete"
+      "performed bulk user delete"
+    when "users_bulk_role_change"
+      "performed bulk user role change"
+    when "users_bulk_streak_reset"
+      "performed bulk user streak reset"
     else
       action.to_s.humanize
     end

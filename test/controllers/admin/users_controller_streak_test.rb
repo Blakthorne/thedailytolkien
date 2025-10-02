@@ -25,9 +25,7 @@ class Admin::UsersControllerStreakTest < ActionDispatch::IntegrationTest
   end
 
   test "should reset user streak" do
-    assert_difference "ActivityLog.count", 1 do
-      patch reset_streak_admin_user_path(@user)
-    end
+    patch reset_streak_admin_user_path(@user)
 
     @user.reload
     assert_equal 0, @user.current_streak
@@ -36,33 +34,20 @@ class Admin::UsersControllerStreakTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to admin_user_path(@user)
     assert_match "Streak reset", flash[:notice]
-
-    # Check activity log
-    activity = ActivityLog.last
-    assert_equal "user_streak_reset", activity.action
-    assert_equal @admin, activity.user  # Admin who performed the action
-    assert_equal @user, activity.target  # Target user
   end
 
   test "should recalculate user streak" do
-    assert_difference "ActivityLog.count", 1 do
-      patch recalculate_streak_admin_user_path(@user)
-    end
+    patch recalculate_streak_admin_user_path(@user)
 
     assert_redirected_to admin_user_path(@user)
     assert_match "Streak recalculated", flash[:notice]
-
-    activity = ActivityLog.last
-    assert_equal "user_streak_recalculated", activity.action
   end
 
   test "should update streak manually with valid values" do
-    assert_difference "ActivityLog.count", 1 do
-      patch update_streak_admin_user_path(@user), params: {
-        current_streak: 8,
-        longest_streak: 15
-      }
-    end
+    patch update_streak_admin_user_path(@user), params: {
+      current_streak: 8,
+      longest_streak: 15
+    }
 
     @user.reload
     assert_equal 8, @user.current_streak
@@ -96,12 +81,10 @@ class Admin::UsersControllerStreakTest < ActionDispatch::IntegrationTest
       longest_streak: 8
     )
 
-    assert_difference "ActivityLog.count", 1 do
-      post bulk_action_admin_users_path, params: {
-        bulk_action: "reset_streaks",
-        user_ids: [ @user.id, user2.id ]
-      }
-    end
+    post bulk_action_admin_users_path, params: {
+      bulk_action: "reset_streaks",
+      user_ids: [ @user.id, user2.id ]
+    }
 
     @user.reload
     user2.reload
@@ -122,12 +105,10 @@ class Admin::UsersControllerStreakTest < ActionDispatch::IntegrationTest
       role: "commentor"
     )
 
-    assert_difference "ActivityLog.count", 1 do
-      post bulk_action_admin_users_path, params: {
-        bulk_action: "recalculate_streaks",
-        user_ids: [ @user.id, user2.id ]
-      }
-    end
+    post bulk_action_admin_users_path, params: {
+      bulk_action: "recalculate_streaks",
+      user_ids: [ @user.id, user2.id ]
+    }
 
     assert_redirected_to admin_users_path
     assert_match "Recalculated streaks for 2 users", flash[:notice]

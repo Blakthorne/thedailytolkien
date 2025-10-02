@@ -11,14 +11,6 @@ class AdminController < ApplicationController
   protected
 
   def handle_record_not_found(exception)
-    # Log the 404 attempt for security monitoring
-    log_action("record_not_found", nil, {
-      attempted_model: exception.model,
-      attempted_id: exception.id,
-      attempted_path: request.path,
-      referer: request.referer
-    })
-
     # Determine appropriate redirect based on the model
     redirect_path = case exception.model
     when "User"

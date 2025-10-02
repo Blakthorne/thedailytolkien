@@ -10,7 +10,7 @@ class ActivityLogDebugTest < ActionDispatch::IntegrationTest
     # Create some test activities
     ActivityLog.create!(
       user: @admin,
-      action: "dashboard_view",
+      action: "comment_created",
       ip_address: "127.0.0.1",
       user_agent: "Debug Test"
     )

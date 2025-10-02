@@ -21,7 +21,6 @@ class Admin::QuotesController < AdminController
       format.html
       format.csv do
         csv_data = generate_quotes_csv
-  log_action("quotes_export_csv", nil, { count: Quote.count })
         send_data csv_data,
                   filename: "quotes-#{Date.current}.csv",
                   type: "text/csv",

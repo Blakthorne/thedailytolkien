@@ -12,7 +12,6 @@ class Admin::UsersController < AdminController
       format.html
       format.csv do
         csv_data = generate_users_csv
-  log_action("users_export_csv", nil, { count: User.count })
         send_data csv_data,
                   filename: "users-#{Date.current}.csv",
                   type: "text/csv",
@@ -133,29 +132,12 @@ class Admin::UsersController < AdminController
   # Individual streak management actions
   def reset_streak
     # Capture values before resetting
-    previous_current = @user.current_streak
-    previous_longest = @user.longest_streak
-
     @user.reset_streak!
-    log_action("user_streak_reset", @user, {
-      previous_current_streak: previous_current,
-      previous_longest_streak: previous_longest
-    })
     redirect_to admin_user_path(@user), notice: "Streak reset for #{@user.email}."
   end
 
   def recalculate_streak
-    old_current = @user.current_streak
-    old_longest = @user.longest_streak
-
     @user.recalculate_streak!
-
-    log_action("user_streak_recalculated", @user, {
-      old_current_streak: old_current,
-      old_longest_streak: old_longest,
-      new_current_streak: @user.current_streak,
-      new_longest_streak: @user.longest_streak
-    })
 
     redirect_to admin_user_path(@user), notice: "Streak recalculated for #{@user.email}."
   end
@@ -224,11 +206,6 @@ class Admin::UsersController < AdminController
       user.recalculate_streak!
       recalc_count += 1
     end
-
-    log_action("users_bulk_streak_recalculated", nil, {
-      count: recalc_count,
-      user_ids: user_ids
-    })
 
     recalc_count
   end

@@ -139,7 +139,7 @@ class AdminComprehensiveTest < ActionDispatch::IntegrationTest
     # Create some activity
     ActivityLog.create!(
       user: @admin,
-      action: "create",
+      action: "comment_created",
       target: @quote,
       details: { test: "comprehensive_test" },
       ip_address: "127.0.0.1"
@@ -162,7 +162,7 @@ class AdminComprehensiveTest < ActionDispatch::IntegrationTest
     assert_response :success
 
     # Test filtering by action
-    get admin_activity_logs_path(action: "create")
+    get admin_activity_logs_path(action: "comment_created")
     assert_response :success
   end
 

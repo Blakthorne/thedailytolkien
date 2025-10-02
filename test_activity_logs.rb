@@ -7,7 +7,7 @@ begin
   admin = User.find_by(role: 'admin')
   activity = ActivityLog.create!(
     user: admin,
-    action: 'dashboard_view',
+    action: 'comment_created',
     ip_address: '127.0.0.1',
     user_agent: 'Test'
   )

@@ -20,7 +20,6 @@ class StreakUpdateService
       streak_data
     rescue StandardError => e
       Rails.logger.error "Failed to update streak for user #{user.id}: #{e.message}"
-      log_streak_error(e)
       # Return current state on error to avoid breaking login
       {
         current_streak: user.current_streak,
@@ -63,29 +62,8 @@ class StreakUpdateService
     )
   end
 
-  def log_streak_error(error)
-    ActivityLog.create!(
-      user: user,
-      action: "streak_update_failed",
-      details: {
-        error_message: error.message,
-        login_time: login_time.iso8601,
-        user_timezone: user.streak_timezone
-      },
-      ip_address: current_ip_address
-    )
-  rescue StandardError => logging_error
-    Rails.logger.error "Failed to log streak error: #{logging_error.message}"
-  end
-
   def streak_action_type(streak_data)
-    if streak_data[:streak_broken]
-      "streak_broken"
-    elsif streak_data[:streak_continued]
-      "streak_continued"
-    else
-      "streak_updated"
-    end
+    "streak_broken"
   end
 
   def streak_log_details(streak_data)

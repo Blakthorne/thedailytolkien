@@ -10,9 +10,9 @@ class ActivityLogJSONErrorTest < ActionDispatch::IntegrationTest
     # Create some test activities
     ActivityLog.create!(
       user: @admin,
-      action: "dashboard_view",
+      action: "comment_created",
       ip_address: "127.0.0.1",
-      user_agent: "Debug Test"
+      user_agent: "Test Agent"
     )
 
     get admin_activity_logs_path
@@ -20,7 +20,7 @@ class ActivityLogJSONErrorTest < ActionDispatch::IntegrationTest
 
     # Check that the page contains expected content
     assert_select "table.app-table"
-    assert_select "td", text: /viewed dashboard/
+    assert_select "td", text: /created a comment/
 
     puts "✅ Activity logs page loaded successfully without JSON errors"
   end

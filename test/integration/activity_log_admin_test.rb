@@ -8,7 +8,7 @@ class ActivityLogAdminTest < ActionDispatch::IntegrationTest
     # Create some activity logs that will definitely show up
     @test_activity = ActivityLog.create!(
       user: @admin,
-      action: "dashboard_view",
+      action: "comment_created",
       ip_address: "127.0.0.1",
       user_agent: "Test Agent"
     )
@@ -43,7 +43,7 @@ class ActivityLogAdminTest < ActionDispatch::IntegrationTest
   end
 
   test "activity logs filtering by action works" do
-    get admin_activity_logs_path, params: { activity_action: "dashboard_view" }
+    get admin_activity_logs_path, params: { activity_action: "comment_created" }
     assert_response :success
 
     # Check that the action filter exists
@@ -97,14 +97,14 @@ class ActivityLogAdminTest < ActionDispatch::IntegrationTest
 
   test "activity log action descriptions are human readable" do
     # Test that our action_description method returns human-readable text
-    activity = ActivityLog.new(action: "quote_liked")
-    assert_equal "liked quote", activity.action_description
+    activity = ActivityLog.new(action: "comment_created")
+    assert_equal "created a comment", activity.action_description
 
     activity = ActivityLog.new(action: "user_role_change")
     assert_equal "changed user role", activity.action_description
 
-    activity = ActivityLog.new(action: "quotes_export_csv_enhanced")
-    assert_equal "exported quotes to CSV", activity.action_description
+    activity = ActivityLog.new(action: "quotes_csv_import")
+    assert_equal "imported quotes from CSV", activity.action_description
   end
 
   test "activity log target descriptions work correctly" do
