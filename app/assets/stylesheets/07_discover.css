@@ -335,15 +335,9 @@
   box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
 }
 
-.discover-card:focus {
-  outline: 2px solid #ff6b35;
-  outline-offset: 2px;
-}
-
 /* Last displayed date styling */
 .discover-date {
-  margin-top: 1.5rem;
-  padding-top: 1rem;
+  margin-top: 0.5rem;
   border-top: 1px solid rgba(139, 115, 85, 0.2);
   font-size: 0.875rem;
   color: #8b7355;

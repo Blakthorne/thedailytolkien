@@ -263,7 +263,6 @@
 
 /* Mobile Action Buttons */
 .mobile-drawer-actions {
-  margin-top: auto;
   padding-top: 1rem;
   border-top: 1px solid var(--border-subtle);
 }

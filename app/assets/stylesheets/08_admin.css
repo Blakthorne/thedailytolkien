@@ -1,0 +1,373 @@
+/* ========================================
+   ADMIN SECTION STYLES
+   ======================================== */
+
+/* Admin Page Header */
+.admin-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.admin-page-title {
+  color: var(--text-primary);
+  margin: 0;
+  font-family: 'Crimson Text', serif;
+  font-size: 2rem;
+  font-weight: 800;
+}
+
+/* Admin Section Cards */
+.admin-section {
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(139, 115, 85, 0.1);
+  overflow: hidden;
+  transition: all var(--transition-fast);
+}
+
+.admin-section:hover {
+  box-shadow: 0 4px 16px rgba(139, 115, 85, 0.15);
+}
+
+.admin-section-header {
+  background: var(--parchment-bg);
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.admin-section-title {
+  margin: 0;
+  color: var(--text-primary);
+  font-family: 'Crimson Text', serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.admin-section-body {
+  padding: 1.5rem;
+}
+
+/* Import/Export Grid Layout */
+.import-export-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+/* Form Styling */
+.admin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.admin-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.admin-form-label {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+.admin-file-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--parchment-bg);
+  font-size: 0.95rem;
+  transition: all var(--transition-fast);
+}
+
+.admin-file-input:focus {
+  outline: none;
+  border-color: var(--text-secondary);
+  box-shadow: 0 0 0 3px rgba(139, 115, 85, 0.1);
+}
+
+/* Info Boxes */
+.admin-info-box {
+  background: rgba(139, 115, 85, 0.05);
+  border: 1px solid rgba(139, 115, 85, 0.2);
+  border-radius: 8px;
+  padding: 1.25rem;
+  border-left: 4px solid var(--text-secondary);
+}
+
+.admin-info-title {
+  margin: 0 0 0.75rem 0;
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.admin-info-text {
+  margin: 0 0 0.75rem 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.admin-code-block {
+  display: block;
+  margin: 0.75rem 0;
+  padding: 0.75rem;
+  background: white;
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  overflow-x: auto;
+}
+
+.admin-info-list {
+  margin: 0.75rem 0 0 0;
+  padding-left: 1.25rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.admin-info-list li {
+  margin-bottom: 0.25rem;
+}
+
+/* Buttons */
+.admin-btn {
+  width: 100%;
+  padding: 1rem 1.5rem;
+  background: var(--text-secondary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  text-align: center;
+  transition: all var(--transition-fast);
+  cursor: pointer;
+  display: inline-block;
+  font-family: 'Source Sans Pro', sans-serif;
+}
+
+.admin-btn:hover {
+  background: #6d5940;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(139, 115, 85, 0.3);
+  color: white;
+  text-decoration: none;
+}
+
+.admin-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(139, 115, 85, 0.3);
+}
+
+/* Export Cards */
+.export-options {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.export-card {
+  padding: 1.25rem;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--parchment-bg);
+  transition: all var(--transition-fast);
+}
+
+.export-card:hover {
+  border-color: var(--text-secondary);
+  background: white;
+}
+
+.export-card-title {
+  margin: 0 0 0.5rem 0;
+  color: var(--text-primary);
+  font-size: 1.1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.export-card-description {
+  margin: 0 0 1rem 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.export-btn {
+  padding: 0.75rem 1.25rem;
+  background: var(--text-secondary);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all var(--transition-fast);
+  display: inline-block;
+}
+
+.export-btn:hover {
+  background: #6d5940;
+  color: white;
+  text-decoration: none;
+}
+
+/* Tip Boxes */
+.admin-tip-box {
+  background: #e8f4f8;
+  border: 1px solid #17a2b8;
+  border-radius: 8px;
+  padding: 1rem;
+  border-left: 4px solid #17a2b8;
+  margin-top: 1.5rem;
+}
+
+.admin-success-box {
+  background: #f0f8e8;
+  border: 1px solid #28a745;
+  border-radius: 8px;
+  padding: 1rem;
+  border-left: 4px solid #28a745;
+}
+
+.admin-tip-text {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #0c5460;
+}
+
+.admin-success-text {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #155724;
+}
+
+/* Statistics Grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.stat-card {
+  padding: 1.5rem;
+  background: var(--parchment-bg);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  text-align: center;
+  transition: all var(--transition-fast);
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(139, 115, 85, 0.15);
+}
+
+.stat-number {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-family: 'Crimson Text', serif;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.stat-label {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .import-export-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .admin-page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .admin-page-title {
+    font-size: 1.75rem;
+  }
+
+  .admin-section-header {
+    padding: 1.25rem;
+  }
+
+  .admin-section-body {
+    padding: 1.25rem;
+  }
+
+  .admin-section-title {
+    font-size: 1.1rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+  }
+
+  .stat-card {
+    padding: 1.25rem;
+  }
+
+  .stat-number {
+    font-size: 2rem;
+  }
+
+  .export-options {
+    gap: 0.75rem;
+  }
+
+  .export-card {
+    padding: 1rem;
+  }
+
+  .admin-info-box {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-page-title {
+    font-size: 1.5rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .stat-number {
+    font-size: 1.75rem;
+  }
+
+  .stat-label {
+    font-size: 0.85rem;
+  }
+}

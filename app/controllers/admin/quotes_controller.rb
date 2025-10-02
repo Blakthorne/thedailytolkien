@@ -5,7 +5,7 @@ class Admin::QuotesController < AdminController
 
   def index
     @quotes = Quote.includes(:tags).order(created_at: :desc)
-    @quotes = @quotes.where("text ILIKE ? OR book ILIKE ?", "%#{params[:search]}%", "%#{params[:search]}%") if params[:search].present?
+    @quotes = @quotes.where("text LIKE ? COLLATE NOCASE OR book LIKE ? COLLATE NOCASE", "%#{params[:search]}%", "%#{params[:search]}%") if params[:search].present?
 
     # Filter by tag if specified
     if params[:tag_id].present?

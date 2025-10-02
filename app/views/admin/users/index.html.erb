@@ -1,9 +1,9 @@
 <% content_for(:breadcrumb) do %>
-  <%= link_to "Dashboard", admin_root_path %> > <strong>Users</strong>
+   <strong>Users</strong>
 <% end %>
 
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-  <h1>Manage Users</h1>
+<div class="admin-page-header">
+  <h1 class="admin-page-title">Manage Users</h1>
   <div>
     <%= link_to "Export CSV", admin_users_path(format: :csv), class: "admin-nav-link" %>
   </div>
@@ -93,7 +93,7 @@
       <caption id="users-table-caption" class="sr-only">Users table. Click on headers to sort. Click a row to view details.</caption>
         <thead>
           <tr>
-            <th class="col-priority-critical">
+            <th class="checkbox-cell">
               <input type="checkbox" id="select-all" onchange="toggleAll(this)" aria-label="Select all users">
             </th>
             <th class="col-priority-critical" data-type="text" role="columnheader" tabindex="0" aria-sort="none" style="outline: none;">Name</th>
@@ -110,7 +110,7 @@
           <% if @users.any? %>
             <% @users.each do |user| %>
               <tr data-controller="row-link" data-row-link-url-value="<%= admin_user_path(user) %>" tabindex="0" aria-label="User: <%= user.full_name %>">
-                <td class="col-priority-critical" data-label="Select">
+                <td class="checkbox-cell" data-label="Select">
                   <% unless user == current_user %>
                     <%= check_box_tag "user_ids[]", user.id, false, 
                         class: "user-checkbox", onchange: "updateBulkActions()", "aria-label": "Select #{user.full_name}" %>

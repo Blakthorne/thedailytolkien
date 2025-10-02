@@ -118,42 +118,42 @@
   }
 </style>
 
-<div class="admin-section admin-content-wrapper">
-  <div class="admin-header" style="width: 100%;">
-    <h1>Create New Tag</h1>
-    <p style="font-family: 'Crimson Text', serif; color: #666; margin-top: 1rem;">
-      Add a new tag to organize quotes by theme, character, or concept
-    </p>
-  </div>
+<% content_for(:breadcrumb) do %>
+  <%= link_to "Tags", admin_tags_path %> >
+  <strong>New Tag</strong>
+<% end %>
 
-  <div class="form-card" style="width: 100%;">
-    <% if @tag.errors.any? %>
-      <div class="error-messages">
-        <h4>Please correct the following errors:</h4>
-        <ul>
-          <% @tag.errors.full_messages.each do |message| %>
-            <li><%= message %></li>
-          <% end %>
-        </ul>
-      </div>
-    <% end %>
+<div class="admin-page-header">
+  <h1 class="admin-page-title">Create New Tag</h1>
+</div>
 
-    <%= form_with model: [:admin, @tag], local: true do |form| %>
-      <div class="form-group">
-        <%= form.label :name, class: "form-label" %>
-        <%= form.text_field :name, class: "form-input", placeholder: "e.g., Friendship, Courage, Gandalf" %>
-      </div>
+<div class="form-card" style="width: 100%;">
+  <% if @tag.errors.any? %>
+    <div class="error-messages">
+      <h4>Please correct the following errors:</h4>
+      <ul>
+        <% @tag.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
 
-      <div class="form-group">
-        <%= form.label :description, class: "form-label" %>
-        <%= form.text_area :description, class: "form-input form-textarea", 
-                          placeholder: "Optional: Describe what this tag represents..." %>
-      </div>
+  <%= form_with model: [:admin, @tag], local: true do |form| %>
+    <div class="form-group">
+      <%= form.label :name, class: "form-label" %>
+      <%= form.text_field :name, class: "form-input", placeholder: "e.g., Friendship, Courage, Gandalf" %>
+    </div>
 
-      <div class="form-actions">
-        <%= form.submit "Create Tag", class: "btn btn-primary" %>
-        <%= link_to "Cancel", admin_tags_path, class: "btn btn-secondary" %>
-      </div>
-    <% end %>
-  </div>
+    <div class="form-group">
+      <%= form.label :description, class: "form-label" %>
+      <%= form.text_area :description, class: "form-input form-textarea", 
+                        placeholder: "Optional: Describe what this tag represents..." %>
+    </div>
+
+    <div class="form-actions">
+      <%= form.submit "Create Tag", class: "btn btn-primary" %>
+      <%= link_to "Cancel", admin_tags_path, class: "btn btn-secondary" %>
+    </div>
+  <% end %>
 </div>

@@ -1,9 +1,9 @@
 <% content_for(:breadcrumb) do %>
-  <%= link_to "Dashboard", admin_root_path %> > <strong>Quotes</strong>
+   <strong>Quotes</strong>
 <% end %>
 
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-  <h1>Manage Quotes</h1>
+<div class="admin-page-header">
+  <h1 class="admin-page-title">Manage Quotes</h1>
   <div>
     <%= link_to "Export CSV", admin_quotes_path(format: :csv), class: "admin-nav-link", 
         style: "margin-right: 0.5rem;" %>
@@ -82,14 +82,14 @@
       <tbody>
         <% if @quotes.any? %>
           <% @quotes.each do |quote| %>
-            <tr data-controller="row-link" data-row-link-url-value="<%= admin_quote_path(quote) %>" tabindex="0" aria-label="Quote: <%= truncate(quote.text, length: 50) %>">
+            <tr data-controller="row-link" data-row-link-url-value="<%= admin_quote_path(quote) %>" tabindex="0" aria-label="Quote: <%= truncate(quote.text, length: 30) %>">
               <td class="checkbox-cell">
                 <%= check_box_tag "quote_ids[]", quote.id, false, 
                     class: "quote-checkbox", onchange: "updateBulkActions()", "aria-label": "Select quote" %>
               </td>
               <td class="quote-preview">
                 <%= link_to admin_quote_path(quote), class: "action-link", style: "color: inherit; text-decoration: none;" do %>
-                  "<%= truncate(quote.text, length: 100) %>"
+                  "<%= truncate(quote.text, length: 30) %>"
                 <% end %>
               </td>
               <td>

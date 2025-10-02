@@ -15,6 +15,7 @@
 @import url("./05_responsive.css");
 @import url("./06_quotes.css");
 @import url("./07_discover.css");
+@import url("./08_admin.css");
 
 /* Visually hidden but focusable when targeted (for skip links & captions) */
 .sr-only:not(:focus):not(:active) {
@@ -380,8 +381,27 @@ table[data-controller="sortable-table"] th:focus {
 
 /* Checkbox Column */
 .app-table .checkbox-cell {
-  width: 40px;
+  width: 50px;
+  max-width: 50px;
+  min-width: 50px;
   padding: 1rem 0.5rem;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.app-table .checkbox-cell input[type="checkbox"] {
+  margin: 0;
+  transform: scale(1.1);
+}
+
+/* Mobile responsive checkbox columns */
+@media (max-width: 768px) {
+  .app-table .checkbox-cell {
+    width: 40px;
+    max-width: 40px;
+    min-width: 40px !important;
+    padding: 0.75rem 0.25rem;
+  }
 }
 
 /* Action Links */

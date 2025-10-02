@@ -128,46 +128,44 @@
   }
 </style>
 
-<div class="admin-section admin-content-wrapper">
-  <div class="admin-header" style="width: 100%;">
-    <h1>Edit Tag: <%= @tag.name %></h1>
-    <p style="font-family: 'Crimson Text', serif; color: #666; margin-top: 1rem;">
-      Modify tag details and organization
-    </p>
-  </div>
+<% content_for(:breadcrumb) do %>
+  <%= link_to "Tags", admin_tags_path %> > 
+  <%= link_to "Tag ##{@tag.id}", admin_tag_path(@tag) %> > 
+  <strong>Edit</strong>
+<% end %>
 
-  <div class="form-card" style="width: 100%;">
-    <div class="tag-usage-info">
-      <strong>Current Usage:</strong> This tag is used on <%= pluralize(@tag.quotes.count, 'quote') %>
+<div class="admin-page-header">
+  <h1 class="admin-page-title">Edit Tag</h1>
+</div>
+
+<div class="form-card" style="width: 100%;">
+
+  <% if @tag.errors.any? %>
+    <div class="error-messages">
+      <h4>Please correct the following errors:</h4>
+      <ul>
+        <% @tag.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <%= form_with model: [:admin, @tag], local: true do |form| %>
+    <div class="form-group">
+      <%= form.label :name, class: "form-label" %>
+      <%= form.text_field :name, class: "form-input", placeholder: "e.g., Friendship, Courage, Gandalf" %>
     </div>
 
-    <% if @tag.errors.any? %>
-      <div class="error-messages">
-        <h4>Please correct the following errors:</h4>
-        <ul>
-          <% @tag.errors.full_messages.each do |message| %>
-            <li><%= message %></li>
-          <% end %>
-        </ul>
-      </div>
-    <% end %>
+    <div class="form-group">
+      <%= form.label :description, class: "form-label" %>
+      <%= form.text_area :description, class: "form-input form-textarea", 
+                        placeholder: "Optional: Describe what this tag represents..." %>
+    </div>
 
-    <%= form_with model: [:admin, @tag], local: true do |form| %>
-      <div class="form-group">
-        <%= form.label :name, class: "form-label" %>
-        <%= form.text_field :name, class: "form-input", placeholder: "e.g., Friendship, Courage, Gandalf" %>
-      </div>
-
-      <div class="form-group">
-        <%= form.label :description, class: "form-label" %>
-        <%= form.text_area :description, class: "form-input form-textarea", 
-                          placeholder: "Optional: Describe what this tag represents..." %>
-      </div>
-
-      <div class="form-actions">
-        <%= form.submit "Update Tag", class: "btn btn-primary" %>
-        <%= link_to "Cancel", admin_tags_path, class: "btn btn-secondary" %>
-      </div>
-    <% end %>
-  </div>
+    <div class="form-actions">
+      <%= form.submit "Update Tag", class: "btn btn-primary" %>
+      <%= link_to "Cancel", admin_tags_path, class: "btn btn-secondary" %>
+    </div>
+  <% end %>
 </div>
