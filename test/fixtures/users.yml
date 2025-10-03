@@ -1,11 +1,28 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
+one:
+    first_name: "Test"
+    last_name: "User One"
+    email: "user_one@example.com"
+    encrypted_password: <%= Devise::Encryptor.digest(User, 'password123') %>
+    role: "commentor"
+    failed_attempts: 0
+
+two:
+    first_name: "Test"
+    last_name: "User Two"
+    email: "user_two@example.com"
+    encrypted_password: <%= Devise::Encryptor.digest(User, 'password123') %>
+    role: "commentor"
+    failed_attempts: 0
+
 admin:
     first_name: "Test"
     last_name: "Admin"
     email: "admin@example.com"
     encrypted_password: <%= Devise::Encryptor.digest(User, 'password123') %>
     role: "admin"
+    failed_attempts: 0
 
 admin_user:
     first_name: "Test"
@@ -13,6 +30,7 @@ admin_user:
     email: "admin_user@example.com"
     encrypted_password: <%= Devise::Encryptor.digest(User, 'password123') %>
     role: "admin"
+    failed_attempts: 0
 
 commentor:
     first_name: "Test"
@@ -20,6 +38,7 @@ commentor:
     email: "commentor@example.com"
     encrypted_password: <%= Devise::Encryptor.digest(User, 'password123') %>
     role: "commentor"
+    failed_attempts: 0
 
 commentor_user:
     first_name: "Test"
@@ -27,3 +46,4 @@ commentor_user:
     email: "commentor_user@example.com"
     encrypted_password: <%= Devise::Encryptor.digest(User, 'password123') %>
     role: "commentor"
+    failed_attempts: 0

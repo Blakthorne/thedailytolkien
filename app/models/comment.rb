@@ -1,8 +1,9 @@
 class Comment < ApplicationRecord
   MAX_DEPTH = 4
   PROFANITY_WORDS = %w[
-    damn hell fuck shit ass bitch bastard crap
+    damn hell fuck shit ass bitch bastard crap fool
     stupid idiot moron dumb dumbass retard
+    bullshit
   ].freeze
 
   belongs_to :user, optional: true
@@ -24,12 +25,21 @@ class Comment < ApplicationRecord
   def filtered_content
     return content unless contains_profanity?
 
-    # Replace profanity with asterisks while preserving word length
+    # Replace profanity with asterisks while preserving original word/character positions
     filtered = content.dup
+
+    # First try direct word matching
     PROFANITY_WORDS.each do |word|
-      filtered.gsub!(/\b#{Regexp.escape(word)}\b/i, "*" * word.length)
+      filtered.gsub!(/\b#{Regexp.escape(word)}\b/i) { |match| "*" * match.length }
     end
-    filtered
+
+    # Then check for obfuscated versions and filter them too
+    # This is a simplified approach - just mark the whole comment as filtered if obfuscation detected
+    if filtered == content && contains_profanity?
+      "[Content filtered due to inappropriate language]"
+    else
+      filtered
+    end
   end
 
   def to_admin_json
@@ -63,10 +73,64 @@ class Comment < ApplicationRecord
     self.user == user
   end
 
+  def contains_profanity?
+    return false if content.blank?
+
+    # Check both the original content and a version with spaces/punctuation collapsed
+    normalized_content = normalize_for_profanity_check(content)
+
+    PROFANITY_WORDS.any? do |word|
+      # Build a flexible regex for the word that allows separators between characters
+      # This creates a pattern like: d[\s_\-\*]*a[\s_\-\*]*m[\s_\-\*]*n for "damn"
+      flexible_pattern = word.chars.map { |c| Regexp.escape(c) }.join('[\\s_\\-\\*\\.\\,\\!\\?\\;\\:\\\'\\"\\`\\~\\|\\\\\\/ ]*')
+      flexible_regex = /\b#{flexible_pattern}\b/i
+
+      # Check both normalized (leetspeak/unicode replaced) and original
+      normalized_content.match?(flexible_regex) || content.downcase.match?(flexible_regex)
+    end
+  end
+
   private
 
-  def contains_profanity?
-    PROFANITY_WORDS.any? { |word| content.match?(/\b#{Regexp.escape(word)}\b/i) }
+  # Normalize content to detect profanity with common evasion techniques
+  def normalize_for_profanity_check(text)
+    return "" if text.blank?
+    normalized = text.dup.downcase
+
+    # First, replace leetspeak substitutions (process longer patterns first)
+    leetspeak_replacements = [
+      [ "|\\/|", "m" ], [ "|\\|", "n" ], [ "\\/\\/", "w" ],
+      [ "|-|", "h" ], [ "|3", "b" ], [ "|)", "d" ],
+      [ "|<", "k" ], [ "|_|", "u" ], [ "|_", "l" ], [ "|>", "p" ],
+      [ "|2", "r" ], [ "\\/", "v" ], [ "ph", "f" ], [ "><", "x" ],
+      [ "11", "ll" ], # Process multi-digit patterns before single digits
+      [ "@", "a" ], [ "4", "a" ], [ "^", "a" ],
+      [ "8", "b" ], [ "(", "c" ], [ "<", "c" ],
+      [ "{", "c" ], [ "3", "e" ], [ "€", "e" ],
+      [ "6", "g" ], [ "9", "g" ], [ "#", "h" ],
+      [ "!", "i" ], [ "1", "i" ], [ "|", "i" ],
+      [ "0", "o" ], [ "5", "s" ], [ "$", "s" ],
+      [ "7", "t" ], [ "+", "t" ], [ "2", "z" ]
+    ]
+
+    # Apply leetspeak replacements
+    leetspeak_replacements.each do |leet, normal|
+      normalized.gsub!(leet, normal)
+    end
+
+    # Replace common Unicode substitutions
+    unicode_map = {
+      "а" => "a", "е" => "e", "о" => "o", # Cyrillic
+      "ⓐ" => "a", "ⓔ" => "e", "ⓞ" => "o", # Circled letters
+      "𝐚" => "a", "𝐞" => "e", "𝐨" => "o", # Bold letters
+      "𝑎" => "a", "𝑒" => "e", "𝑜" => "o"  # Italic letters
+    }
+
+    unicode_map.each do |unicode_char, normal|
+      normalized.gsub!(unicode_char, normal)
+    end
+
+    normalized
   end
 
 

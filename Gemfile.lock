@@ -305,6 +305,8 @@ GEM
     raabro (1.4.0)
     racc (1.8.1)
     rack (3.2.1)
+    rack-attack (6.7.0)
+      rack (>= 1.0, < 4)
     rack-livereload (0.5.1)
       rack
     rack-protection (4.1.1)
@@ -498,6 +500,7 @@ DEPENDENCIES
   omniauth-rails_csrf_protection
   propshaft
   puma (>= 5.0)
+  rack-attack
   rack-livereload
   rails (~> 8.0.2, >= 8.0.2.1)
   redcarpet (~> 3.6)

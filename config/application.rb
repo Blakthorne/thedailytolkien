@@ -23,5 +23,8 @@ module Thedailytolkien
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
+
+    # Enable Rack::Attack middleware for rate limiting and brute force protection
+    config.middleware.use Rack::Attack
   end
 end

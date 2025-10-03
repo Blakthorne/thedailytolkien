@@ -5,6 +5,12 @@ class Admin::ImportExportController < AdminController
     # Display the import/export page
   end
 
+  # Maximum file size for CSV uploads (5MB)
+  MAX_CSV_FILE_SIZE = 5.megabytes
+
+  # Maximum number of rows to process
+  MAX_CSV_ROWS = 10_000
+
   def import
     unless params[:csv_file].present?
       redirect_to admin_import_export_path, alert: "Please select a CSV file to upload."
@@ -13,8 +19,30 @@ class Admin::ImportExportController < AdminController
 
     file = params[:csv_file]
 
-    unless file.content_type == "text/csv" || file.original_filename.end_with?(".csv")
-      redirect_to admin_import_export_path, alert: "Please upload a valid CSV file."
+    # Security check 1: File size validation
+    if file.size > MAX_CSV_FILE_SIZE
+      redirect_to admin_import_export_path,
+                  alert: "File size exceeds maximum allowed size of #{MAX_CSV_FILE_SIZE / 1.megabyte}MB."
+      return
+    end
+
+    # Security check 2: Content-type validation (strict)
+    unless file.content_type == "text/csv"
+      redirect_to admin_import_export_path,
+                  alert: "Invalid file type. Only CSV files with text/csv content-type are allowed."
+      return
+    end
+
+    # Security check 3: File extension validation
+    unless file.original_filename.end_with?(".csv")
+      redirect_to admin_import_export_path, alert: "Invalid file extension. Only .csv files are allowed."
+      return
+    end
+
+    # Security check 4: Validate CSV structure and content
+    validation_result = validate_csv_file(file)
+    unless validation_result[:valid]
+      redirect_to admin_import_export_path, alert: validation_result[:error]
       return
     end
 
@@ -60,6 +88,58 @@ class Admin::ImportExportController < AdminController
 
   private
 
+  # Validate CSV file structure and content for security
+  def validate_csv_file(file)
+    begin
+      # Read first chunk to check for malicious content
+      file.rewind
+      first_bytes = file.read(1000)
+      file.rewind
+
+      # Security check: Look for potentially malicious content
+      # Check for null bytes (indicates binary file)
+      if first_bytes.include?("\x00")
+        return { valid: false, error: "Invalid CSV file format (binary content detected)." }
+      end
+
+      # Check for extremely long lines by scanning entire file efficiently
+      File.foreach(file.path).with_index do |line, index|
+        # Only check first 100 lines for performance
+        break if index > 100
+
+        if line.length > 10_000
+          return { valid: false, error: "CSV contains excessively long lines." }
+        end
+      end
+      file.rewind
+
+      # Validate CSV can be parsed
+      csv_data = CSV.read(file.path, headers: true)
+
+      # Check row count
+      if csv_data.length > MAX_CSV_ROWS
+        return { valid: false, error: "CSV exceeds maximum allowed rows (#{MAX_CSV_ROWS})." }
+      end
+
+      # Validate required headers exist
+      required_headers = [ "text", "book" ]
+      headers = csv_data.headers.map(&:to_s).map(&:downcase)
+
+      missing_headers = required_headers - headers
+      if missing_headers.any?
+        return { valid: false, error: "CSV missing required columns: #{missing_headers.join(', ')}" }
+      end
+
+      { valid: true }
+    rescue CSV::MalformedCSVError => e
+      { valid: false, error: "Malformed CSV file: #{e.message}" }
+    rescue StandardError => e
+      { valid: false, error: "Error validating CSV: #{e.message}" }
+    ensure
+      file.rewind
+    end
+  end
+
   def process_csv_import(file)
     result = {
       total_rows: 0,
@@ -72,14 +152,27 @@ class Admin::ImportExportController < AdminController
     CSV.foreach(file.path, headers: true, header_converters: :symbol) do |row|
       result[:total_rows] += 1
 
+      # Safety check: Stop processing if row limit exceeded
+      if result[:total_rows] > MAX_CSV_ROWS
+        result[:errors] << "Maximum row limit (#{MAX_CSV_ROWS}) exceeded. Processing stopped."
+        break
+      end
+
       begin
-        # Extract data from CSV row
+        # Extract and sanitize data from CSV row
         text = row[:text]&.strip
         book = row[:book]&.strip
         chapter = row[:chapter]&.strip
         context = row[:context]&.strip
         character = row[:character]&.strip
         tags_string = row[:tags]&.strip
+
+        # Security: Validate field lengths to prevent DoS
+        if text && text.length > 2000
+          result[:failed] += 1
+          result[:errors] << "Row #{result[:total_rows]}: Text exceeds maximum length (2000 characters)"
+          next
+        end
 
         # Validate required fields
         if text.blank? || book.blank?

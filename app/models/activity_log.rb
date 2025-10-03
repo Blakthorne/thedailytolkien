@@ -17,14 +17,18 @@ class ActivityLog < ApplicationRecord
 
   # Common actions for admin activities
   ACTIONS = %w[
+    account_locked
+    account_unlocked
     comment_created
     comment_moderated
+    failed_login_attempt
     quote_create
     quote_delete
     quote_update
     quotes_bulk_delete
     quotes_csv_import
     quotes_csv_import_error
+    rate_limit_exceeded
     tag_created
     tag_deleted
     tag_updated
@@ -61,10 +65,16 @@ class ActivityLog < ApplicationRecord
   # Human-friendly description of the action (keeps target details out so views can append them)
   def action_description
     case action.to_s
+    when "account_locked"
+      "account locked due to failed login attempts"
+    when "account_unlocked"
+      "account automatically unlocked"
     when "comment_created"
       "created a comment"
     when "comment_moderated"
       "moderated a comment"
+    when "failed_login_attempt"
+      "failed login attempt"
     when "quote_create"
       "created a quote"
     when "quote_delete"
@@ -77,6 +87,8 @@ class ActivityLog < ApplicationRecord
       "imported quotes from CSV"
     when "quotes_csv_import_error"
       "failed to import quotes from CSV"
+    when "rate_limit_exceeded"
+      "exceeded rate limit"
     when "tag_created"
       "created a tag"
     when "tag_deleted"

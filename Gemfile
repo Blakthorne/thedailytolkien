@@ -25,6 +25,9 @@ gem "devise"
 gem "omniauth-google-oauth2"
 gem "omniauth-rails_csrf_protection"
 
+# Rate limiting and brute force protection
+gem "rack-attack"
+
 # Admin functionality
 gem "kaminari"
 

@@ -16,24 +16,49 @@
 </div>
 
 <div>
-  <!-- Quote Display -->
-  <div class="admin-section" style="margin-bottom: 2rem; border-left: 4px solid #8b7355;">
-    <blockquote style="margin: 0; font-size: 1.25rem; font-style: italic; color: #3d2c1d; line-height: 1.6;">
-      <%= simple_format(@quote.text) %>
+  <!-- Quote Display (matches home page format) -->
+  <div class="quote-card" style="margin-bottom: 2rem;">
+    <blockquote class="quote-text">
+      <%= @quote.text %>
     </blockquote>
-    
-    <div style="margin-top: 1.5rem; color: #8b7355;">
-      <strong>— <%= @quote.book %></strong>
-      <% if @quote.chapter %>
-        <br>Chapter <%= @quote.chapter %>
+
+    <div class="metadata-section">
+      <% if @quote.book.present? %>
+        <div class="metadata-item">
+          <span class="metadata-label">Book</span>
+          <span class="metadata-value"><%= @quote.book %></span>
+        </div>
       <% end %>
-      <% if @quote.context %>
-        <br>Context: <%= @quote.context %>
+      <% if @quote.chapter.present? %>
+        <div class="metadata-item">
+          <span class="metadata-label">Chapter</span>
+          <span class="metadata-value"><%= @quote.chapter %></span>
+        </div>
       <% end %>
-      <% if @quote.character %>
-        <br>Spoken by <%= @quote.character %>
+      <% if @quote.context.present? %>
+        <div class="metadata-item">
+          <span class="metadata-label">Context</span>
+          <span class="metadata-value"><%= @quote.context %></span>
+        </div>
+      <% end %>
+      <% if @quote.character.present? %>
+        <div class="metadata-item">
+          <span class="metadata-label">Character</span>
+          <span class="metadata-value"><%= @quote.character %></span>
+        </div>
       <% end %>
     </div>
+
+    <!-- Tags Section (without engagement buttons) -->
+    <% if @quote.tags.any? %>
+      <div class="quote-engagement-section">
+        <div class="quote-tags">
+          <% @quote.tags.each do |tag| %>
+            <span class="tag-badge"><%= tag.name %></span>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
   </div>
 
   <!-- Quote Details -->
@@ -116,7 +141,7 @@
     <h4 style="margin: 0 0 1rem 0; color: #3d2c1d;">Quick Actions</h4>
     <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
       <%= link_to "Edit Quote", edit_admin_quote_path(@quote), class: "admin-nav-link" %>
-      <%= link_to "View on Site", root_path(date: @quote.created_at.to_date), 
+      <%= link_to "View on Site", discover_path(@quote.id), 
           style: "background: #8b7355; color: white; padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none;", 
           target: "_blank" %>
       <%= link_to "Back to Quotes", admin_quotes_path, class: "admin-nav-link" %>

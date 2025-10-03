@@ -98,6 +98,69 @@
   </div>
 </div>
 
+  <!-- Pagination Controls -->
+  <% if @activities.any? %>
+    <div style="margin-bottom: 2rem; padding: 1.5rem; background: #fefcfa; border-radius: 8px; border: 1px solid #8b7355;">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <!-- Page Info -->
+        <div style="color: #3d2c1d;">
+          <strong>Page <%= @activities.current_page %> of <%= @activities.total_pages %></strong>
+          <span style="color: #8b7355; margin-left: 0.5rem;">
+            (Showing <%= @activities.offset_value + 1 %>-<%= [@activities.offset_value + @activities.size, @activities.total_count].min %> of <%= @activities.total_count %> activities)
+          </span>
+        </div>
+
+        <!-- Pagination Links -->
+        <% if @activities.total_pages > 1 %>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <% if @activities.prev_page %>
+              <%= link_to "← Previous", admin_activity_logs_path(params.permit(:user_id, :activity_action, :start_date, :end_date).merge(page: @activities.prev_page)), 
+                  style: "background: #8b7355; color: white; padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none;" %>
+            <% else %>
+              <span style="background: #e0d8cf; color: #8b7355; padding: 0.5rem 1rem; border-radius: 4px;">← Previous</span>
+            <% end %>
+
+            <!-- Page Numbers -->
+            <div style="display: flex; gap: 0.25rem;">
+              <% if @activities.current_page > 3 %>
+                <%= link_to "1", admin_activity_logs_path(params.permit(:user_id, :activity_action, :start_date, :end_date).merge(page: 1)), 
+                    style: "padding: 0.5rem 0.75rem; border-radius: 4px; text-decoration: none; background: #fefcfa; color: #3d2c1d; border: 1px solid #8b7355;" %>
+                <% if @activities.current_page > 4 %>
+                  <span style="padding: 0.5rem 0.75rem; color: #8b7355;">...</span>
+                <% end %>
+              <% end %>
+
+              <% page_range = [[@activities.current_page - 2, 1].max, [@activities.current_page + 2, @activities.total_pages].min] %>
+              <% (page_range[0]..page_range[1]).each do |page_num| %>
+                <% if page_num == @activities.current_page %>
+                  <span style="padding: 0.5rem 0.75rem; border-radius: 4px; background: #8b7355; color: white; font-weight: bold;"><%= page_num %></span>
+                <% else %>
+                  <%= link_to page_num, admin_activity_logs_path(params.permit(:user_id, :activity_action, :start_date, :end_date).merge(page: page_num)), 
+                      style: "padding: 0.5rem 0.75rem; border-radius: 4px; text-decoration: none; background: #fefcfa; color: #3d2c1d; border: 1px solid #8b7355;" %>
+                <% end %>
+              <% end %>
+
+              <% if @activities.current_page < @activities.total_pages - 2 %>
+                <% if @activities.current_page < @activities.total_pages - 3 %>
+                  <span style="padding: 0.5rem 0.75rem; color: #8b7355;">...</span>
+                <% end %>
+                <%= link_to @activities.total_pages, admin_activity_logs_path(params.permit(:user_id, :activity_action, :start_date, :end_date).merge(page: @activities.total_pages)), 
+                    style: "padding: 0.5rem 0.75rem; border-radius: 4px; text-decoration: none; background: #fefcfa; color: #3d2c1d; border: 1px solid #8b7355;" %>
+              <% end %>
+            </div>
+
+            <% if @activities.next_page %>
+              <%= link_to "Next →", admin_activity_logs_path(params.permit(:user_id, :activity_action, :start_date, :end_date).merge(page: @activities.next_page)), 
+                  style: "background: #8b7355; color: white; padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none;" %>
+            <% else %>
+              <span style="background: #e0d8cf; color: #8b7355; padding: 0.5rem 1rem; border-radius: 4px;">Next →</span>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
   <!-- Activity Log Table -->
   <div class="app-table-section">
   <table class="app-table" data-controller="sortable-table" aria-describedby="activity-table-caption">
@@ -170,10 +233,4 @@
     </tbody>
   </table>
   </div>
-
-  <% if @activities.count == 200 %>
-    <div style="background: #fff3cd; border: 1px solid #ffeaa7; color: #856404; padding: 1rem; border-radius: 4px; margin-top: 1rem;">
-      <strong>Note:</strong> Showing the most recent 200 activities. Use filters to narrow down results.
-    </div>
-  <% end %>
 </div>

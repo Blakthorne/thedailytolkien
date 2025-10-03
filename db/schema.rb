@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_11_145405) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_02_220357) do
   create_table "activity_logs", force: :cascade do |t|
     t.integer "user_id", null: false
     t.string "action"
@@ -111,12 +111,16 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_11_145405) do
     t.string "streak_timezone", default: "UTC", null: false
     t.string "first_name", null: false
     t.string "last_name", null: false
+    t.integer "failed_attempts", default: 0, null: false
+    t.string "unlock_token"
+    t.datetime "locked_at"
     t.index ["current_streak"], name: "index_users_on_current_streak"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["last_login_date"], name: "index_users_on_last_login_date"
     t.index ["longest_streak"], name: "index_users_on_longest_streak"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["streak_timezone"], name: "index_users_on_streak_timezone"
+    t.index ["unlock_token"], name: "index_users_on_unlock_token", unique: true
   end
 
   add_foreign_key "activity_logs", "users"

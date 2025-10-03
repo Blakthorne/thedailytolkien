@@ -24,7 +24,7 @@ class Admin::ActivityLogsController < AdminController
 
     # CRITICAL: Filter activities to only show those with valid actions
     @activities = @activities.where(action: @actions)
-    @activities = @activities.order(created_at: :desc).limit(200)
+    @activities = @activities.order(created_at: :desc).page(params[:page]).per(25)
 
     # Activity logging removed for activity logs view per user request
   end

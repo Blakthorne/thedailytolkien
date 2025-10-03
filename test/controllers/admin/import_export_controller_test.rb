@@ -186,10 +186,128 @@ class Admin::ImportExportControllerTest < ActionDispatch::IntegrationTest
 
     post admin_import_export_import_path, params: { csv_file: uploaded_file }
     assert_redirected_to admin_import_export_path
-    assert_equal "Please upload a valid CSV file.", flash[:alert]
+    # Updated to match new security error message
+    assert_equal "Invalid file type. Only CSV files with text/csv content-type are allowed.", flash[:alert]
 
     text_file.close
     text_file.unlink
+  end
+
+  test "should reject CSV files exceeding max file size" do
+    sign_in @admin
+
+    # Create a file that exceeds the 5MB limit
+    large_csv = Tempfile.new([ "large", ".csv" ])
+    large_csv.write("text,book\n")
+    # Write enough data to exceed 5MB
+    10_000.times do
+      large_csv.write("#{'a' * 600},The Fellowship of the Ring\n")
+    end
+    large_csv.rewind
+
+    uploaded_file = Rack::Test::UploadedFile.new(large_csv.path, "text/csv", original_filename: "large.csv")
+
+    post admin_import_export_import_path, params: { csv_file: uploaded_file }
+    assert_redirected_to admin_import_export_path
+    assert_match(/File size exceeds maximum allowed size/, flash[:alert])
+
+    large_csv.close
+    large_csv.unlink
+  end
+
+  test "should reject CSV with binary content" do
+    sign_in @admin
+
+    # Create a file with null bytes (binary content)
+    binary_csv = Tempfile.new([ "binary", ".csv" ])
+    binary_csv.write("text,book\n")
+    binary_csv.write("Test\x00binary,The Fellowship of the Ring\n")
+    binary_csv.rewind
+
+    uploaded_file = Rack::Test::UploadedFile.new(binary_csv.path, "text/csv", original_filename: "binary.csv")
+
+    post admin_import_export_import_path, params: { csv_file: uploaded_file }
+    assert_redirected_to admin_import_export_path
+    assert_match(/binary content detected/, flash[:alert])
+
+    binary_csv.close
+    binary_csv.unlink
+  end
+
+  test "should reject CSV with excessively long lines" do
+    sign_in @admin
+
+    # Create a CSV with a very long line
+    long_line_csv = Tempfile.new([ "long_line", ".csv" ])
+    long_line_csv.write("text,book\n")
+    long_line_csv.write("#{'a' * 15_000},The Fellowship of the Ring\n")
+    long_line_csv.rewind
+
+    uploaded_file = Rack::Test::UploadedFile.new(long_line_csv.path, "text/csv", original_filename: "long_line.csv")
+
+    post admin_import_export_import_path, params: { csv_file: uploaded_file }
+    assert_redirected_to admin_import_export_path
+    assert_match(/excessively long lines/, flash[:alert])
+
+    long_line_csv.close
+    long_line_csv.unlink
+  end
+
+  test "should reject CSV without required headers" do
+    sign_in @admin
+
+    # Create a CSV missing the required 'text' column
+    no_headers_csv = Tempfile.new([ "no_headers", ".csv" ])
+    no_headers_csv.write("book,author\n")
+    no_headers_csv.write("The Fellowship of the Ring,J.R.R. Tolkien\n")
+    no_headers_csv.rewind
+
+    uploaded_file = Rack::Test::UploadedFile.new(no_headers_csv.path, "text/csv", original_filename: "no_headers.csv")
+
+    post admin_import_export_import_path, params: { csv_file: uploaded_file }
+    assert_redirected_to admin_import_export_path
+    assert_match(/missing required columns/, flash[:alert])
+
+    no_headers_csv.close
+    no_headers_csv.unlink
+  end
+
+  test "should reject malformed CSV" do
+    sign_in @admin
+
+    # Create a malformed CSV
+    malformed_csv = Tempfile.new([ "malformed", ".csv" ])
+    malformed_csv.write("text,book\n")
+    malformed_csv.write("\"Unclosed quote,The Fellowship of the Ring\n")
+    malformed_csv.rewind
+
+    uploaded_file = Rack::Test::UploadedFile.new(malformed_csv.path, "text/csv", original_filename: "malformed.csv")
+
+    post admin_import_export_import_path, params: { csv_file: uploaded_file }
+    assert_redirected_to admin_import_export_path
+    assert_match(/Malformed CSV file/, flash[:alert])
+
+    malformed_csv.close
+    malformed_csv.unlink
+  end
+
+  test "should reject CSV with invalid file extension" do
+    sign_in @admin
+
+    csv_file = Tempfile.new([ "test", ".txt" ])
+    csv_file.write("text,book\n")
+    csv_file.write("You shall not pass!,The Fellowship of the Ring\n")
+    csv_file.rewind
+
+    # Upload with .txt extension even though content-type is CSV
+    uploaded_file = Rack::Test::UploadedFile.new(csv_file.path, "text/csv", original_filename: "test.txt")
+
+    post admin_import_export_import_path, params: { csv_file: uploaded_file }
+    assert_redirected_to admin_import_export_path
+    assert_match(/Invalid file extension/, flash[:alert])
+
+    csv_file.close
+    csv_file.unlink
   end
 
   private
