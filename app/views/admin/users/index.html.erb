@@ -196,7 +196,7 @@
   </div>
 <% end %>
 
-<script>
+<%= content_tag :script, nonce: true do %>
 function toggleAll(checkbox) {
   const checkboxes = document.querySelectorAll('.user-checkbox');
   checkboxes.forEach(cb => cb.checked = checkbox.checked);
@@ -228,4 +228,4 @@ function clearSelection() {
   document.getElementById('select-all').checked = false;
   updateBulkActions();
 }
-</script>
+<% end %>

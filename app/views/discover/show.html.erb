@@ -169,7 +169,7 @@
 <% end %>
 
 <!-- JavaScript for Real-time Interactions -->
-<script type="module">
+<%= content_tag :script, type: "module", nonce: true do %>
 import { QuoteEngagement, QuoteComments } from "quote_engagement";
 
 // Turbo lifecycle integration for all modules
@@ -229,5 +229,4 @@ document.addEventListener('turbo:load', function() {
   }
   <% end %>
 });
-</script>
-</script>
+<% end %>

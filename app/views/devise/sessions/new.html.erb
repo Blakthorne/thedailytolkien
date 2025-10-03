@@ -297,7 +297,7 @@
   }
 </style>
 
-<script>
+<%= content_tag :script, nonce: true do %>
 document.addEventListener('DOMContentLoaded', function() {
   const form = document.querySelector('form');
   const emailField = document.querySelector('.field:has([type="email"])');
@@ -408,7 +408,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 });
-</script>
+<% end %>
 
 <div class="auth-wrapper">
   <div class="title-section">
