@@ -42,7 +42,11 @@ class ApplicationController < ActionController::Base
   def update_user_streak_if_needed
     # Smart day-boundary detection: only update when we cross into a new day
     # in the user's timezone, providing immediate updates at midnight
-    user_timezone = Time.find_zone(current_user.streak_timezone)
+
+    # Safely get timezone, fallback to UTC if invalid
+    timezone_name = current_user.streak_timezone.presence || "UTC"
+    user_timezone = Time.find_zone(timezone_name) || Time.find_zone("UTC")
+
     current_date_in_user_tz = Time.current.in_time_zone(user_timezone).to_date
 
     # Only update if user hasn't been seen today in their timezone
@@ -52,7 +56,8 @@ class ApplicationController < ActionController::Base
       current_user.update_login_streak
     end
   rescue StandardError => e
-    Rails.logger.error "Failed to update streak for user #{current_user.id}: #{e.message}"
+    Rails.logger.error "Failed to update streak for user #{current_user&.id}: #{e.message}"
+    Rails.logger.error e.backtrace.first(5).join("\n")
     # Don't let streak update failure break the user experience
   end
 
