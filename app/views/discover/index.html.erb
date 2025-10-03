@@ -72,7 +72,7 @@
   <div class="discover-cards-container">
     <% if @quotes.any? %>
       <% @quotes.each do |quote| %>
-        <div class="quote-card discover-card" onclick="window.location.href='<%= discover_path(quote.id) %>'" role="button" tabindex="0" aria-label="View quote: <%= quote.discover_snippet(50) %>">
+        <div class="quote-card discover-card" data-href="<%= discover_path(quote.id) %>" role="button" tabindex="0" aria-label="View quote: <%= quote.discover_snippet(50) %>" style="cursor: pointer;">
           <blockquote class="quote-text">
             "<%= quote.discover_snippet(100) %>"
           </blockquote>
@@ -153,5 +153,30 @@
     </div>
   <% end %>
 </main>
+
+<script nonce="<%= content_security_policy_nonce %>">
+  // Handle discover card clicks with proper event delegation
+  document.addEventListener('DOMContentLoaded', function() {
+    const container = document.querySelector('.discover-cards-container');
+    if (!container) return;
+    
+    container.addEventListener('click', function(event) {
+      const card = event.target.closest('[data-href]');
+      if (card && card.dataset.href) {
+        window.location.href = card.dataset.href;
+      }
+    });
+    
+    // Handle keyboard navigation (Enter key)
+    container.addEventListener('keydown', function(event) {
+      if (event.key === 'Enter') {
+        const card = event.target.closest('[data-href]');
+        if (card && card.dataset.href) {
+          window.location.href = card.dataset.href;
+        }
+      }
+    });
+  });
+</script>
 
 

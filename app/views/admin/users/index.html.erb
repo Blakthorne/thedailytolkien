@@ -63,7 +63,7 @@
       <%= f.submit "Apply", 
           style: "background: #8b4513; color: white; padding: 0.25rem 1rem; border: none; border-radius: 4px; cursor: pointer;",
           onclick: "return confirm('Are you sure you want to perform this action on the selected users?')" %>
-      <button type="button" onclick="clearSelection()" 
+      <button type="button" data-action="clear-selection" 
               style="background: #8b7355; color: white; padding: 0.25rem 1rem; border: none; border-radius: 4px; cursor: pointer;">
         Clear Selection
       </button>
@@ -94,7 +94,7 @@
         <thead>
           <tr>
             <th class="checkbox-cell">
-              <input type="checkbox" id="select-all" onchange="toggleAll(this)" aria-label="Select all users">
+              <input type="checkbox" id="select-all" data-action="toggle-all" aria-label="Select all users">
             </th>
             <th class="col-priority-critical" data-type="text" role="columnheader" tabindex="0" aria-sort="none" style="outline: none;">Name</th>
             <th class="col-priority-critical" data-type="text" role="columnheader" tabindex="0" aria-sort="descending" style="outline: none;">Email</th>
@@ -197,6 +197,31 @@
 <% end %>
 
 <script nonce="<%= content_security_policy_nonce %>">
+// Use event delegation instead of inline event handlers
+document.addEventListener('DOMContentLoaded', function() {
+  // Handle select-all checkbox
+  const selectAll = document.getElementById('select-all');
+  if (selectAll) {
+    selectAll.addEventListener('change', function() {
+      toggleAll(this);
+    });
+  }
+  
+  // Handle clear selection button
+  document.addEventListener('click', function(event) {
+    if (event.target.closest('[data-action="clear-selection"]')) {
+      clearSelection();
+    }
+  });
+  
+  // Handle individual checkboxes
+  document.addEventListener('change', function(event) {
+    if (event.target.classList.contains('user-checkbox')) {
+      updateBulkActions();
+    }
+  });
+});
+
 function toggleAll(checkbox) {
   const checkboxes = document.querySelectorAll('.user-checkbox');
   checkboxes.forEach(cb => cb.checked = checkbox.checked);
