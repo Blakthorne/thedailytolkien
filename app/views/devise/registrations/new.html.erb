@@ -305,7 +305,7 @@
   }
 </style>
 
-<%= content_tag :script, nonce: true do %>
+<script nonce="<%= content_security_policy_nonce %>">
 document.addEventListener('DOMContentLoaded', function() {
   const form = document.querySelector('form');
   const firstNameField = document.querySelector('.field:has(input[name="user[first_name]"])');
@@ -490,7 +490,7 @@ document.addEventListener('DOMContentLoaded', function() {
     };
   }
 });
-<% end %>
+</script>
 
 <div class="auth-wrapper">
   <div class="title-section">
@@ -575,7 +575,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <%= link_to "Already have an account? Sign in", new_session_path(resource_name) %>
   </div>
 
-  <%= content_tag :script, nonce: true do %>
+  <script nonce="<%= content_security_policy_nonce %>">
     // Detect and populate timezone for registration
     document.addEventListener('DOMContentLoaded', function() {
       const timezoneField = document.getElementById('user_streak_timezone');
@@ -584,7 +584,7 @@ document.addEventListener('DOMContentLoaded', function() {
         timezoneField.value = detectedTimezone;
       }
     });
-  <% end %>
+  </script>
 
   <%# <%= render "devise/shared/links" %>
   </div>

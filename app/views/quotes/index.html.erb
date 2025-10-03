@@ -154,7 +154,7 @@
 </main>
 
 <!-- JavaScript for Real-time Interactions -->
-<%= content_tag :script, type: "module", nonce: true do %>
+<script type="module" nonce="<%= content_security_policy_nonce %>">
 import { QuoteEngagement, QuoteComments } from "quote_engagement";
 
 // Turbo lifecycle integration for all modules
@@ -214,4 +214,4 @@ document.addEventListener('turbo:load', function() {
   }
   <% end %>
 });
-<% end %>
+</script>

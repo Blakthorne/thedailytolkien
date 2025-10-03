@@ -144,7 +144,7 @@
   </div>
 <% end %>
 
-<%= content_tag :script, nonce: true do %>
+<script nonce="<%= content_security_policy_nonce %>">
 function toggleAll(checkbox) {
   const checkboxes = document.querySelectorAll('.quote-checkbox');
   checkboxes.forEach(cb => cb.checked = checkbox.checked);
@@ -176,4 +176,4 @@ function clearSelection() {
   document.getElementById('select-all').checked = false;
   updateBulkActions();
 }
-<% end %>
+</script>

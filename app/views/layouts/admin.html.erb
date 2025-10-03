@@ -18,7 +18,7 @@
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
     
-    <%= content_tag :script, nonce: true do %>
+    <script nonce="<%= content_security_policy_nonce %>">
       // Inline JavaScript fallback for admin functionality
       document.addEventListener('DOMContentLoaded', function() {
         // Row clicking functionality
@@ -58,7 +58,7 @@
           document.dispatchEvent(event);
         }, 100);
       });
-    <% end %>
+    </script>
     
     <style>
       /* Admin-specific styles that harmonize with main app */
