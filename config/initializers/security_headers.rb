@@ -43,9 +43,9 @@ end
 # When a nonce is present, browsers ignore 'unsafe-inline' per CSP Level 2 spec
 # This is why we only generate nonces in production
 if Rails.env.production?
-  Rails.application.config.content_security_policy_nonce_generator = ->(request) {
-    request.session.id.to_s
-  }
+  # Use Rails' default nonce generator (SecureRandom-based)
+  # Do NOT use request.session.id as it may not be available when CSP middleware runs
+  # causing 500 errors in production, especially in containerized environments
 
   # Only apply nonce to script-src, not style-src
   # This prevents the nonce from overriding 'unsafe-inline' for styles
