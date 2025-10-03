@@ -24,13 +24,18 @@ Rails.application.config.content_security_policy do |policy|
   policy.font_src    :self, :https, :data
   policy.img_src     :self, :https, :data
   policy.object_src  :none
-  policy.script_src  :self, :https
+
+  # TEMPORARY: Allow unsafe-inline in ALL environments until views are CSP-ready
+  # The codebase has extensive inline scripts and event handlers that need refactoring
+  # before we can enforce strict CSP with nonces in production
+  # TODO: Gradually migrate inline scripts to external files and use nonces
+  policy.script_src  :self, :https, :unsafe_inline
+
   # Allow inline styles (required for existing inline style attributes in views)
   # Note: This is less secure than using nonces or hashes, but required for 377+ inline styles
   policy.style_src   :self, :https, :unsafe_inline
 
-  # Development/Test environment: Allow inline scripts and LiveReload
-  # Note: 'unsafe-inline' allows inline onclick handlers and <script> tags in views
+  # Development/Test environment: Add LiveReload connections
   # LiveReload needs http://localhost:35729 and ws:// connections for hot reloading
   if Rails.env.development? || Rails.env.test?
     policy.connect_src :self, :https, "ws://localhost:*", "ws://127.0.0.1:*", "http://localhost:35729", "http://127.0.0.1:35729"
@@ -38,19 +43,17 @@ Rails.application.config.content_security_policy do |policy|
   end
 end
 
-# Generate CSP nonce for scripts in PRODUCTION ONLY
-# In development/test, we use 'unsafe-inline' for flexibility with inline scripts
-# When a nonce is present, browsers ignore 'unsafe-inline' per CSP Level 2 spec
-# This is why we only generate nonces in production
-if Rails.env.production?
-  # Use Rails' default nonce generator (SecureRandom-based)
-  # Do NOT use request.session.id as it may not be available when CSP middleware runs
-  # causing 500 errors in production, especially in containerized environments
-
-  # Only apply nonce to script-src, not style-src
-  # This prevents the nonce from overriding 'unsafe-inline' for styles
-  Rails.application.config.content_security_policy_nonce_directives = %w[script-src]
-end
+# NOTE: CSP nonces are disabled until the codebase is prepared for strict CSP
+# The nonce system was causing 500 errors in production because:
+# 1. Views have inline scripts and event handlers that need nonces
+# 2. Not all views were updated to use nonces correctly
+# 3. The nonce generator had session dependencies that failed in production
+#
+# Future work: Implement proper CSP with nonces by:
+# 1. Migrating all inline scripts to external files or adding nonces
+# 2. Removing all inline event handlers (onclick, onchange, etc.)
+# 3. Using event delegation with data attributes
+# 4. Testing thoroughly in production-like environment before deployment
 
 # Report CSP violations (optional - only in production)
 if Rails.env.production?
