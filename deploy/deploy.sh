@@ -106,21 +106,58 @@ deploy_app() {
 run_migrations() {
     log_info "Running database migrations..."
 
-    # Verify migration file exists in the image (fail fast if missing)
-    if ! docker run --rm thedailytolkien:latest /bin/sh -c "ls db/migrate | grep -q lockable"; then
-        log_error "Expected lockable migration file not found in image. Aborting."
+    # Ensure the Docker image contains the same migration files as the repository on disk
+    local host_migrations
+    local image_migrations
+
+    host_migrations=$(find db/migrate -type f -printf '%f\n' | sort)
+    image_migrations=$(docker run --rm thedailytolkien:latest /bin/sh -c "cd /rails && find db/migrate -type f -printf '%f\\n' | sort")
+
+    if [ -z "$image_migrations" ]; then
+        log_error "No migration files were found inside the Docker image. Aborting."
         exit 1
     fi
 
-    # Use the namespaced primary database task
-    docker-compose -f "$COMPOSE_FILE" run --rm web ./bin/rails db:migrate:primary || {
-        log_error 'Primary db:migrate failed'
+    if [ "$host_migrations" != "$image_migrations" ]; then
+        log_error "Mismatch between repository migrations and the Docker image. Please rebuild the image before deploying."
+        log_error "Host migrations:"
+        echo "$host_migrations"
+        log_error "Image migrations:"
+        echo "$image_migrations"
         exit 1
-    }
+    fi
 
-    # Post‑migration verification: check columns exist
-    if ! docker-compose -f "$COMPOSE_FILE" run --rm web ./bin/rails runner "puts (User.column_names & %w[locked_at failed_attempts unlock_token]).size == 3" | grep -q true; then
-        log_error "Lockable columns not present after migration. Aborting."
+    # Run migrations for each configured database context
+    local contexts=(primary cache queue cable)
+    for context in "${contexts[@]}"; do
+        local migrate_task="db:migrate"
+        local status_task="db:migrate:status"
+
+        if [ "$context" != "primary" ]; then
+            migrate_task+=":${context}"
+            status_task+=":${context}"
+        fi
+
+        log_info "Running ${migrate_task}..."
+        if ! docker-compose -f "$COMPOSE_FILE" run --rm web ./bin/rails "$migrate_task"; then
+            log_error "${migrate_task} failed"
+            exit 1
+        fi
+
+        log_info "Verifying ${status_task} has no pending migrations..."
+        if docker-compose -f "$COMPOSE_FILE" run --rm web ./bin/rails "$status_task" | grep -E '\bdown\b'; then
+            log_error "Pending migrations detected for context '${context}'. Aborting."
+            exit 1
+        fi
+    done
+
+    # Specific verification for Devise lockable columns to guard against regressions
+        local lockable_check
+        lockable_check=$'ActiveRecord::Base.connected_to(role: :writing, database: :primary) do
+    puts(%w[locked_at failed_attempts unlock_token].all? { |column| ActiveRecord::Base.connection.column_exists?(:users, column) })
+end'
+        if ! docker-compose -f "$COMPOSE_FILE" run --rm web ./bin/rails runner "$lockable_check" | grep -q true; then
+        log_error "Expected Devise lockable columns are missing after migrations. Aborting."
         exit 1
     fi
 

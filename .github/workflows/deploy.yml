@@ -47,6 +47,25 @@ jobs:
                   docker build -t thedailytolkien:latest .
                   docker save thedailytolkien:latest | gzip > thedailytolkien.tar.gz
 
+            - name: Verify migrations are bundled in Docker image
+              run: |
+                  HOST_MIGRATIONS=$(find db/migrate -type f -printf '%f\n' | sort)
+                  IMAGE_MIGRATIONS=$(docker run --rm thedailytolkien:latest /bin/sh -c "cd /rails && find db/migrate -type f -printf '%f\\n' | sort")
+
+                  if [ -z "$IMAGE_MIGRATIONS" ]; then
+                    echo "Docker image does not contain any migration files." >&2
+                    exit 1
+                  fi
+
+                  if [ "$HOST_MIGRATIONS" != "$IMAGE_MIGRATIONS" ]; then
+                    echo "Mismatch between repository migrations and Docker image contents." >&2
+                    echo "Host migrations:" >&2
+                    echo "$HOST_MIGRATIONS" >&2
+                    echo "Image migrations:" >&2
+                    echo "$IMAGE_MIGRATIONS" >&2
+                    exit 1
+                  fi
+
             - name: Copy files to server
               uses: appleboy/scp-action@v0.1.7
               with:
