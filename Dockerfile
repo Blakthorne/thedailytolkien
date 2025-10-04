@@ -44,8 +44,8 @@ COPY . .
 
 # Fail the build early if migrations are missing from the image
 RUN if [ -z "$(find db/migrate -type f -name '*.rb' -print -quit)" ]; then \
-        echo "No migration files were copied into the Docker image. Check .dockerignore and the build context." >&2; \
-        exit 1; \
+    echo "No migration files were copied into the Docker image. Check .dockerignore and the build context." >&2; \
+    exit 1; \
     fi
 
 # Precompile bootsnap code for faster boot times
