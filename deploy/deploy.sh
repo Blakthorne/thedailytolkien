@@ -58,7 +58,7 @@ create_backup() {
     # Backup database if container is running
     if docker-compose -f "$COMPOSE_FILE" ps -q web | grep -q .; then
         log_info "Backing up database..."
-        docker-compose -f "$COMPOSE_FILE" exec -T web ./bin/rails db:dump > "$BACKUP_DIR/database.sql" 2>/dev/null || log_warn "Database backup failed (this is normal on first deployment)"
+        docker-compose -f "$COMPOSE_FILE" exec -T web sqlite3 storage/production.sqlite3 .dump > "$BACKUP_DIR/database.sql" 2>/dev/null || log_warn "Database backup failed (this is normal on first deployment)"
     fi
     
     # Backup storage volume
