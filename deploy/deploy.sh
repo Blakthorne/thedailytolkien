@@ -107,7 +107,7 @@ deploy_app() {
 # Function to run database migrations
 run_migrations() {
     log_info "Running database migrations..."
-    docker-compose -f "$COMPOSE_FILE" run --rm web ./bin/rails db:migrate || {
+    docker-compose -f "$COMPOSE_FILE" exec -T web ./bin/rails db:migrate || {
         log_error "Database migrations failed!"
         exit 1
     }
