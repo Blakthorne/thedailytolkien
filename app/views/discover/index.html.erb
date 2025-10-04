@@ -106,7 +106,11 @@
 
           <!-- Last Displayed Date -->
           <div class="discover-date">
-            Last featured on <%= Time.at(quote.last_date_displayed).in_time_zone(@user_timezone).strftime('%B %d, %Y') %>
+            <% if quote.last_date_displayed.present? %>
+              Last featured on <%= Time.at(quote.last_date_displayed).in_time_zone(@user_timezone).strftime('%B %d, %Y') %>
+            <% else %>
+              Never featured
+            <% end %>
           </div>
         </div>
       <% end %>

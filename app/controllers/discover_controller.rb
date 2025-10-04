@@ -5,9 +5,9 @@ class DiscoverController < ApplicationController
   before_action :set_user_timezone
   after_action :reset_user_timezone
 
-  # Discover index - displays paginated table of all displayed quotes with filtering/sorting
+  # Discover index - displays paginated table of all quotes with filtering/sorting
   def index
-    @quotes = Quote.displayed.includes(:tags, :quote_likes, :comments)
+    @quotes = Quote.includes(:tags, :quote_likes, :comments)
 
     # Apply filters
     if params[:search].present?
@@ -33,13 +33,16 @@ class DiscoverController < ApplicationController
     # Apply sorting
     case params[:sort_by]
     when "date"
-      @quotes = @quotes.order(last_date_displayed: params[:sort_direction] == "asc" ? :asc : :desc)
+      # Sort by last_date_displayed, with NULLs (never displayed) at the end
+      direction = params[:sort_direction] == "asc" ? "ASC" : "DESC"
+      @quotes = @quotes.order(Arel.sql("last_date_displayed IS NULL, last_date_displayed #{direction}"))
     when "book"
       @quotes = @quotes.order(book: params[:sort_direction] == "asc" ? :asc : :desc)
     when "character"
       @quotes = @quotes.order(character: params[:sort_direction] == "asc" ? :asc : :desc)
     else
-      @quotes = @quotes.by_display_date
+      # Default: sort by last_date_displayed DESC, with never-displayed quotes at the end
+      @quotes = @quotes.order(Arel.sql("last_date_displayed IS NULL, last_date_displayed DESC"))
     end
 
     # Paginate results
@@ -58,8 +61,10 @@ class DiscoverController < ApplicationController
       return
     end
 
-    # Calculate the discover date from the quote's last display date
-    @discover_date = Time.at(@quote.last_date_displayed).in_time_zone(@user_timezone || "UTC").to_date
+    # Calculate the discover date from the quote's last display date (if it has been displayed)
+    @discover_date = @quote.last_date_displayed.present? ?
+      Time.at(@quote.last_date_displayed).in_time_zone(@user_timezone || "UTC").to_date :
+      nil
 
     if @quote
       # Load all interaction data for full interactivity (like quotes#index)
@@ -88,9 +93,9 @@ class DiscoverController < ApplicationController
 
   # Set up filter options for discover index dropdowns
   def load_discover_filters
-    @books = Quote.displayed.distinct.pluck(:book).compact.sort
-    @characters = Quote.displayed.distinct.pluck(:character).compact.sort
-    @tags = Tag.joins(:quotes).where(quotes: { id: Quote.displayed.select(:id) }).distinct.order(:name)
+    @books = Quote.distinct.pluck(:book).compact.sort
+    @characters = Quote.distinct.pluck(:character).compact.sort
+    @tags = Tag.joins(:quotes).distinct.order(:name)
   end
 
   # Set user timezone for proper date display

@@ -1,16 +1,366 @@
-<h2>Forgot your password?</h2>
+<style>
+  body {
+    font-family: 'Source Sans Pro', sans-serif;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
 
-<%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :post }) do |f| %>
-  <%= render "devise/shared/error_messages", resource: resource %>
+  .app-header {
+    visibility: hidden;
+  }
 
-  <div class="field">
-    <%= f.label :email %><br />
-    <%= f.email_field :email, autofocus: true, autocomplete: "email" %>
+  .auth-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 3rem;
+    max-width: 900px;
+    width: 100%;
+    margin: 2rem auto;
+    padding: 0 1rem;
+  }
+
+  .title-section {
+    flex: 1;
+    text-align: center;
+    padding: 2rem;
+  }
+
+  .title-section h1 {
+    font-family: 'Crimson Text', serif;
+    font-size: 3.5rem;
+    font-weight: 700;
+    color: #3d2c1d;
+    margin: 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    letter-spacing: 0.1em;
+    line-height: 1.2;
+  }
+
+  .title-section .subtitle {
+    font-family: 'Source Sans Pro', sans-serif;
+    font-size: 1.2rem;
+    color: #8b7355;
+    margin-top: 1rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+  }
+
+  .reset-container {
+    background: rgba(245, 240, 232, 0.1);
+    backdrop-filter: blur(2px);
+    border-radius: 12px;
+    padding: 2rem 2rem;
+    border: 2px solid #8b7355;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    max-width: 500px;
+    width: 100%;
+    flex: 1;
+  }
+
+  h2 {
+    font-family: 'Crimson Text', serif;
+    color: #3d2c1d;
+    text-align: center;
+    margin-bottom: 1rem;
+    font-size: 2rem;
+    font-weight: 600;
+  }
+
+  .instructions {
+    text-align: center;
+    color: #8b7355;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+
+  .reset-form {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .field {
+    margin-bottom: 0;
+  }
+
+  .field label {
+    display: block;
+    font-weight: 600;
+    color: #3d2c1d;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+  }
+
+  .field input[type="email"] {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #8b7355;
+    border-radius: 6px;
+    font-size: 1rem;
+    background: #fefcfa;
+    color: #3d2c1d;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    box-sizing: border-box;
+  }
+
+  .field input[type="email"]:focus {
+    outline: none;
+    border-color: #3d2c1d;
+    box-shadow: 0 0 0 3px rgba(61, 44, 29, 0.1);
+  }
+
+  .field.error input {
+    border-color: #dc3545;
+    background: rgba(220, 53, 69, 0.05);
+  }
+
+  .field.error .error-message {
+    display: block;
+  }
+
+  .error-message {
+    color: #dc3545;
+    font-size: 0.85rem;
+    font-weight: 500;
+    display: none;
+    margin-top: 0.25rem;
+  }
+
+  .success-message {
+    background: rgba(40, 167, 69, 0.1);
+    border: 1px solid #28a745;
+    color: #155724;
+    padding: 1rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    display: none;
+    text-align: center;
+    font-weight: 500;
+  }
+
+  .success-message.show {
+    display: block;
+  }
+
+  .actions {
+    margin-top: 1.5rem;
+  }
+
+  input[type="submit"] {
+    width: 100%;
+    padding: 0.875rem;
+    background: #8b7355;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+  input[type="submit"]:hover {
+    background: #3d2c1d;
+  }
+
+  input[type="submit"]:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+  }
+
+  .back-link {
+    text-align: center;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(139, 115, 85, 0.3);
+  }
+
+  .back-link a {
+    color: #8b7355;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: color 0.2s ease;
+  }
+
+  .back-link a:hover {
+    color: #3d2c1d;
+    text-decoration: underline;
+  }
+
+  @media (max-width: 768px) {
+    body {
+      padding: 0rem;
+    }
+
+    .auth-wrapper {
+      flex-direction: column;
+      gap: 2rem;
+      text-align: center;
+      margin: 1rem auto;
+      padding: 0 1rem;
+      max-width: 100%;
+    }
+
+    .title-section {
+      padding: 1rem;
+    }
+
+    .title-section h1 {
+      font-size: 2.5rem;
+    }
+
+    .title-section .subtitle {
+      font-size: 1rem;
+    }
+
+    .reset-container {
+      max-width: 100%;
+      margin: 0;
+      padding: 1.5rem 1rem;
+      text-align: left;
+    }
+  }
+</style>
+
+<script nonce="<%= content_security_policy_nonce %>">
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.querySelector('form');
+  const emailField = document.querySelector('.field:has([type="email"])');
+  const emailInput = document.querySelector('[type="email"]');
+  const submitButton = document.querySelector('[type="submit"]');
+
+  // Disable submit button initially
+  submitButton.disabled = true;
+  submitButton.style.opacity = '0.8';
+  submitButton.style.cursor = 'not-allowed';
+
+  // Create error message element
+  const emailError = document.createElement('div');
+  emailError.className = 'error-message';
+  emailField.appendChild(emailError);
+
+  function validateEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
+
+  function showError(field, message) {
+    field.classList.add('error');
+    const errorElement = field.querySelector('.error-message');
+    errorElement.textContent = message;
+    errorElement.style.display = 'block';
+  }
+
+  function clearError(field) {
+    field.classList.remove('error');
+    const errorElement = field.querySelector('.error-message');
+    errorElement.style.display = 'none';
+  }
+
+  function validateForm() {
+    let isValid = true;
+    const email = emailInput.value.trim();
+
+    // Clear previous errors
+    clearError(emailField);
+
+    // Email validation
+    if (!email) {
+      showError(emailField, 'Email address is required');
+      isValid = false;
+    } else if (!validateEmail(email)) {
+      showError(emailField, 'Please enter a valid email address');
+      isValid = false;
+    }
+
+    return isValid;
+  }
+
+  // Real-time validation and button state management
+  emailInput.addEventListener('input', function() {
+    const email = emailInput.value.trim();
+    
+    // Clear error if user is typing
+    if (email) {
+      clearError(emailField);
+    }
+    
+    // Enable/disable submit button based on validation
+    if (email && validateEmail(email)) {
+      submitButton.disabled = false;
+      submitButton.style.opacity = '1';
+      submitButton.style.cursor = 'pointer';
+    } else {
+      submitButton.disabled = true;
+      submitButton.style.opacity = '0.8';
+      submitButton.style.cursor = 'not-allowed';
+    }
+  });
+
+  // Validate on blur (when user leaves the field)
+  emailInput.addEventListener('blur', function() {
+    const email = emailInput.value.trim();
+    if (email && !validateEmail(email)) {
+      showError(emailField, 'Please enter a valid email address');
+    }
+  });
+
+  // Form submission validation
+  form.addEventListener('submit', function(e) {
+    if (!validateForm()) {
+      e.preventDefault();
+      emailInput.focus();
+    } else {
+      // Disable submit button to prevent double submission
+      submitButton.disabled = true;
+      submitButton.value = 'Sending...';
+    }
+  });
+});
+</script>
+
+<div class="auth-wrapper">
+  <div class="title-section">
+    <h1>The Daily Tolkien</h1>
+    <div class="subtitle">Words from the maker of Middle-earth</div>
   </div>
 
-  <div class="actions">
-    <%= f.submit "Send me reset password instructions" %>
-  </div>
-<% end %>
+  <div class="reset-container">
+    <h2>Forgot Your Password?</h2>
 
-<%= render "devise/shared/links" %>
+    <p class="instructions">
+      Enter your email address below and we'll send you instructions to reset your password.
+    </p>
+
+    <% if flash[:notice] %>
+      <div class="success-message show">
+        <%= flash[:notice] %>
+      </div>
+    <% end %>
+
+    <%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :post }) do |f| %>
+      <div class="reset-form">
+        <div class="field">
+          <%= f.label :email, "Email Address" %>
+          <%= f.email_field :email, autofocus: true, autocomplete: "email", placeholder: "you@example.com" %>
+        </div>
+      </div>
+
+      <div class="actions">
+        <%= f.submit "Send Reset Instructions" %>
+      </div>
+    <% end %>
+
+    <div class="back-link">
+      <%= link_to "← Back to Sign In", new_session_path(resource_name) %>
+    </div>
+  </div>
+</div>

@@ -223,6 +223,25 @@
 
   .oauth-button .label { display: inline-block; }
 
+  .forgot-password-link {
+    text-align: right;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .forgot-password-link a {
+    color: #8b7355;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: color 0.2s ease;
+  }
+
+  .forgot-password-link a:hover {
+    color: #3d2c1d;
+    text-decoration: underline;
+  }
+
   .signup-link {
     text-align: center;
     margin-top: 1.5rem;
@@ -419,6 +438,12 @@ document.addEventListener('DOMContentLoaded', function() {
   <div class="login-container">
     <h2>Sign In</h2>
 
+    <% if flash[:notice].present? %>
+      <div class="success-message" style="background: #d4edda; color: #155724; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; border: 1px solid #c3e6cb;">
+        <%= flash[:notice] %>
+      </div>
+    <% end %>
+
     <div id="auth-error" class="auth-error" style="<%= flash[:alert].present? ? '' : 'display: none;' %>">
       <%= flash[:alert] || 'Invalid email or password. Please check your credentials and try again.' %>
     </div>
@@ -433,6 +458,10 @@ document.addEventListener('DOMContentLoaded', function() {
       <div class="field">
         <%= f.label :password %>
         <%= f.password_field :password, autocomplete: "current-password" %>
+      </div>
+
+      <div class="forgot-password-link">
+        <%= link_to "Forgot your password?", new_password_path(resource_name) %>
       </div>
 
       <% if devise_mapping.rememberable? %>
