@@ -112,15 +112,11 @@ run_migrations() {
         exit 1
     fi
 
-    # One-off container (fresh image) – NOT exec
-    # Ensures we use the newly loaded codebase
-    docker-compose -f "$COMPOSE_FILE" run --rm web ./bin/rails db:migrate || {
+    # Use the namespaced primary database task
+    docker-compose -f "$COMPOSE_FILE" run --rm web ./bin/rails db:migrate:primary || {
         log_error 'Primary db:migrate failed'
         exit 1
     }
-
-    # If you later need all secondary DB migrations, uncomment:
-    # docker-compose -f "$COMPOSE_FILE" run --rm web ./bin/rails db:migrate:all
 
     # Post‑migration verification: check columns exist
     if ! docker-compose -f "$COMPOSE_FILE" run --rm web ./bin/rails runner "puts (User.column_names & %w[locked_at failed_attempts unlock_token]).size == 3" | grep -q true; then
