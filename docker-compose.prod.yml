@@ -11,7 +11,6 @@ services:
       - RAILS_SERVE_STATIC_FILES=1
     volumes:
       - rails_storage:/rails/storage
-      - rails_db:/rails/db
       - rails_log:/rails/log
     networks:
       - app_network
@@ -24,8 +23,6 @@ services:
 
 volumes:
   rails_storage:
-    driver: local
-  rails_db:
     driver: local
   rails_log:
     driver: local
