@@ -156,7 +156,8 @@
 
 <script nonce="<%= content_security_policy_nonce %>">
   // Handle discover card clicks with proper event delegation
-  document.addEventListener('DOMContentLoaded', function() {
+  // Use turbo:load instead of DOMContentLoaded to work with Turbo navigation
+  document.addEventListener('turbo:load', function() {
     const container = document.querySelector('.discover-cards-container');
     if (!container) return;
     
