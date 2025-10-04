@@ -107,10 +107,9 @@ run_migrations() {
     log_info "Running database migrations..."
 
     # Ensure the Docker image contains the same migration files as the repository on disk
-    local host_migrations
+    local host_migrations=""
     local image_migrations
 
-    host_migrations=$(find db/migrate -type f -printf '%f\n' | sort)
     image_migrations=$(docker run --rm thedailytolkien:latest /bin/sh -c "cd /rails && find db/migrate -type f -printf '%f\\n' | sort")
 
     if [ -z "$image_migrations" ]; then
@@ -118,7 +117,13 @@ run_migrations() {
         exit 1
     fi
 
-    if [ "$host_migrations" != "$image_migrations" ]; then
+    if [ -d db/migrate ]; then
+        host_migrations=$(find db/migrate -type f -printf '%f\n' | sort)
+    else
+        log_warn "Local db/migrate directory not found; skipping host vs. image migration comparison."
+    fi
+
+    if [ -n "$host_migrations" ] && [ "$host_migrations" != "$image_migrations" ]; then
         log_error "Mismatch between repository migrations and the Docker image. Please rebuild the image before deploying."
         log_error "Host migrations:"
         echo "$host_migrations"
