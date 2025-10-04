@@ -70,19 +70,17 @@ create_backup() {
     log_info "Backup created at: $BACKUP_DIR"
 }
 
-# Function to deploy the application
+# Function to deploy the application (start/replace containers)
 deploy_app() {
     log_info "Deploying application..."
-    
-    # Stop existing containers
+
+    # Stop old containers first (so migrations run against current DB file without file locks)
     log_info "Stopping existing containers..."
     docker-compose -f "$COMPOSE_FILE" down --remove-orphans || true
-    
-    # Remove old images (keep the latest for rollback)
+
     log_info "Cleaning up old Docker images..."
     docker image prune -f || true
-    
-    # Start the new deployment
+
     log_info "Starting new deployment..."
     docker-compose -f "$COMPOSE_FILE" up -d
     
@@ -104,13 +102,32 @@ deploy_app() {
     done
 }
 
-# Function to run database migrations
+# Function to run database migrations using the NEW image
 run_migrations() {
     log_info "Running database migrations..."
-    docker-compose -f "$COMPOSE_FILE" exec -T web ./bin/rails db:migrate || {
-        log_error "Database migrations failed!"
+
+    # Verify migration file exists in the image (fail fast if missing)
+    if ! docker run --rm thedailytolkien:latest /bin/sh -c "ls db/migrate | grep -q lockable"; then
+        log_error "Expected lockable migration file not found in image. Aborting."
+        exit 1
+    fi
+
+    # One-off container (fresh image) – NOT exec
+    # Ensures we use the newly loaded codebase
+    docker-compose -f "$COMPOSE_FILE" run --rm web ./bin/rails db:migrate || {
+        log_error 'Primary db:migrate failed'
         exit 1
     }
+
+    # If you later need all secondary DB migrations, uncomment:
+    # docker-compose -f "$COMPOSE_FILE" run --rm web ./bin/rails db:migrate:all
+
+    # Post‑migration verification: check columns exist
+    if ! docker-compose -f "$COMPOSE_FILE" run --rm web ./bin/rails runner "puts (User.column_names & %w[locked_at failed_attempts unlock_token]).size == 3" | grep -q true; then
+        log_error "Lockable columns not present after migration. Aborting."
+        exit 1
+    fi
+
     log_info "Database migrations completed ✅"
 }
 
