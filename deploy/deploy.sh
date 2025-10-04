@@ -157,11 +157,9 @@ run_migrations() {
     done
 
     # Specific verification for Devise lockable columns to guard against regressions
-        local lockable_check
-        lockable_check=$'ActiveRecord::Base.connected_to(role: :writing, database: :primary) do
-    puts(%w[locked_at failed_attempts unlock_token].all? { |column| ActiveRecord::Base.connection.column_exists?(:users, column) })
-end'
-        if ! docker-compose -f "$COMPOSE_FILE" run --rm web ./bin/rails runner "$lockable_check" | grep -q true; then
+    local lockable_check
+    lockable_check=$'puts(%w[locked_at failed_attempts unlock_token].all? { |column| ActiveRecord::Base.connection.column_exists?(:users, column) })'
+    if ! docker-compose -f "$COMPOSE_FILE" run --rm web ./bin/rails runner "$lockable_check" | grep -q true; then
         log_error "Expected Devise lockable columns are missing after migrations. Aborting."
         exit 1
     fi
