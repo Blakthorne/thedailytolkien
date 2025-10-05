@@ -82,7 +82,8 @@ Rails.application.configure do
   # Enable DNS rebinding protection and other `Host` header attacks.
   config.hosts = [
     "thedailytolkien.com",     # Allow requests from production domain
-    "98.86.217.231"                       # Allow requests from server IP
+    "www.thedailytolkien.com", # Allow requests from www subdomain
+    "98.86.217.231"            # Allow requests from server IP
   ]
   #
   # Skip DNS rebinding protection for the default health check endpoint.
