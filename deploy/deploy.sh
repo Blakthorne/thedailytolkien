@@ -206,17 +206,96 @@ update_nginx_config() {
         # Create a backup of the current config
         sudo cp "$NGINX_SITE_CONFIG" "${NGINX_SITE_CONFIG}.backup.$(date +%Y%m%d_%H%M%S)"
         
-        # Check if The Daily Tolkien configuration already exists
-        if sudo grep -q "thedailytolkien.com" "$NGINX_SITE_CONFIG"; then
-            log_info "The Daily Tolkien configuration already exists in multi-app config"
-        else
-            log_info "Adding The Daily Tolkien configuration to multi-app config"
+        # Check if ANY The Daily Tolkien configuration exists (old or new domain)
+        if sudo grep -q "thedailytolkien_backend\|thedailytolkien.com\|thedailytolkien.davidpolar.com" "$NGINX_SITE_CONFIG"; then
+            log_warn "Found existing The Daily Tolkien configuration, removing it to avoid duplicates..."
             
-            # Use server-blocks-only config to avoid duplicate global directives
-            sudo bash -c "echo '' >> $NGINX_SITE_CONFIG"
-            sudo bash -c "echo '# The Daily Tolkien Configuration' >> $NGINX_SITE_CONFIG"
-            sudo bash -c "cat deploy/nginx-server-blocks.conf >> $NGINX_SITE_CONFIG"
+            # Use Python for reliable multi-line block removal
+            sudo python3 <<'PYTHON_EOF'
+import re
+
+config_file = "/etc/nginx/sites-available/service-integrator"
+
+with open(config_file, 'r') as f:
+    content = f.read()
+
+# Remove upstream thedailytolkien_backend blocks
+content = re.sub(
+    r'# Upstream for The Daily Tolkien.*?upstream\s+thedailytolkien_backend\s*\{[^}]*\}\s*',
+    '',
+    content,
+    flags=re.DOTALL
+)
+
+content = re.sub(
+    r'upstream\s+thedailytolkien_backend\s*\{[^}]*\}\s*',
+    '',
+    content,
+    flags=re.DOTALL
+)
+
+# Remove server blocks containing thedailytolkien domains
+def remove_matching_server_blocks(text, pattern):
+    lines = text.split('\n')
+    result = []
+    in_target_block = False
+    brace_depth = 0
+    server_start_idx = -1
+    
+    for i, line in enumerate(lines):
+        if not in_target_block:
+            if re.search(r'^\s*server\s*\{', line):
+                server_start_idx = len(result)
+                brace_depth = 1
+                result.append(line)
+            elif 'server_name' in line and re.search(pattern, line):
+                # This server block matches our pattern
+                in_target_block = True
+                # Remove the server { line we just added
+                if server_start_idx >= 0:
+                    result = result[:server_start_idx]
+                brace_depth = 1
+            else:
+                result.append(line)
+                if '{' in line:
+                    brace_depth += line.count('{')
+                if '}' in line:
+                    brace_depth -= line.count('}')
+                    if brace_depth == 0:
+                        server_start_idx = -1
+        else:
+            # We're inside a target block, count braces to find the end
+            brace_depth += line.count('{')
+            brace_depth -= line.count('}')
+            if brace_depth <= 0:
+                in_target_block = False
+                brace_depth = 0
+                server_start_idx = -1
+    
+    return '\n'.join(result)
+
+content = remove_matching_server_blocks(content, r'thedailytolkien\.(com|davidpolar\.com)')
+
+# Remove comment markers
+content = re.sub(r'# The Daily Tolkien Configuration\s*\n', '', content)
+
+# Clean up excessive blank lines
+content = re.sub(r'\n{3,}', '\n\n', content)
+
+with open(config_file, 'w') as f:
+    f.write(content)
+PYTHON_EOF
+            
+            log_info "Old configuration removed successfully"
         fi
+        
+        # Now add the new configuration
+        log_info "Adding The Daily Tolkien configuration to multi-app config"
+        
+        # Use server-blocks-only config to avoid duplicate global directives
+        sudo bash -c "echo '' >> $NGINX_SITE_CONFIG"
+        sudo bash -c "echo '# The Daily Tolkien Configuration' >> $NGINX_SITE_CONFIG"
+        sudo bash -c "cat deploy/nginx-server-blocks.conf >> $NGINX_SITE_CONFIG"
     fi
     
     # Test and reload Nginx
