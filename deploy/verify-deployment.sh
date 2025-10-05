@@ -69,7 +69,7 @@ fi
 
 echo ""
 echo "6. Checking domain configuration..."
-if sudo grep -q "thedailytolkien.davidpolar.com" /etc/nginx/sites-available/service-integrator 2>/dev/null; then
+if sudo grep -q "thedailytolkien.com" /etc/nginx/sites-available/service-integrator 2>/dev/null; then
     check_pass "The Daily Tolkien domain found in Nginx config"
 else
     check_warn "The Daily Tolkien domain not found in Nginx config"
@@ -77,7 +77,7 @@ fi
 
 echo ""
 echo "7. Testing external connectivity..."
-if curl -f -s -I https://thedailytolkien.davidpolar.com/up > /dev/null 2>&1; then
+if curl -f -s -I https://thedailytolkien.com/up > /dev/null 2>&1; then
     check_pass "External HTTPS connectivity working"
 else
     check_warn "External HTTPS connectivity not working (DNS or SSL issue)"
@@ -85,7 +85,7 @@ fi
 
 echo ""
 echo "8. Checking SSL certificate..."
-if echo | openssl s_client -connect thedailytolkien.davidpolar.com:443 -servername thedailytolkien.davidpolar.com 2>/dev/null | openssl x509 -noout -dates > /dev/null 2>&1; then
+if echo | openssl s_client -connect thedailytolkien.com:443 -servername thedailytolkien.com 2>/dev/null | openssl x509 -noout -dates > /dev/null 2>&1; then
     check_pass "SSL certificate is valid"
 else
     check_warn "SSL certificate issue"
