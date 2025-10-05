@@ -67,7 +67,301 @@ config.action_mailer.smtp_settings = {
 }
 ```
 
-### Option 2: SendGrid (Recommended for Production)
+### Option 2: SendPulse SMTP (Great Balance of Features & Price)
+
+SendPulse offers a generous free tier (12,000 emails/month to 500 subscribers) and is excellent for transactional emails with good deliverability rates.
+
+#### Step 1: Create SendPulse Account and Get SMTP Credentials
+
+1. **Sign up for SendPulse**
+
+    - Go to https://sendpulse.com/
+    - Click "Sign Up" and create a free account
+    - Verify your email address
+
+2. **Access SMTP Settings**
+
+    - Log in to your SendPulse dashboard
+    - Navigate to **Settings** (gear icon in top right) → **SMTP**
+    - Or go directly to: https://login.sendpulse.com/settings/smtp
+
+3. **Generate SMTP Password**
+
+    - In the SMTP settings page, you'll see:
+        - **SMTP Server**: `smtp-pulse.com`
+        - **Port**: `465` (SSL) or `2525` (TLS) or `25` (not recommended)
+        - **Username**: Your SendPulse account email
+    - Click **"Generate Password"** or **"Show Password"**
+    - **Important**: Copy this SMTP password immediately - it's different from your login password
+    - Store it securely (you'll need it for Rails configuration)
+
+4. **Verify Your Sender Email/Domain** (Required)
+    - Go to **Settings** → **Sender addresses**
+    - Click **"Add sender address"**
+    - Option A: **Single Email Verification** (Quick)
+        - Enter: `noreply@thedailytolkien.com` (or your preferred sender)
+        - SendPulse will send a verification email
+        - Click the verification link
+    - Option B: **Domain Verification** (Recommended for Production)
+        - Enter your domain: `thedailytolkien.com`
+        - SendPulse will provide DNS records to add:
+            - **SPF record** (TXT record for domain authentication)
+            - **DKIM record** (TXT record for email signing)
+            - **Domain verification** (TXT record to prove ownership)
+        - Add these records to your DNS provider
+        - Wait 15-60 minutes for DNS propagation
+        - Click "Verify Domain" in SendPulse
+
+#### Step 2: Add DNS Records (For Domain Verification - Recommended)
+
+If you chose domain verification above, add these records to your DNS:
+
+```
+Type: TXT
+Host: @
+Value: sendpulse-verification=abc123xyz... (from SendPulse)
+
+Type: TXT
+Host: @
+Value: v=spf1 include:_spf.sendpulse.com ~all
+
+Type: TXT
+Host: pulse._domainkey
+Value: k=rsa; p=MIGfMA0GCSqGSIb3... (DKIM key from SendPulse)
+```
+
+**DNS Configuration Tips:**
+
+-   If using **Cloudflare**: Turn off proxy (gray cloud) for mail-related records
+-   DNS changes can take 15-60 minutes to propagate
+-   Verify with: `nslookup -type=TXT thedailytolkien.com`
+
+#### Step 3: Add Credentials to Rails
+
+```bash
+# On your local machine
+EDITOR="nano" rails credentials:edit
+
+# Add these lines (using TLS on port 2525 - recommended):
+smtp:
+  user_name: your-sendpulse-email@example.com
+  password: your-generated-smtp-password-here
+  address: smtp-pulse.com
+  port: 2525
+  domain: thedailytolkien.com
+
+# Alternative: Using SSL on port 465
+smtp:
+  user_name: your-sendpulse-email@example.com
+  password: your-generated-smtp-password-here
+  address: smtp-pulse.com
+  port: 465
+  domain: thedailytolkien.com
+
+# Save and exit (Ctrl+X, Y, Enter in nano)
+```
+
+**Important Notes:**
+
+-   `user_name` is your **SendPulse account email** (not "apikey")
+-   `password` is the **generated SMTP password** (not your login password)
+-   `port: 2525` uses TLS/STARTTLS (recommended for most servers)
+-   `port: 465` uses SSL (use if port 2525 is blocked)
+-   Avoid `port: 25` as it's often blocked by hosting providers
+
+#### Step 4: Update production.rb
+
+For **Port 2525 (TLS/STARTTLS - Recommended)**:
+
+```ruby
+# config/environments/production.rb
+
+# Enable email delivery errors
+config.action_mailer.raise_delivery_errors = true
+config.action_mailer.delivery_method = :smtp
+config.action_mailer.perform_deliveries = true
+
+# Set host for links in mailer templates
+config.action_mailer.default_url_options = { host: "thedailytolkien.com", protocol: 'https' }
+
+# SendPulse SMTP configuration (TLS on port 2525)
+config.action_mailer.smtp_settings = {
+  user_name: Rails.application.credentials.dig(:smtp, :user_name),
+  password: Rails.application.credentials.dig(:smtp, :password),
+  address: Rails.application.credentials.dig(:smtp, :address),
+  port: Rails.application.credentials.dig(:smtp, :port) || 2525,
+  domain: Rails.application.credentials.dig(:smtp, :domain),
+  authentication: :plain,
+  enable_starttls_auto: true
+}
+```
+
+For **Port 465 (SSL - Alternative)**:
+
+```ruby
+# SendPulse SMTP configuration (SSL on port 465)
+config.action_mailer.smtp_settings = {
+  user_name: Rails.application.credentials.dig(:smtp, :user_name),
+  password: Rails.application.credentials.dig(:smtp, :password),
+  address: Rails.application.credentials.dig(:smtp, :address),
+  port: Rails.application.credentials.dig(:smtp, :port) || 465,
+  domain: Rails.application.credentials.dig(:smtp, :domain),
+  authentication: :plain,
+  enable_starttls_auto: true,
+  ssl: true,
+  tls: true
+}
+```
+
+#### Step 5: Configure Sender Email in Devise
+
+```ruby
+# config/initializers/devise.rb (around line 24)
+
+# Must match verified sender in SendPulse
+config.mailer_sender = 'noreply@thedailytolkien.com'
+```
+
+#### Step 6: Test SMTP Connection (Before Deploying)
+
+```bash
+# Test if SendPulse SMTP server is reachable
+telnet smtp-pulse.com 2525
+
+# Or using openssl for SSL/TLS:
+openssl s_client -connect smtp-pulse.com:465
+openssl s_client -connect smtp-pulse.com:2525 -starttls smtp
+
+# Expected: Connection successful
+# Exit: Ctrl+C
+```
+
+#### Step 7: Deploy and Test
+
+```bash
+# 1. Commit changes
+git add config/environments/production.rb config/initializers/devise.rb
+git commit -m "Configure SendPulse SMTP for production"
+git push origin main
+
+# 2. Deploy to server
+ssh ubuntu@98.86.217.231
+cd ~/thedailytolkien
+git pull origin main
+export RAILS_MASTER_KEY="your-master-key"
+./deploy/deploy.sh
+
+# 3. Test email sending
+docker-compose -f docker-compose.prod.yml exec web bin/rails console
+
+# Verify SMTP settings loaded
+ActionMailer::Base.smtp_settings
+# Should show: {:user_name=>"your-email@...", :address=>"smtp-pulse.com", :port=>2525, ...}
+
+# Send test password reset
+User.first.send_reset_password_instructions
+
+# Or send manual test
+ActionMailer::Base.mail(
+  from: 'noreply@thedailytolkien.com',
+  to: 'your-email@example.com',
+  subject: 'SendPulse SMTP Test',
+  body: 'This is a test from The Daily Tolkien via SendPulse SMTP'
+).deliver_now
+
+# Expected output: "Sent mail to your-email@example.com"
+exit
+```
+
+#### Step 8: Verify in SendPulse Dashboard
+
+1. Go to **Statistics** → **SMTP** in SendPulse
+2. You should see:
+    - **Emails sent**: Count of emails
+    - **Delivery status**: Delivered, bounced, etc.
+    - **Individual email tracking**: Opens, clicks (if enabled)
+
+#### SendPulse Troubleshooting
+
+**Error: "535 5.7.8 Authentication credentials invalid"**
+
+-   **Cause**: Wrong SMTP password or username
+-   **Fix**:
+    -   Regenerate SMTP password in SendPulse settings
+    -   Verify username is your SendPulse account email
+    -   Check credentials: `Rails.application.credentials.dig(:smtp)`
+
+**Error: "550 5.7.1 Sender address rejected"**
+
+-   **Cause**: Sender email not verified in SendPulse
+-   **Fix**:
+    -   Go to SendPulse → Settings → Sender addresses
+    -   Verify the email in `devise.rb` matches a verified sender
+    -   Click verification link in email or complete domain verification
+
+**Error: "Connection timeout" or "Connection refused"**
+
+-   **Cause**: Port blocked by firewall
+-   **Fix**:
+
+    ```bash
+    # Check firewall
+    sudo ufw status
+
+    # Allow ports
+    sudo ufw allow 2525/tcp
+    sudo ufw allow 465/tcp
+
+    # Try alternative port (465 instead of 2525 or vice versa)
+    ```
+
+**Error: "Must issue a STARTTLS command first"**
+
+-   **Cause**: TLS configuration mismatch
+-   **Fix**:
+    -   For port 2525: Use `enable_starttls_auto: true` (no ssl/tls options)
+    -   For port 465: Use `enable_starttls_auto: true, ssl: true, tls: true`
+
+**Emails go to spam**
+
+-   **Fix**:
+    -   Complete domain verification (not just email)
+    -   Add SPF and DKIM DNS records
+    -   Use consistent sender email
+    -   Avoid spammy content
+    -   Warm up sending (start with low volume)
+
+#### SendPulse Free Tier Limits
+
+-   **12,000 emails/month** to up to 500 subscribers
+-   **Unlimited transactional emails** (password resets, confirmations, etc.)
+-   Great deliverability rates
+-   Email tracking and analytics
+-   No credit card required for free tier
+
+#### SendPulse Advantages
+
+✅ **Generous free tier** (12,000 emails/month)  
+✅ **Great for transactional emails** (password resets, notifications)  
+✅ **Good deliverability** with proper domain setup  
+✅ **Email tracking** and analytics dashboard  
+✅ **Multiple SMTP ports** (25, 465, 2525) for firewall flexibility  
+✅ **Easy domain verification** with clear DNS instructions  
+✅ **No credit card required** for free plan
+
+#### Quick Reference: SendPulse Credentials Format
+
+```yaml
+# In rails credentials:edit
+smtp:
+    user_name: your-sendpulse-email@example.com # Your SendPulse account email
+    password: ABC123xyz... # Generated SMTP password (not login password)
+    address: smtp-pulse.com # SendPulse SMTP server
+    port: 2525 # TLS (recommended) or 465 for SSL
+    domain: thedailytolkien.com # Your domain
+```
+
+### Option 3: SendGrid (Popular Alternative)
 
 SendGrid offers 100 emails/day free tier, which is perfect for a small application.
 
@@ -107,7 +401,7 @@ SendGrid requires sender verification:
 2. Verify a single sender email address OR
 3. Authenticate your domain (recommended for production)
 
-### Option 3: Mailgun (Alternative)
+### Option 4: Mailgun (Alternative)
 
 Similar to SendGrid:
 
@@ -120,7 +414,7 @@ smtp:
     domain: thedailytolkien.com
 ```
 
-### Option 4: AWS SES (Most Scalable)
+### Option 5: AWS SES (Most Scalable)
 
 For larger scale:
 
@@ -140,7 +434,8 @@ smtp:
 Pick one of the options above based on your needs:
 
 -   **Gmail**: Quick setup, good for testing
--   **SendGrid**: Best for production, generous free tier
+-   **SendPulse**: Great balance of features & generous free tier (12,000 emails/month)
+-   **SendGrid**: Popular choice, 100 emails/day free
 -   **Mailgun**: Good alternative to SendGrid
 -   **AWS SES**: Best for high volume
 

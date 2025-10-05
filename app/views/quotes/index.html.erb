@@ -157,19 +157,32 @@
 <script type="module" nonce="<%= content_security_policy_nonce %>">
 import { QuoteEngagement, QuoteComments } from "quote_engagement";
 
-// Turbo lifecycle integration for all modules
-document.addEventListener('turbo:load', () => {
+// Initialize immediately if DOM is already loaded, otherwise wait for events
+function initializeModules() {
   QuoteEngagement.init();
   QuoteComments.init();
-});
+}
 
+// Handle both initial page load and Turbo navigation
+if (document.readyState === 'loading') {
+  // DOM is still loading - wait for DOMContentLoaded
+  document.addEventListener('DOMContentLoaded', initializeModules, { once: true });
+} else {
+  // DOM is already ready (module loaded late) - initialize immediately
+  initializeModules();
+}
+
+// Also handle Turbo navigation (this will run on subsequent navigations)
+document.addEventListener('turbo:load', initializeModules);
+
+// Cleanup before Turbo caches the page
 document.addEventListener('turbo:before-cache', () => {
   QuoteEngagement.destroy();
-  // Comments module doesn't need cleanup as it uses document-level listeners
+  QuoteComments.destroy();
 });
 
 // ActionCable setup for real-time updates
-document.addEventListener('turbo:load', function() {
+function setupActionCable() {
   <% if @quote %>
   // Subscribe to quote interaction updates
   if (typeof window.App === 'undefined') {
@@ -213,5 +226,13 @@ document.addEventListener('turbo:load', function() {
     });
   }
   <% end %>
-});
+}
+
+// Setup ActionCable on both initial load and Turbo navigation
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', setupActionCable, { once: true });
+} else {
+  setupActionCable();
+}
+document.addEventListener('turbo:load', setupActionCable);
 </script>

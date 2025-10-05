@@ -191,18 +191,34 @@ export const QuoteEngagement = {
 };
 
 /**
- * QuoteComments - Comment interaction functionality
+ * QuoteComments - Comment submission and interaction functionality
  */
 export const QuoteComments = {
+  initialized: false,
+
   /**
    * Initialize comment functionality
    */
   init() {
+    if (this.initialized) return;
+    
     this.bindCommentFormSubmission();
     this.bindCommentInteractions();
     this.bindReplyForms();
     this.bindEditForms();
     this.bindDeleteButtons();
+    
+    this.initialized = true;
+  },
+
+  /**
+   * Clean up event listeners
+   * Note: Since we use .bind(this) inline, we can't remove listeners
+   * This is acceptable since document-level delegation is efficient
+   */
+  destroy() {
+    // Reset initialization flag
+    this.initialized = false;
   },
 
   /**
@@ -241,302 +257,6 @@ export const QuoteComments = {
    */
   bindDeleteButtons() {
     document.addEventListener('click', this.handleDeleteClick.bind(this));
-  },
-
-  /**
-   * Handle main comment form submission
-   */
-  handleCommentSubmission(e) {
-    e.preventDefault();
-    
-    const form = e.target;
-    const formData = new FormData(form);
-    const submitBtn = form.querySelector('.btn-primary');
-    
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Posting...';
-    
-    fetch(form.action, {
-      method: 'POST',
-      body: formData,
-      headers: {
-        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-      }
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        document.getElementById('comment_content').value = '';
-        
-        if (data.html) {
-          const commentsList = document.getElementById('comments-list');
-          if (commentsList.innerHTML.includes('No comments yet')) {
-            commentsList.innerHTML = data.html;
-          } else {
-            commentsList.insertAdjacentHTML('beforeend', data.html);
-          }
-        }
-        
-        const commentsTitle = document.querySelector('.comments-section .section-title');
-        if (commentsTitle) {
-          commentsTitle.innerHTML = `Comments (${data.comments_count})`;
-        }
-      } else {
-        const errorMessage = data.errors ? data.errors.join(', ') : (data.error || 'Error posting comment. Please try again.');
-        alert(errorMessage);
-      }
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      alert('Error posting comment. Please try again.');
-    })
-    .finally(() => {
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Post Comment';
-    });
-  },
-
-  /**
-   * Handle comment button clicks (reply, edit, cancel)
-   */
-  handleCommentClick(e) {
-    if (e.target.classList.contains('reply-btn')) {
-      this.toggleReplyForm(e.target.dataset.commentId);
-    } else if (e.target.classList.contains('cancel-reply-btn')) {
-      this.hideReplyForm(e.target.dataset.commentId);
-    } else if (e.target.classList.contains('edit-btn')) {
-      this.showEditForm(e.target.dataset.commentId);
-    } else if (e.target.classList.contains('cancel-edit-btn')) {
-      this.hideEditForm(e.target.dataset.commentId);
-    }
-  },
-
-  /**
-   * Toggle reply form visibility
-   */
-  toggleReplyForm(commentId) {
-    const replyForm = document.getElementById(`reply-form-${commentId}`);
-    
-    document.querySelectorAll('.reply-form').forEach(form => {
-      if (form.id !== `reply-form-${commentId}`) {
-        form.style.display = 'none';
-      }
-    });
-    
-    replyForm.style.display = replyForm.style.display === 'none' ? 'block' : 'none';
-    
-    if (replyForm.style.display === 'block') {
-      const textarea = replyForm.querySelector('textarea');
-      setTimeout(() => textarea.focus(), 100);
-    }
-  },
-
-  /**
-   * Hide reply form
-   */
-  hideReplyForm(commentId) {
-    const replyForm = document.getElementById(`reply-form-${commentId}`);
-    replyForm.style.display = 'none';
-    replyForm.querySelector('textarea').value = '';
-  },
-
-  /**
-   * Show edit form
-   */
-  showEditForm(commentId) {
-    const editForm = document.getElementById(`edit-form-${commentId}`);
-    const commentContent = document.querySelector(`[data-comment-id="${commentId}"] .comment-content`);
-    
-    document.querySelectorAll('.edit-form').forEach(form => {
-      if (form.id !== `edit-form-${commentId}`) {
-        form.style.display = 'none';
-      }
-    });
-    
-    if (commentContent && editForm) {
-      commentContent.style.display = 'none';
-      editForm.style.display = 'block';
-      
-      const textarea = editForm.querySelector('textarea');
-      setTimeout(() => textarea.focus(), 100);
-    }
-  },
-
-  /**
-   * Hide edit form
-   */
-  hideEditForm(commentId) {
-    const editForm = document.getElementById(`edit-form-${commentId}`);
-    const commentContent = document.querySelector(`[data-comment-id="${commentId}"] .comment-content`);
-    
-    if (editForm && commentContent) {
-      editForm.style.display = 'none';
-      commentContent.style.display = 'block';
-    }
-  },
-
-  /**
-   * Handle reply form submission
-   */
-  handleReplySubmission(e) {
-    if (!e.target.classList.contains('reply-form-inner')) return;
-    
-    e.preventDefault();
-    
-    const form = e.target;
-    const formData = new FormData(form);
-    const submitBtn = form.querySelector('.btn-primary');
-    const commentId = form.dataset.commentId;
-    
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Posting...';
-    
-    fetch(form.action, {
-      method: 'POST',
-      body: formData,
-      headers: {
-        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-      }
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        const replyForm = document.getElementById(`reply-form-${commentId}`);
-        replyForm.style.display = 'none';
-        form.querySelector('textarea').value = '';
-        location.reload();
-      } else {
-        const errorMessage = data.errors ? data.errors.join(', ') : (data.error || 'Error posting reply. Please try again.');
-        alert(errorMessage);
-      }
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      alert('Error posting reply. Please try again.');
-    })
-    .finally(() => {
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Post Reply';
-    });
-  },
-
-  /**
-   * Handle edit form submission
-   */
-  handleEditSubmission(e) {
-    if (!e.target.classList.contains('edit-form-inner')) return;
-    
-    e.preventDefault();
-    
-    const form = e.target;
-    const formData = new FormData(form);
-    const submitBtn = form.querySelector('.btn-primary');
-    const commentId = form.dataset.commentId;
-    
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Saving...';
-    
-    fetch(form.action, {
-      method: 'PATCH',
-      body: formData,
-      headers: {
-        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-      }
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        const commentContent = document.querySelector(`[data-comment-id="${commentId}"] .comment-content`);
-        const editForm = document.getElementById(`edit-form-${commentId}`);
-        const textarea = form.querySelector('textarea');
-        
-        if (commentContent && editForm) {
-          const simpleFormatted = textarea.value
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/\n\s*\n/g, '</p><p>')
-            .replace(/\n/g, '<br>')
-            .replace(/^/, '<p>')
-            .replace(/$/, '</p>')
-            .replace(/<p><\/p>/g, '');
-          commentContent.innerHTML = simpleFormatted;
-          
-          let editIndicator = document.querySelector(`[data-comment-id="${commentId}"] .edit-indicator`);
-          if (!editIndicator) {
-            editIndicator = document.createElement('span');
-            editIndicator.className = 'edit-indicator';
-            document.querySelector(`[data-comment-id="${commentId}"] .comment-actions`).appendChild(editIndicator);
-          }
-          editIndicator.textContent = `(edited just now)`;
-          
-          editForm.style.display = 'none';
-          commentContent.style.display = 'block';
-        }
-      } else {
-        const errorMessage = data.errors ? data.errors.join(', ') : (data.error || 'Error saving changes. Please try again.');
-        alert(errorMessage);
-      }
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      alert('Error saving changes. Please try again.');
-    })
-    .finally(() => {
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Save Changes';
-    });
-  },
-
-  /**
-   * Handle delete button clicks
-   */
-  handleDeleteClick(e) {
-    if (!e.target.classList.contains('delete-btn')) return;
-    
-    const commentId = e.target.dataset.commentId;
-    const confirmMessage = e.target.dataset.turboConfirm;
-    
-    if (confirm(confirmMessage)) {
-      e.target.disabled = true;
-      e.target.textContent = 'Deleting...';
-      
-      fetch(`/comments/${commentId}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-          'Accept': 'application/json'
-        }
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          const commentElement = document.querySelector(`[data-comment-id="${commentId}"]`);
-          if (commentElement) {
-            commentElement.remove();
-          }
-          
-          if (data.total_count !== undefined) {
-            const commentsTitle = document.querySelector('.comments-section .section-title');
-            if (commentsTitle) {
-              commentsTitle.innerHTML = `Comments (${data.total_count})`;
-            }
-          }
-        } else {
-          const errorMessage = data.error || 'Error deleting comment. Please try again.';
-          alert(errorMessage);
-          e.target.disabled = false;
-          e.target.textContent = e.target.textContent.includes('Admin') ? 'Delete (Admin)' : 'Delete';
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('Error deleting comment. Please try again.');
-        e.target.disabled = false;
-        e.target.textContent = e.target.textContent.includes('Admin') ? 'Delete (Admin)' : 'Delete';
-      });
-    }
   }
 };
 
