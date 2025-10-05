@@ -207,7 +207,7 @@ update_nginx_config() {
         sudo cp "$NGINX_SITE_CONFIG" "${NGINX_SITE_CONFIG}.backup.$(date +%Y%m%d_%H%M%S)"
         
         # Check if The Daily Tolkien configuration already exists
-        if sudo grep -q "thedailytolkien.davidpolar.com" "$NGINX_SITE_CONFIG"; then
+        if sudo grep -q "thedailytolkien.com" "$NGINX_SITE_CONFIG"; then
             log_info "The Daily Tolkien configuration already exists in multi-app config"
         else
             log_info "Adding The Daily Tolkien configuration to multi-app config"
@@ -234,7 +234,7 @@ show_status() {
     log_info "Deployment Status:"
     docker-compose -f "$COMPOSE_FILE" ps
     
-    log_info "Application URL: https://thedailytolkien.davidpolar.com"
+    log_info "Application URL: https://thedailytolkien.com"
 }
 
 # Main execution

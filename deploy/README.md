@@ -62,7 +62,7 @@ export RAILS_MASTER_KEY="your-key-here"
 
 ### Health Checks
 
--   Application: https://thedailytolkien.davidpolar.com/up
+-   Application: https://thedailytolkien.com/up
 -   Container: `docker-compose -f docker-compose.prod.yml ps`
 
 ### Logs

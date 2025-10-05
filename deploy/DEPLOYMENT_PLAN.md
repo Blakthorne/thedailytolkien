@@ -6,7 +6,7 @@ This deployment plan outlines the complete setup for deploying The Daily Tolkien
 
 **Deployment Details:**
 
--   **Domain:** thedailytolkien.davidpolar.com
+-   **Domain:** thedailytolkien.com
 -   **Server IP:** 98.86.217.231
 -   **Platform:** AWS Lightsail Instance
 -   **Container:** Docker with Rails 8.0.2.1
@@ -60,13 +60,13 @@ chmod +x server-setup.sh
 Ensure your domain DNS is configured:
 
 ```
-A Record: thedailytolkien.davidpolar.com → 98.86.217.231
+A Record: thedailytolkien.com → 98.86.217.231
 ```
 
 ### Step 4: Set Up SSL Certificates
 
 ```bash
-sudo certbot --nginx -d thedailytolkien.davidpolar.com
+sudo certbot --nginx -d thedailytolkien.com
 ```
 
 ## Phase 2: GitHub Actions Setup
@@ -191,8 +191,8 @@ sudo nginx -t && sudo systemctl reload nginx
 The Daily Tolkien uses:
 
 -   **Upstream backend:** `127.0.0.1:3001` (Docker container)
--   **Domain:** `thedailytolkien.davidpolar.com`
--   **SSL certificates:** `/etc/letsencrypt/live/thedailytolkien.davidpolar.com/`
+-   **Domain:** `thedailytolkien.com`
+-   **SSL certificates:** `/etc/letsencrypt/live/thedailytolkien.com/`
 -   **Rate limiting:** 10 requests/second with burst of 20
 
 This configuration is designed to coexist with your other applications without conflicts.
@@ -240,7 +240,7 @@ docker-compose -f ~/thedailytolkien/docker-compose.prod.yml exec web env | grep 
 
 ### Health Checks
 
--   **Application health:** https://thedailytolkien.davidpolar.com/up
+-   **Application health:** https://thedailytolkien.com/up
 -   **Docker container status:** `docker-compose ps`
 -   **Nginx status:** `sudo systemctl status nginx`
 
@@ -289,7 +289,7 @@ docker-compose -f docker-compose.prod.yml up -d
 
 ```bash
 # Check if The Daily Tolkien config is in the multi-app config
-sudo grep -n "thedailytolkien.davidpolar.com" /etc/nginx/sites-available/service-integrator
+sudo grep -n "thedailytolkien.com" /etc/nginx/sites-available/service-integrator
 
 # Test Nginx configuration
 sudo nginx -t
@@ -363,7 +363,7 @@ sudo certbot certificates
 sudo certbot renew --dry-run
 
 # If certificate doesn't exist, create it
-sudo certbot --nginx -d thedailytolkien.davidpolar.com
+sudo certbot --nginx -d thedailytolkien.com
 ```
 
 ## Phase 8: Monitoring and Maintenance
@@ -388,7 +388,7 @@ docker-compose -f docker-compose.prod.yml logs web
 sudo nginx -t
 
 # Check SSL certificate
-openssl s_client -connect thedailytolkien.davidpolar.com:443
+openssl s_client -connect thedailytolkien.com:443
 
 # Test internal connectivity
 curl -f http://localhost:3001/up

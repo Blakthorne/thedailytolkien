@@ -58,7 +58,7 @@ Rails.application.configure do
   # config.action_mailer.raise_delivery_errors = false
 
   # Set host to be used by links generated in mailer templates.
-  config.action_mailer.default_url_options = { host: "thedailytolkien.davidpolar.com" }
+  config.action_mailer.default_url_options = { host: "thedailytolkien.com" }
 
   # Specify outgoing SMTP server. Remember to add smtp/* credentials via rails credentials:edit.
   # config.action_mailer.smtp_settings = {
@@ -81,7 +81,7 @@ Rails.application.configure do
 
   # Enable DNS rebinding protection and other `Host` header attacks.
   config.hosts = [
-    "thedailytolkien.davidpolar.com",     # Allow requests from production domain
+    "thedailytolkien.com",     # Allow requests from production domain
     "98.86.217.231"                       # Allow requests from server IP
   ]
   #
