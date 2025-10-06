@@ -30,27 +30,18 @@ class Quote < ApplicationRecord
 
   # Associations for interaction system
   has_many :quote_likes, dependent: :destroy
-  has_many :comments, dependent: :destroy
+  has_many :comments, dependent: :destroy, counter_cache: true
 
   # Associations for tagging system
   has_many :quote_tags, dependent: :destroy
   has_many :tags, through: :quote_tags
 
   # Engagement metrics methods
-  def likes_count
-    quote_likes.likes.count
-  end
-
-  def dislikes_count
-    quote_likes.dislikes.count
-  end
-
-  def comments_count
-    comments.count
-  end
+  # Note: These now use counter cache columns instead of COUNT queries
+  # The columns are automatically updated by Rails when associations change
 
   def engagement_score
-    likes_count + comments_count - dislikes_count
+    (read_attribute(:likes_count) || 0) + (read_attribute(:comments_count) || 0) - (read_attribute(:dislikes_count) || 0)
   end
 
   # Check if user has liked/disliked this quote

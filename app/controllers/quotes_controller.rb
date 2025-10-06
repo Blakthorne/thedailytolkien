@@ -13,9 +13,10 @@ class QuotesController < ApplicationController
       @user_like_status = current_user ? @quote.user_like_status(current_user) : nil
       # Load only top-level comments (replies will be loaded via associations)
       @comments = @quote.comments.includes(:user, replies: :user).top_level.ordered
+      # Tags already loaded in set_quote, but re-order them
       @tags = @quote.tags.order(:name)
 
-      # Engagement stats
+      # Engagement stats from counter cache columns (no queries needed)
       @likes_count = @quote.likes_count
       @dislikes_count = @quote.dislikes_count
       @comments_count = @quote.comments_count
@@ -50,14 +51,15 @@ class QuotesController < ApplicationController
     tomorrow_start = now_in_tz.beginning_of_day.tomorrow.to_i
 
     # Find if there's already a quote selected for today
-    @quote = Quote.includes(:quote_likes, :comments, :tags)
+    # Only eager load tags here - comments will be loaded separately with proper includes
+    @quote = Quote.includes(:tags)
                    .where.not(text: nil)
                    .where(last_date_displayed: today_start...tomorrow_start)
                    .first
 
     # If no quote for today, select the next one in rotation
     if @quote.nil?
-      @quote = Quote.includes(:quote_likes, :comments, :tags)
+      @quote = Quote.includes(:tags)
                     .where.not(text: nil)
                     .order(Arel.sql("last_date_displayed IS NULL DESC, last_date_displayed ASC, id ASC"))
                     .first

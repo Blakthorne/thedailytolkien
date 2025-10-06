@@ -7,7 +7,8 @@ class DiscoverController < ApplicationController
 
   # Discover index - displays paginated table of all quotes with filtering/sorting
   def index
-    @quotes = Quote.includes(:tags, :quote_likes, :comments)
+    # Start with base query - NO eager loading yet
+    @quotes = Quote.all
 
     # Apply filters
     if params[:search].present?
@@ -30,7 +31,7 @@ class DiscoverController < ApplicationController
       @quotes = @quotes.joins(:tags).where(tags: { id: params[:tag_id] })
     end
 
-    # Apply sorting
+    # Apply sorting (now uses indexed columns for better performance)
     case params[:sort_by]
     when "date"
       # Sort by last_date_displayed, with NULLs (never displayed) at the end
@@ -40,13 +41,23 @@ class DiscoverController < ApplicationController
       @quotes = @quotes.order(book: params[:sort_direction] == "asc" ? :asc : :desc)
     when "character"
       @quotes = @quotes.order(character: params[:sort_direction] == "asc" ? :asc : :desc)
+    when "likes"
+      # Now we can sort by counter cache column efficiently
+      @quotes = @quotes.order(likes_count: params[:sort_direction] == "asc" ? :asc : :desc)
+    when "comments"
+      # Now we can sort by counter cache column efficiently
+      @quotes = @quotes.order(comments_count: params[:sort_direction] == "asc" ? :asc : :desc)
     else
       # Default: sort by last_date_displayed DESC, with never-displayed quotes at the end
       @quotes = @quotes.order(Arel.sql("last_date_displayed IS NULL, last_date_displayed DESC"))
     end
 
-    # Paginate results
+    # Paginate FIRST - only load 25 quotes
     @quotes = @quotes.page(params[:page]).per(25)
+
+    # NOW eager load associations ONLY for the 25 quotes being displayed
+    # Only load tags since that's all we display in the table
+    @quotes = @quotes.includes(:tags)
 
     # Load filter options
     load_discover_filters
@@ -67,18 +78,17 @@ class DiscoverController < ApplicationController
       nil
 
     if @quote
-      # Load all interaction data for full interactivity (like quotes#index)
-      @quote_likes = @quote.quote_likes.includes(:user)
-      @comments = @quote.comments.includes(:user, replies: :user).where(parent_id: nil).order(:created_at)
+      # Load only top-level comments with users and replies (same pattern as quotes controller)
+      @comments = @quote.comments.includes(:user, replies: :user).top_level.ordered
       @user_like_status = current_user ? @quote.user_like_status(current_user) : nil
 
-      # Set up data for interactive functionality (matching quotes controller)
+      # Use counter cache columns for counts (no queries needed)
       @likes_count = @quote.likes_count
       @dislikes_count = @quote.dislikes_count
       @comments_count = @quote.comments_count
 
-      # Load tags for display (matching quotes controller pattern)
-      @tags = @quote.tags
+      # Load tags for display
+      @tags = @quote.tags.order(:name)
     end
   end
 

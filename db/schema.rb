@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_02_220357) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_06_173758) do
   create_table "activity_logs", force: :cascade do |t|
     t.integer "user_id", null: false
     t.string "action"
@@ -75,9 +75,18 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_02_220357) do
     t.integer "first_date_displayed"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "likes_count", default: 0, null: false
+    t.integer "dislikes_count", default: 0, null: false
+    t.integer "comments_count", default: 0, null: false
+    t.index ["book", "character"], name: "index_quotes_on_book_and_character"
+    t.index ["book"], name: "index_quotes_on_book"
+    t.index ["character"], name: "index_quotes_on_character"
+    t.index ["comments_count"], name: "index_quotes_on_comments_count"
+    t.index ["dislikes_count"], name: "index_quotes_on_dislikes_count"
     t.index ["first_date_displayed"], name: "index_quotes_on_first_date_displayed"
     t.index ["last_date_displayed", "created_at"], name: "index_quotes_on_last_date_created_at"
     t.index ["last_date_displayed"], name: "index_quotes_on_last_date_displayed"
+    t.index ["likes_count"], name: "index_quotes_on_likes_count"
   end
 
   create_table "tags", force: :cascade do |t|

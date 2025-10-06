@@ -7,7 +7,7 @@ class Comment < ApplicationRecord
   ].freeze
 
   belongs_to :user, optional: true
-  belongs_to :quote
+  belongs_to :quote, counter_cache: true
   belongs_to :parent, class_name: "Comment", optional: true
   has_many :replies, class_name: "Comment", foreign_key: :parent_id, dependent: :destroy
 
