@@ -34,6 +34,9 @@ class CommentsController < ApplicationController
     end
 
     if @comment.save
+      # Reload quote to get updated counter cache
+      @quote.reload
+
       # Broadcast the new comment via ActionCable
       QuoteInteractionChannel.broadcast_to(@quote, {
         type: "new_comment",
@@ -97,6 +100,9 @@ class CommentsController < ApplicationController
   def destroy
     if @comment.user == current_user || current_user.admin?
       @comment.destroy
+
+      # Reload quote to get updated counter cache
+      @quote.reload
 
       # Broadcast the update via ActionCable
       QuoteInteractionChannel.broadcast_to(@quote, {

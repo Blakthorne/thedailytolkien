@@ -30,7 +30,7 @@ class Quote < ApplicationRecord
 
   # Associations for interaction system
   has_many :quote_likes, dependent: :destroy
-  has_many :comments, dependent: :destroy, counter_cache: true
+  has_many :comments, dependent: :destroy
 
   # Associations for tagging system
   has_many :quote_tags, dependent: :destroy

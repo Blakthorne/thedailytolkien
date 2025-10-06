@@ -7,9 +7,12 @@ class Comment < ApplicationRecord
   ].freeze
 
   belongs_to :user, optional: true
-  belongs_to :quote, counter_cache: true
+  belongs_to :quote
   belongs_to :parent, class_name: "Comment", optional: true
   has_many :replies, class_name: "Comment", foreign_key: :parent_id, dependent: :destroy
+
+  after_create :increment_quote_comments_count
+  after_destroy :decrement_quote_comments_count
 
   validates :content, presence: true, length: { minimum: 1, maximum: 2000 }
   validates :depth, presence: true, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 4 }
@@ -136,7 +139,11 @@ class Comment < ApplicationRecord
 
 
   def set_depth
-    self.depth = parent ? parent.depth + 1 : 0
+    self.depth = if parent && parent.depth
+      parent.depth + 1
+    else
+      0
+    end
   end
 
   def validate_depth
@@ -197,5 +204,19 @@ class Comment < ApplicationRecord
     # Update edit tracking
     self.edited_at = Time.current
     self.edit_count = (edit_count || 0) + 1
+  end
+
+  def increment_quote_comments_count
+    return unless quote && quote.persisted? && !quote.destroyed?
+    quote.class.increment_counter(:comments_count, quote.id)
+  rescue ActiveRecord::RecordNotFound
+    # Quote was deleted, ignore
+  end
+
+  def decrement_quote_comments_count
+    return unless quote && quote.persisted? && !quote.destroyed?
+    quote.class.decrement_counter(:comments_count, quote.id)
+  rescue ActiveRecord::RecordNotFound
+    # Quote was deleted, ignore
   end
 end
