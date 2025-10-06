@@ -13,13 +13,13 @@ class AddCounterCachesToQuotes < ActiveRecord::Migration[8.0]
     # Backfill existing data
     say_with_time "Backfilling counter caches for existing quotes..." do
       Quote.find_each do |quote|
-        Quote.reset_counters(quote.id, :comments)
-
-        # Manually update likes and dislikes counts since they're conditional
+        # Manually count all associations since we're using manual counter caches
+        comments_count = quote.comments.count
         likes_count = quote.quote_likes.where(like_type: 1).count
         dislikes_count = quote.quote_likes.where(like_type: 0).count
 
         quote.update_columns(
+          comments_count: comments_count,
           likes_count: likes_count,
           dislikes_count: dislikes_count
         )
