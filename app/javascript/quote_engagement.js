@@ -2,13 +2,6 @@
  * Quote Engagement System
  * Handles like/dislike interactions and comment functionality
  * Optimized for Turbo navigation with proper cleanup
- * 
- * This module provides a complete engagement system that:
- * - Works consistently across Turbo navigations
- * - Has proper cleanup to prevent memory leaks
- * - Provides real-time updates via ActionCable
- * - Includes comprehensive error handling
- * - Maintains accessibility standards
  */
 
 /**
@@ -18,37 +11,24 @@ export const QuoteEngagement = {
   initialized: false,
   boundHandleClick: null,
 
-  /**
-   * Initialize the engagement system
-   */
   init() {
     if (this.initialized) return;
     
-    // Bind the click handler once to preserve reference for cleanup
     this.boundHandleClick = this.handleClick.bind(this);
     document.addEventListener('click', this.boundHandleClick);
-    
     this.initialized = true;
   },
 
-  /**
-   * Clean up event listeners (called before Turbo caches the page)
-   */
   destroy() {
     if (!this.initialized) return;
     
     if (this.boundHandleClick) {
       document.removeEventListener('click', this.boundHandleClick);
     }
-    
     this.initialized = false;
   },
 
-  /**
-   * Handle click events on engagement buttons
-   */
   handleClick(event) {
-    // Use event delegation to find engagement buttons
     const button = event.target.closest('[data-quote-engagement] .engagement-btn[data-type]');
     if (!button) return;
 
@@ -62,20 +42,14 @@ export const QuoteEngagement = {
     this.submitLike(button, quoteId, type);
   },
 
-  /**
-   * Submit like/dislike via AJAX
-   */
   async submitLike(button, quoteId, type) {
-    // Prevent double-clicks
     if (button.disabled) return;
     
     this.setButtonLoading(button, true);
 
     try {
       const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-      if (!csrfToken) {
-        throw new Error('CSRF token not found');
-      }
+      if (!csrfToken) throw new Error('CSRF token not found');
 
       const response = await fetch(`/quotes/${quoteId}/likes`, {
         method: 'POST',
@@ -106,8 +80,7 @@ export const QuoteEngagement = {
       if (data.success) {
         this.updateEngagementUI(data);
       } else {
-        const errorMsg = data.error || 'An error occurred';
-        alert(errorMsg);
+        alert(data.error || 'An error occurred');
       }
 
     } catch (error) {
@@ -118,9 +91,6 @@ export const QuoteEngagement = {
     }
   },
 
-  /**
-   * Update the engagement UI with new data
-   */
   updateEngagementUI(data) {
     const container = document.querySelector('[data-quote-engagement]');
     if (!container) return;
@@ -130,11 +100,9 @@ export const QuoteEngagement = {
     
     if (!likeBtn || !dislikeBtn) return;
 
-    // Reset active states
     likeBtn.classList.remove('like-active');
     dislikeBtn.classList.remove('dislike-active');
 
-    // Update counts
     const likeCount = likeBtn.querySelector('.count');
     const dislikeCount = dislikeBtn.querySelector('.count');
     
@@ -145,7 +113,6 @@ export const QuoteEngagement = {
       dislikeCount.textContent = data.dislikes_count;
     }
 
-    // Set active state and ARIA attributes
     const isLiked = data.user_like_status === 'like';
     const isDisliked = data.user_like_status === 'dislike';
 
@@ -159,9 +126,6 @@ export const QuoteEngagement = {
     dislikeBtn.setAttribute('aria-pressed', isDisliked.toString());
   },
 
-  /**
-   * Update only counts (for ActionCable broadcasts)
-   */
   updateEngagementCounts(data) {
     const container = document.querySelector('[data-quote-engagement]');
     if (!container) return;
@@ -177,86 +141,161 @@ export const QuoteEngagement = {
     }
   },
 
-  /**
-   * Set button loading state
-   */
   setButtonLoading(button, loading) {
     button.disabled = loading;
-    if (loading) {
-      button.classList.add('loading');
-    } else {
-      button.classList.remove('loading');
-    }
+    button.classList.toggle('loading', loading);
   }
 };
 
 /**
- * QuoteComments - Comment submission and interaction functionality
+ * QuoteComments - Comment interaction functionality
  */
 export const QuoteComments = {
   initialized: false,
+  boundClickHandler: null,
 
-  /**
-   * Initialize comment functionality
-   */
   init() {
     if (this.initialized) return;
     
-    this.bindCommentFormSubmission();
-    this.bindCommentInteractions();
-    this.bindReplyForms();
-    this.bindEditForms();
-    this.bindDeleteButtons();
-    
+    this.boundClickHandler = this.handleClick.bind(this);
+    document.addEventListener('click', this.boundClickHandler);
     this.initialized = true;
   },
 
-  /**
-   * Clean up event listeners
-   * Note: Since we use .bind(this) inline, we can't remove listeners
-   * This is acceptable since document-level delegation is efficient
-   */
   destroy() {
-    // Reset initialization flag
+    if (!this.initialized) return;
+    
+    if (this.boundClickHandler) {
+      document.removeEventListener('click', this.boundClickHandler);
+    }
     this.initialized = false;
   },
 
-  /**
-   * Bind main comment form submission
-   */
-  bindCommentFormSubmission() {
-    const commentForm = document.getElementById('comment-form');
-    if (commentForm) {
-      commentForm.addEventListener('submit', this.handleCommentSubmission.bind(this));
+  handleClick(event) {
+    const target = event.target;
+
+    // Reply button - show reply form
+    if (target.classList.contains('reply-btn')) {
+      event.preventDefault();
+      const commentId = target.dataset.commentId;
+      this.toggleForm(`reply-form-${commentId}`);
+      return;
+    }
+
+    // Cancel reply button - hide reply form
+    if (target.classList.contains('cancel-reply-btn')) {
+      event.preventDefault();
+      const commentId = target.dataset.commentId;
+      this.hideForm(`reply-form-${commentId}`, true);
+      return;
+    }
+
+    // Edit button - show edit form
+    if (target.classList.contains('edit-btn')) {
+      event.preventDefault();
+      const commentId = target.dataset.commentId;
+      const commentContent = document.querySelector(`[data-comment-id="${commentId}"] > .comment-content`);
+      const editForm = document.getElementById(`edit-form-${commentId}`);
+      
+      if (commentContent && editForm) {
+        const isVisible = editForm.style.display !== 'none';
+        editForm.style.display = isVisible ? 'none' : 'block';
+        commentContent.style.display = isVisible ? 'block' : 'none';
+      }
+      return;
+    }
+
+    // Cancel edit button - hide edit form
+    if (target.classList.contains('cancel-edit-btn')) {
+      event.preventDefault();
+      const commentId = target.dataset.commentId;
+      const commentContent = document.querySelector(`[data-comment-id="${commentId}"] > .comment-content`);
+      const editForm = document.getElementById(`edit-form-${commentId}`);
+      
+      if (commentContent && editForm) {
+        editForm.style.display = 'none';
+        commentContent.style.display = 'block';
+      }
+      return;
+    }
+
+    // Delete button - submit DELETE request
+    if (target.classList.contains('delete-btn')) {
+      event.preventDefault();
+      const commentId = target.dataset.commentId;
+      const confirmMessage = target.dataset.turboConfirm || 'Are you sure you want to delete this comment?';
+      
+      if (confirm(confirmMessage)) {
+        this.deleteComment(commentId);
+      }
+      return;
     }
   },
 
-  /**
-   * Bind comment interaction buttons (reply, edit, cancel)
-   */
-  bindCommentInteractions() {
-    document.addEventListener('click', this.handleCommentClick.bind(this));
+  toggleForm(formId) {
+    const form = document.getElementById(formId);
+    if (form) {
+      const isHidden = form.style.display === 'none' || !form.style.display;
+      form.style.display = isHidden ? 'block' : 'none';
+    }
   },
 
-  /**
-   * Bind reply form submissions
-   */
-  bindReplyForms() {
-    document.addEventListener('submit', this.handleReplySubmission.bind(this));
+  hideForm(formId, clearInput = false) {
+    const form = document.getElementById(formId);
+    if (form) {
+      form.style.display = 'none';
+      if (clearInput) {
+        const textarea = form.querySelector('textarea');
+        if (textarea) textarea.value = '';
+      }
+    }
   },
 
-  /**
-   * Bind edit form submissions
-   */
-  bindEditForms() {
-    document.addEventListener('submit', this.handleEditSubmission.bind(this));
-  },
+  async deleteComment(commentId) {
+    try {
+      const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+      if (!csrfToken) throw new Error('CSRF token not found');
 
-  /**
-   * Bind delete button clicks
-   */
-  bindDeleteButtons() {
-    document.addEventListener('click', this.handleDeleteClick.bind(this));
+      const response = await fetch(`/comments/${commentId}`, {
+        method: 'DELETE',
+        headers: {
+          'Accept': 'application/json',
+          'X-CSRF-Token': csrfToken,
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        credentials: 'same-origin'
+      });
+
+      if (!response.ok) {
+        if (response.status === 403) {
+          alert('You are not authorized to delete this comment.');
+          return;
+        }
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      if (data.success) {
+        // Remove comment from DOM
+        const commentElement = document.querySelector(`[data-comment-id="${commentId}"]`);
+        if (commentElement) {
+          commentElement.remove();
+        }
+        
+        // Update comment count
+        const commentsTitle = document.querySelector('.comments-section .section-title');
+        if (commentsTitle && typeof data.total_count !== 'undefined') {
+          commentsTitle.textContent = `Comments (${data.total_count})`;
+        }
+      } else {
+        alert(data.error || 'Failed to delete comment');
+      }
+
+    } catch (error) {
+      console.error('Delete error:', error);
+      alert('Network error. Please try again.');
+    }
   }
 };
 

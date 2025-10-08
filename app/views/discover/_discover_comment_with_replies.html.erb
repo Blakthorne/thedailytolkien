@@ -34,7 +34,7 @@
     <% end %>
   </div>
   
-  <div class="comment-content">
+  <div class="comment-content" id="comment-content-<%= comment.id %>">
     <%= simple_format(comment.filtered_content) %>
   </div>
   
@@ -100,10 +100,10 @@
   
   <!-- Reply form (initially hidden) -->
   <% if user_signed_in? && depth < max_depth %>
-    <div class="reply-form" id="reply-form-<%= comment.id %>" style="display: none; margin-top: 1rem; padding: 1rem; background: rgba(245, 240, 232, 0.7); border-radius: 8px; border-left: 3px solid #8b7355;">
+    <div class="reply-form" id="reply-form-<%= comment.id %>" style="display: none; margin-top: 1rem; padding: 1rem; background: rgba(245, 240, 232, 0.5); border-radius: 8px; border-left: 3px solid #8b7355;">
       <%= form_with model: [comment.quote, Comment.new], url: quote_comments_path(comment.quote), method: :post, local: false, 
                     class: "reply-form-inner", data: { comment_id: comment.id } do |f| %>
-        <%= f.hidden_field :parent_id, value: comment.id %>
+        <%= hidden_field_tag :parent_id, comment.id %>
         <div class="form-group">
           <label for="reply_content_<%= comment.id %>">Reply to <%= comment.user_display_name %>:</label>
           <%= f.text_area :content, class: "form-control", id: "reply_content_#{comment.id}", 
@@ -120,9 +120,7 @@
   <% end %>
 </div>
 
-<!-- Render replies recursively -->
-<% if comment.replies.any? && depth < max_depth %>
-  <% comment.replies.order(:created_at).each do |reply| %>
-    <%= render 'discover_comment_with_replies', comment: reply, depth: depth + 1 %>
-  <% end %>
+<!-- Render nested replies recursively -->
+<% comment.replies.ordered.each do |reply| %>
+  <%= render 'discover_comment_with_replies', comment: reply, depth: depth + 1 %>
 <% end %>

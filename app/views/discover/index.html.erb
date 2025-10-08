@@ -68,6 +68,28 @@
     <% end %>
   </div>
 
+  <!-- Pagination Section (Top) -->
+  <% if @quotes.respond_to?(:current_page) && @quotes.any? %>
+    <div class="pagination-section">
+      <div class="pagination">
+        <% if @quotes.prev_page %>
+          <%= link_to "‹ Previous", discover_index_path(page: @quotes.prev_page, **request.query_parameters.except(:page)), 
+              class: "pagination-btn" %>
+        <% end %>
+        
+        <span class="pagination-info">
+          Page <%= @quotes.current_page %> of <%= @quotes.total_pages %>
+          (<%= @quotes.total_count %> total quotes)
+        </span>
+        
+        <% if @quotes.next_page %>
+          <%= link_to "Next ›", discover_index_path(page: @quotes.next_page, **request.query_parameters.except(:page)), 
+              class: "pagination-btn" %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
   <!-- Cards Section -->
   <div class="discover-cards-container">
     <% if @quotes.any? %>
@@ -134,28 +156,6 @@
       </div>
     <% end %>
   </div>
-
-  <!-- Pagination Section -->
-  <% if @quotes.respond_to?(:current_page) %>
-    <div class="pagination-section">
-      <div class="pagination">
-        <% if @quotes.prev_page %>
-          <%= link_to "‹ Previous", discover_index_path(page: @quotes.prev_page, **request.query_parameters.except(:page)), 
-              class: "pagination-btn" %>
-        <% end %>
-        
-        <span class="pagination-info">
-          Page <%= @quotes.current_page %> of <%= @quotes.total_pages %>
-          (<%= @quotes.total_count %> total quotes)
-        </span>
-        
-        <% if @quotes.next_page %>
-          <%= link_to "Next ›", discover_index_path(page: @quotes.next_page, **request.query_parameters.except(:page)), 
-              class: "pagination-btn" %>
-        <% end %>
-      </div>
-    </div>
-  <% end %>
 </main>
 
 <script nonce="<%= content_security_policy_nonce %>">

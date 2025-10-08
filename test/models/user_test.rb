@@ -42,26 +42,27 @@ class UserTest < ActiveSupport::TestCase
     assert_equal "No streak yet", @user.streak_display
 
     @user.update(current_streak: 1)
-    assert_equal "1 day streak!", @user.streak_display
+    assert_equal "🔥 1", @user.streak_display
 
     @user.update(current_streak: 5)
-    assert_equal "5 day streak!", @user.streak_display
+    assert_equal "🔥 5", @user.streak_display
   end
 
   test "streak_emoji should return appropriate emoji based on streak" do
-    assert_equal "📅", @user.streak_emoji # 0 days
+    # streak_emoji is deprecated and returns empty string
+    assert_equal "", @user.streak_emoji # 0 days
 
     @user.update(current_streak: 1)
-    assert_equal "🔥", @user.streak_emoji # 1-7 days
+    assert_equal "", @user.streak_emoji # deprecated
 
     @user.update(current_streak: 15)
-    assert_equal "⚡", @user.streak_emoji # 8-30 days
+    assert_equal "", @user.streak_emoji # deprecated
 
     @user.update(current_streak: 50)
-    assert_equal "🏆", @user.streak_emoji # 31-99 days
+    assert_equal "", @user.streak_emoji # deprecated
 
     @user.update(current_streak: 150)
-    assert_equal "👑", @user.streak_emoji # 100+ days
+    assert_equal "", @user.streak_emoji # deprecated
   end
 
   test "has_longest_streak_record? should work correctly" do

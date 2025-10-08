@@ -40,7 +40,7 @@
   }
 
   .streak-text {
-    font-size: 0.8rem;
+    font-size: 1rem;
   }
 
   .app-header h1 {
@@ -124,7 +124,7 @@
   .mobile-menu-toggle,
   .mobile-drawer,
   .header-title-link,
-  .auth-link,
+  .header-button,
   .mobile-auth-btn,
   .footer-link {
     transition: none;

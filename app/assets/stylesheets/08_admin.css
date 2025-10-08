@@ -96,6 +96,18 @@
   box-shadow: 0 0 0 3px rgba(139, 115, 85, 0.1);
 }
 
+.admin-user-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+@media (max-width: 768px) {
+  .admin-user-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Info Boxes */
 .admin-info-box {
   background: rgba(139, 115, 85, 0.05);

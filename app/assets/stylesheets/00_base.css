@@ -72,9 +72,13 @@ body::before {
 /* Mobile performance tweaks */
 @media (max-width: 1024px), (pointer: coarse) {
   body {
-    /* Avoid jank on mobile by not using fixed background */
-    background-attachment: scroll;
-    background-position: center top;
+    /* Keep background fixed to prevent stretching during scroll */
+    background-attachment: fixed;
+    background-position: center center;
+    /* Use auto to maintain aspect ratio instead of cover which stretches */
+    background-size: auto 100vh;
+    /* Ensure background repeats if needed */
+    background-repeat: repeat;
   }
   body::before {
     /* Disable extra overlay layer on mobile to reduce paint cost */

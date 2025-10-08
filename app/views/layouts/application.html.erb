@@ -37,36 +37,41 @@
         <div class="header-content">
           <h1><%= link_to "The Daily Tolkien", root_path, class: "header-title-link" %></h1>
           
-          <!-- Mobile hamburger menu -->
-          <button class="mobile-menu-toggle" 
-                  data-action="click->mobile-menu#toggle"
-                  aria-label="Open mobile menu"
-                  aria-expanded="false">
-            <span class="hamburger-line"></span>
-            <span class="hamburger-line"></span>
-            <span class="hamburger-line"></span>
-          </button>
+          <div style="display: flex; align-items: flex-end; gap: 1rem;">
+            <% if user_signed_in? %>
+              <div class="streak-display">
+                <span class="streak-text"><%= current_user.streak_display %></span>
+              </div>
+            <% end %>
+            
+            <!-- Mobile hamburger menu -->
+            <button class="mobile-menu-toggle" 
+                    data-action="click->mobile-menu#toggle"
+                    aria-label="Open mobile menu"
+                    aria-expanded="false">
+              <span class="hamburger-line"></span>
+              <span class="hamburger-line"></span>
+              <span class="hamburger-line"></span>
+            </button>
+          </div>
           
           <!-- Desktop auth links -->
           <div class="auth-links desktop-only">
+            <%= link_to "Discover", discover_index_path, class: "header-button" %>
             <% if user_signed_in? %>
               <span class="user-info">Welcome, <%= current_user.display_name %></span>
               <div class="user-section" data-user-timezone="<%= current_user.streak_timezone %>">
-                <div class="streak-display">
-                  <span class="streak-emoji"><%= current_user.streak_emoji %></span>
-                  <span class="streak-text"><%= current_user.streak_display %></span>
-                  <% if current_user.has_longest_streak_record? %>
-                    <span class="record-badge" title="Personal Record: <%= current_user.longest_streak %> days">
-                      🏆 <%= current_user.longest_streak %>
-                    </span>
-                  <% end %>
-                </div>
+                <% if current_user.has_longest_streak_record? %>
+                  <span class="record-badge" title="Personal Record: <%= current_user.longest_streak %> days">
+                    🏆 <%= current_user.longest_streak %>
+                  </span>
+                <% end %>
                 <%= form_with(url: destroy_user_session_path, method: :delete, data: { turbo: false }) do |f| %>
-                  <%= f.submit "Logout", class: "auth-link logout-link" %>
+                  <%= f.submit "Logout", class: "header-button" %>
                 <% end %>
               </div>
             <% else %>
-              <%= link_to "Login", new_user_session_path, class: "auth-link login-link" %>
+              <%= link_to "Login", new_user_session_path, class: "header-button" %>
             <% end %>
           </div>
         </div>
@@ -89,20 +94,19 @@
                   <div class="mobile-user-welcome">
                     <h3>Welcome back <%= current_user.first_name %>!</h3>
                   </div>
-                  <div class="mobile-streak-section">
-                    <div class="mobile-streak-display">
-                      <span class="mobile-streak-emoji"><%= current_user.streak_emoji %></span>
-                      <div class="mobile-streak-info">
-                        <span class="mobile-streak-text"><%= current_user.streak_display %></span>
-                        <% if current_user.has_longest_streak_record? %>
-                          <span class="mobile-record-badge" title="Personal Record: <%= current_user.longest_streak %> days">
-                            🏆 Personal Record: <%= current_user.longest_streak %> days
-                          </span>
-                        <% end %>
-                      </div>
-                    </div>
-                  </div>
+                  <% if current_user.has_longest_streak_record? %>
+                    <span class="mobile-record-badge" title="Personal Record: <%= current_user.longest_streak %> days">
+                      🏆 Personal Record: <%= current_user.longest_streak %> days
+                    </span>
+                  <% end %>
                 </div>
+                <nav class="mobile-drawer-nav">
+                  <%= link_to "Discover", discover_index_path, class: "mobile-nav-link" %>
+                  <%= link_to "Philosophy", philosophy_path, class: "mobile-nav-link" %>
+                  <% if current_user.admin? %>
+                    <%= link_to "Admin", admin_root_path, class: "mobile-nav-link" %>
+                  <% end %>
+                </nav>
                 <div class="mobile-drawer-actions">
                   <%= form_with(url: destroy_user_session_path, method: :delete, data: { turbo: false }, class: "mobile-logout-form") do |f| %>
                     <%= f.submit "Logout", class: "mobile-auth-btn mobile-logout-btn" %>

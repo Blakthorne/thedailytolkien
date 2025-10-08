@@ -17,7 +17,7 @@
 
 .quote-card {
   background: rgba(245, 240, 232, 0.1); /* Semi-transparent parchment */
-  /* backdrop-filter is expensive on mobile; disabled below via media query */
+  backdrop-filter: blur(2px);
   border-radius: 12px;
   padding: 3rem 2rem;
   margin-bottom: 2rem;

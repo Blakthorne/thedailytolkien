@@ -62,7 +62,7 @@
   font-family: 'Source Sans Pro', sans-serif;
 }
 
-.auth-link {
+.header-button {
   padding: 0.5rem 1rem;
   border-radius: var(--border-radius);
   text-decoration: none;
@@ -71,28 +71,18 @@
   transition: all var(--transition-fast);
   opacity: 0.8;
   font-family: 'Source Sans Pro', sans-serif;
-}
-
-.login-link {
-  background: rgba(139, 115, 85, 0.1);
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
-}
-
-.login-link:hover {
-  background: rgba(139, 115, 85, 0.2);
-  color: var(--text-primary);
-  opacity: 1;
-}
-
-.logout-link {
   background: rgba(61, 44, 29, 0.1);
   color: var(--text-primary);
   border: 1px solid var(--text-primary);
   cursor: pointer;
+  /* Ensure consistent height across different element types */
+  box-sizing: border-box;
+  display: inline-block;
+  line-height: 1.5;
+  vertical-align: middle;
 }
 
-.logout-link:hover {
+.header-button:hover {
   background: rgba(61, 44, 29, 0.2);
   color: var(--text-primary);
   opacity: 1;
@@ -112,7 +102,7 @@
 .streak-display {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.25rem;
   background: rgba(139, 115, 85, 0.1);
   padding: 0.4rem 0.8rem;
   border-radius: 20px;
@@ -124,8 +114,8 @@
 }
 
 .streak-text {
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-size: 1rem;
+  font-weight: 800;
   color: var(--text-primary);
   font-family: 'Source Sans Pro', sans-serif;
 }

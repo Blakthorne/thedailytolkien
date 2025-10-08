@@ -88,26 +88,15 @@ class User < ApplicationRecord
     case current_streak
     when 0
       "No streak yet"
-    when 1
-      "1 day streak!"
     else
-      "#{current_streak} day streak!"
+      "🔥 #{current_streak}"
     end
   end
 
   def streak_emoji
-    case current_streak
-    when 0
-      "📅"
-    when 1..7
-      "🔥"
-    when 8..30
-      "⚡"
-    when 31..99
-      "🏆"
-    else
-      "👑"
-    end
+    # Deprecated method - use streak_icon() helper instead
+    # Returns empty string for all values for backward compatibility
+    ""
   end
 
   def has_longest_streak_record?

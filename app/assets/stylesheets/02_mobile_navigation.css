@@ -166,7 +166,7 @@
   padding: 2rem 1.5rem;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1rem;
   /* Match the drawer panel's solid background */
   background: var(--parchment-bg);
   background-color: var(--parchment-bg);
@@ -225,7 +225,7 @@
 
 .mobile-streak-text {
   font-size: 1.1rem;
-  font-weight: 600;
+  font-weight: 800;
   color: var(--text-primary);
   margin: 0;
 }
@@ -239,6 +239,39 @@
   font-weight: 600;
   border: 1px solid #ffd700;
   align-self: flex-start;
+}
+
+/* Mobile Drawer Navigation Links */
+.mobile-drawer-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.mobile-nav-link {
+  display: block;
+  padding: 1rem 1.25rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  background: rgba(139, 115, 85, 0.05);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all var(--transition-fast);
+  font-family: 'Crimson Text', serif;
+}
+
+.mobile-nav-link:hover,
+.mobile-nav-link:focus {
+  background: rgba(139, 115, 85, 0.12);
+  border-color: var(--text-secondary);
+  color: var(--text-primary);
+  transform: translateX(4px);
+}
+
+.mobile-nav-link:active {
+  transform: translateX(2px);
 }
 
 /* Mobile Guest Info */
