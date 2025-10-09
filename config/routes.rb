@@ -7,6 +7,9 @@ Rails.application.routes.draw do
   # User management routes
   patch "users/update_timezone", to: "users#update_timezone"
 
+  # Profile routes
+  resource :profile, only: [ :show, :edit, :update ], controller: "users/profiles"
+
   get "philosophy" => "philosophy#show"
 
   # Admin routes - protected by authentication

@@ -26,7 +26,7 @@ admin:
 
 admin_user:
     first_name: "Test"
-    last_name: "AdminUser"
+    last_name: "Admin User"
     email: "admin_user@example.com"
     encrypted_password: <%= Devise::Encryptor.digest(User, 'password123') %>
     role: "admin"
@@ -42,7 +42,7 @@ commentor:
 
 commentor_user:
     first_name: "Test"
-    last_name: "CommentorUser"
+    last_name: "Commentor User"
     email: "commentor_user@example.com"
     encrypted_password: <%= Devise::Encryptor.digest(User, 'password123') %>
     role: "commentor"

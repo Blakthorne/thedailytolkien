@@ -1,0 +1,82 @@
+<main class="main-content profile-page">
+  <div class="profile-card">
+    <!-- Page Header -->
+    <div class="profile-header">
+      <div class="profile-title-section">
+        <%= link_to profile_path, class: "back-button", "aria-label": "Back to profile" do %>
+          <svg class="back-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        <% end %>
+        <h1 class="profile-title">Edit Profile</h1>
+      </div>
+    </div>
+
+    <!-- Edit Form Section -->
+    <section class="profile-section">
+      <%= form_with model: @user, url: profile_path, method: :patch, local: true, html: { class: "profile-form" } do |f| %>
+        
+        <!-- First Name Field -->
+        <div class="form-field">
+          <%= f.label :first_name, "First Name", class: "form-label" %>
+          <% first_name_attrs = { class: "form-input #{@user.errors[:first_name].any? ? 'error' : ''}", maxlength: 50, required: true, "aria-required": "true" } %>
+          <% first_name_attrs[:"aria-describedby"] = "first_name_error" if @user.errors[:first_name].any? %>
+          <%= f.text_field :first_name, first_name_attrs %>
+          <span class="char-hint"><span id="first-name-count"><%= @user.first_name&.length || 0 %></span>/50 characters</span>
+          
+          <% if @user.errors[:first_name].any? %>
+            <span class="error-message" id="first_name_error" role="alert">
+              <%= @user.errors[:first_name].first %>
+            </span>
+          <% end %>
+        </div>
+
+        <!-- Last Name Field -->
+        <div class="form-field">
+          <%= f.label :last_name, "Last Name", class: "form-label" %>
+          <% last_name_attrs = { class: "form-input #{@user.errors[:last_name].any? ? 'error' : ''}", maxlength: 50, required: true, "aria-required": "true" } %>
+          <% last_name_attrs[:"aria-describedby"] = "last_name_error" if @user.errors[:last_name].any? %>
+          <%= f.text_field :last_name, last_name_attrs %>
+          <span class="char-hint"><span id="last-name-count"><%= @user.last_name&.length || 0 %></span>/50 characters</span>
+          
+          <% if @user.errors[:last_name].any? %>
+            <span class="error-message" id="last_name_error" role="alert">
+              <%= @user.errors[:last_name].first %>
+            </span>
+          <% end %>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <%= f.submit "Save Changes", 
+                      class: "primary-button", 
+                      data: { turbo_confirm: "Are you sure you want to update your profile?" } %>
+          <%= link_to "Cancel", profile_path, class: "secondary-button" %>
+        </div>
+
+      <% end %>
+    </section>
+  </div>
+</main>
+
+<script>
+  // Character counter for first name
+  document.addEventListener('DOMContentLoaded', () => {
+    const firstNameInput = document.querySelector('input[name="user[first_name]"]');
+    const firstNameCount = document.getElementById('first-name-count');
+    
+    if (firstNameInput && firstNameCount) {
+      firstNameInput.addEventListener('input', (e) => {
+        firstNameCount.textContent = e.target.value.length;
+      });
+    }
+
+    // Character counter for last name
+    const lastNameInput = document.querySelector('input[name="user[last_name]"]');
+    const lastNameCount = document.getElementById('last-name-count');
+    
+    if (lastNameInput && lastNameCount) {
+      lastNameInput.addEventListener('input', (e) => {
+        lastNameCount.textContent = e.target.value.length;
+      });
+    }
+  });
+</script>

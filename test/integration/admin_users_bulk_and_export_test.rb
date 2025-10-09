@@ -3,8 +3,8 @@ require "test_helper"
 class AdminUsersBulkAndExportTest < ActionDispatch::IntegrationTest
   setup do
     @admin = users(:admin_user)
-    @u1 = User.create!(first_name: "Test", last_name: "User1", email: "a1@example.com", password: "password123", role: "commentor")
-    @u2 = User.create!(first_name: "Test", last_name: "User2", email: "a2@example.com", password: "password123", role: "commentor")
+    @u1 = User.create!(first_name: "Test", last_name: "User One", email: "a1@example.com", password: "password123", role: "commentor")
+    @u2 = User.create!(first_name: "Test", last_name: "User Two", email: "a2@example.com", password: "password123", role: "commentor")
     post user_session_path, params: { user: { email: @admin.email, password: "password123" } }
   end
 

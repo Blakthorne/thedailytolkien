@@ -7,8 +7,10 @@ class User < ApplicationRecord
 
   # Validations
   validates :role, inclusion: { in: %w[admin commentor] }
-  validates :first_name, presence: true, length: { minimum: 1, maximum: 50 }
-  validates :last_name, presence: true, length: { minimum: 1, maximum: 50 }
+  validates :first_name, presence: true, length: { minimum: 1, maximum: 50 },
+                        format: { with: /\A[a-zA-Z\s\-']+\z/, message: "can only contain letters, spaces, hyphens, and apostrophes" }
+  validates :last_name, presence: true, length: { minimum: 1, maximum: 50 },
+                       format: { with: /\A[a-zA-Z\s\-']+\z/, message: "can only contain letters, spaces, hyphens, and apostrophes" }
   validates :streak_timezone, presence: true, inclusion: {
     in: ActiveSupport::TimeZone.all.map(&:name),
     message: "must be a valid timezone"
@@ -81,6 +83,16 @@ class User < ApplicationRecord
     name_parts = full_name_string.strip.split(" ")
     self.first_name = name_parts.first
     self.last_name = name_parts.length > 1 ? name_parts[1..-1].join(" ") : "User"
+  end
+
+  # Check if user authenticated via OAuth
+  def oauth_user?
+    provider.present? && uid.present?
+  end
+
+  # Get total comments count for this user
+  def comments_count
+    comments.count
   end
 
   # Streak-related methods

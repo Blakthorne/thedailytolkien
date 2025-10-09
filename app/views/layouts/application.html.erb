@@ -66,9 +66,45 @@
                     🏆 <%= current_user.longest_streak %>
                   </span>
                 <% end %>
-                <%= form_with(url: destroy_user_session_path, method: :delete, data: { turbo: false }) do |f| %>
-                  <%= f.submit "Logout", class: "header-button" %>
-                <% end %>
+                
+                <!-- Profile Dropdown -->
+                <div class="profile-dropdown-container">
+                  <button class="profile-trigger" 
+                          data-profile-trigger
+                          aria-label="User profile menu"
+                          aria-haspopup="true"
+                          aria-expanded="false">
+                    <svg class="profile-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                      <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                  </button>
+                  
+                  <div class="profile-dropdown" data-profile-dropdown role="menu">
+                    <ul class="dropdown-menu">
+                      <li class="dropdown-item">
+                        <%= link_to profile_path, class: "dropdown-link", role: "menuitem" do %>
+                          <svg class="dropdown-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                          </svg>
+                          Profile
+                        <% end %>
+                      </li>
+                      <li class="dropdown-divider" role="separator"></li>
+                      <li class="dropdown-item">
+                        <%= form_with(url: destroy_user_session_path, method: :delete, data: { turbo: false }, class: "dropdown-form") do |f| %>
+                          <svg class="dropdown-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                            <polyline points="16 17 21 12 16 7"/>
+                            <line x1="21" y1="12" x2="9" y2="12"/>
+                          </svg>
+                          <%= f.submit "Logout", role: "menuitem" %>
+                        <% end %>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
               </div>
             <% else %>
               <%= link_to "Login", new_user_session_path, class: "header-button" %>
@@ -107,6 +143,18 @@
                     <%= link_to "Admin", admin_root_path, class: "mobile-nav-link" %>
                   <% end %>
                 </nav>
+                
+                <!-- Mobile Profile Section -->
+                <div class="mobile-profile-dropdown">
+                  <%= link_to profile_path, class: "mobile-nav-link" do %>
+                    <svg class="dropdown-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                      <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                    Profile
+                  <% end %>
+                </div>
+                
                 <div class="mobile-drawer-actions">
                   <%= form_with(url: destroy_user_session_path, method: :delete, data: { turbo: false }, class: "mobile-logout-form") do |f| %>
                     <%= f.submit "Logout", class: "mobile-auth-btn mobile-logout-btn" %>

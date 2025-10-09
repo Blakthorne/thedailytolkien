@@ -1,0 +1,227 @@
+/* ========================================
+   PROFILE DROPDOWN STYLES
+   ======================================== */
+
+/* Desktop Profile Dropdown */
+.profile-dropdown-container {
+  position: relative;
+}
+
+.profile-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(245, 240, 232, 0.5);
+  border: 2px solid var(--border-color);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  color: var(--text-primary);
+}
+
+.profile-trigger:hover {
+  background: rgba(139, 115, 85, 0.2);
+  border-color: var(--text-primary);
+}
+
+.profile-trigger:focus-visible {
+  outline: 3px solid rgba(139, 115, 85, 0.5);
+  outline-offset: 2px;
+}
+
+.profile-icon {
+  width: 24px;
+  height: 24px;
+  color: var(--text-primary);
+}
+
+.profile-dropdown {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  min-width: 200px;
+  background: rgba(245, 240, 232, 0.98);
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all var(--transition-fast);
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+}
+
+.profile-dropdown.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.dropdown-menu {
+  list-style: none;
+  margin: 0;
+  padding: 0.5rem 0;
+}
+
+.dropdown-item {
+  margin: 0;
+}
+
+.dropdown-link,
+.dropdown-form {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  text-decoration: none;
+  color: var(--text-primary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-size: 0.9375rem;
+  font-family: inherit;
+  text-align: left;
+}
+
+.dropdown-link:hover,
+.dropdown-form:hover {
+  background: rgba(139, 115, 85, 0.1);
+}
+
+.dropdown-link:focus-visible,
+.dropdown-form:focus-visible {
+  outline: 2px solid rgba(139, 115, 85, 0.5);
+  outline-offset: -2px;
+  background: rgba(139, 115, 85, 0.1);
+}
+
+.dropdown-icon {
+  width: 20px;
+  height: 20px;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: var(--border-subtle);
+  margin: 0.5rem 0;
+}
+
+/* Mobile Dropdown (inside mobile menu) */
+.mobile-profile-dropdown {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.mobile-dropdown-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 1rem;
+  background: rgba(139, 115, 85, 0.1);
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-family: inherit;
+  font-weight: 600;
+}
+
+.mobile-dropdown-trigger:hover {
+  background: rgba(139, 115, 85, 0.2);
+}
+
+.mobile-dropdown-trigger:focus-visible {
+  outline: 3px solid rgba(139, 115, 85, 0.5);
+  outline-offset: 2px;
+}
+
+.mobile-trigger-content {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.mobile-dropdown-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height var(--transition-medium);
+}
+
+.mobile-dropdown-content.active {
+  max-height: 300px;
+}
+
+.mobile-dropdown-menu {
+  list-style: none;
+  margin: 0;
+  padding: 0.5rem 0 0 0;
+}
+
+.mobile-dropdown-item {
+  margin: 0;
+}
+
+.mobile-dropdown-link,
+.mobile-dropdown-form {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 1rem;
+  text-decoration: none;
+  color: var(--text-primary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-size: 1rem;
+  font-family: inherit;
+  text-align: left;
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+}
+
+.mobile-dropdown-link:hover,
+.mobile-dropdown-form:hover {
+  background: rgba(139, 115, 85, 0.1);
+}
+
+.mobile-dropdown-link:focus-visible,
+.mobile-dropdown-form:focus-visible {
+  outline: 3px solid rgba(139, 115, 85, 0.5);
+  outline-offset: 2px;
+  background: rgba(139, 115, 85, 0.1);
+}
+
+/* Hide mobile dropdown on desktop */
+@media (min-width: 769px) {
+  .mobile-profile-dropdown {
+    display: none;
+  }
+}
+
+/* Hide desktop dropdown on mobile */
+@media (max-width: 768px) {
+  .profile-dropdown-container {
+    display: none;
+  }
+}
+
+/* Ensure touch targets are large enough on mobile */
+@media (max-width: 768px) {
+  .mobile-dropdown-link,
+  .mobile-dropdown-form {
+    min-height: 44px;
+  }
+}

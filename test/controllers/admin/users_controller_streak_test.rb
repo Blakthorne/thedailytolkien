@@ -73,7 +73,7 @@ class Admin::UsersControllerStreakTest < ActionDispatch::IntegrationTest
   test "should handle bulk streak reset" do
     user2 = User.create!(
       first_name: "Test",
-      last_name: "User2",
+      last_name: "User Two",
       email: "user2@example.com",
       password: "password",
       role: "commentor",
@@ -99,7 +99,7 @@ class Admin::UsersControllerStreakTest < ActionDispatch::IntegrationTest
   test "should handle bulk streak recalculation" do
     user2 = User.create!(
       first_name: "Test",
-      last_name: "User2",
+      last_name: "User Two",
       email: "user2@example.com",
       password: "password",
       role: "commentor"

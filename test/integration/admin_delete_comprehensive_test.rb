@@ -11,7 +11,7 @@ class AdminDeleteComprehensiveTest < ActionDispatch::IntegrationTest
 
     # Test 1: Create and delete user successfully
     test_user1 = User.create!(
-      first_name: "Delete", last_name: "Test1",
+      first_name: "Delete", last_name: "Test One",
       email: "delete-test1@example.com", password: "password123", role: "commentor"
     )
 
@@ -36,9 +36,10 @@ class AdminDeleteComprehensiveTest < ActionDispatch::IntegrationTest
 
     # Test 3: Test multiple users
     test_users = []
+    test_names = [ "Alpha", "Beta", "Gamma" ]
     3.times do |i|
       test_users << User.create!(
-        first_name: "Batch", last_name: "Test#{i}",
+        first_name: "Batch", last_name: "Test #{test_names[i]}",
         email: "batch-test#{i}@example.com", password: "password123", role: "commentor"
       )
     end
