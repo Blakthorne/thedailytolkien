@@ -3,6 +3,7 @@ import "@hotwired/turbo-rails"
 import "controllers"
 import "timezone_management"
 import { ProfileDropdown } from "profile_dropdown"
+import "flash_messages"
 
 // Initialize profile dropdown on page load and Turbo navigation
 document.addEventListener('DOMContentLoaded', () => {

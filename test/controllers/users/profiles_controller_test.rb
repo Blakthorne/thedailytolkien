@@ -80,14 +80,42 @@ module Users
       sign_in @user
       get profile_path
       assert_response :success
-      assert_select "a[href=?]", new_user_password_path
+      assert_select "form[action=?]", user_password_path
+      assert_select "button.secondary-button", text: /Reset Password/
     end
 
     test "show does not display password reset button for oauth users" do
       sign_in @oauth_user
       get profile_path
       assert_response :success
-      assert_select "a[href=?]", new_user_password_path, count: 0
+      assert_select "form[action=?]", user_password_path, count: 0
+      assert_select "button.secondary-button", text: /Reset Password/, count: 0
+    end
+
+    test "clicking reset password button sends reset instructions and shows flash message" do
+      sign_in @user
+
+      # Submit password reset request
+      post user_password_path, params: { user: { email: @user.email } }
+
+      # Should redirect to profile
+      assert_redirected_to profile_path
+      follow_redirect!
+
+      # Check for the flash message
+      assert flash[:notice].present?, "Should have a notice flash message"
+      flash_message = flash[:notice]
+      assert_match(/email/, flash_message.downcase, "Flash should mention email being sent")
+    end
+
+    test "reset password redirects oauth users appropriately" do
+      sign_in @oauth_user
+
+      # OAuth users can still access the endpoint, but shouldn't have encrypted_password
+      post user_password_path, params: { user: { email: @oauth_user.email } }
+
+      # Verify some response (could be redirect or error)
+      assert_response :redirect
     end
 
     # Edit Action Tests

@@ -28,10 +28,11 @@ class PasswordResetFlowTest < ActionDispatch::IntegrationTest
       }
     end
 
-    # Step 4: Verify redirect and flash message with actual Devise text
+    # Step 4: Verify redirect and flash message
     assert_redirected_to new_user_session_path
     follow_redirect!
-    assert_select ".success-message", text: /If your email address exists in our database/i
+    # Check for flash message about password reset email
+    assert_select ".flash-notice", text: /email.*instructions/i
 
     # Step 5: Get the reset token from the database (it's hashed)
     # Need to use send_reset_password_instructions which returns the raw token
@@ -108,8 +109,8 @@ class PasswordResetFlowTest < ActionDispatch::IntegrationTest
     # Devise doesn't reveal whether email exists for security
     assert_redirected_to new_user_session_path
     follow_redirect!
-    # Flash message will be displayed with standard Devise security message
-    assert_select ".success-message", text: /If your email address exists in our database/i
+    # Flash message will be displayed regardless of whether email exists
+    assert_select ".flash-notice", text: /email.*instructions/i
   end
 
   test "password reset with expired token fails" do

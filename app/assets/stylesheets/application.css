@@ -18,6 +18,7 @@
 @import url("./08_admin.css");
 @import url("./09_profile.css");
 @import url("./10_profile_dropdown.css");
+@import url("./11_flash_messages.css");
 
 /* Visually hidden but focusable when targeted (for skip links & captions) */
 .sr-only:not(:focus):not(:active) {
