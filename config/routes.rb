@@ -10,7 +10,8 @@ Rails.application.routes.draw do
   # Profile routes
   resource :profile, only: [ :show, :edit, :update ], controller: "users/profiles"
 
-  get "philosophy" => "philosophy#show"
+  # Temporarily hidden - content not ready
+  # get "philosophy" => "philosophy#show"
 
   # Admin routes - protected by authentication
   namespace :admin do

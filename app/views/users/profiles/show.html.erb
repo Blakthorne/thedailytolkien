@@ -15,14 +15,22 @@
       <h2 class="section-title">Personal Information</h2>
       
       <div class="profile-info-grid">
-        <div class="profile-info-item">
+        <div class="profile-info-item profile-name-item">
           <span class="info-label">Name</span>
-          <span class="info-value"><%= @user.full_name %></span>
+          <div class="info-value-with-action">
+            <span class="info-value"><%= @user.full_name %></span>
+            <%= link_to edit_profile_path, class: "inline-edit-button", "aria-label": "Edit name", title: "Edit name" do %>
+              <svg class="edit-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+            <% end %>
+          </div>
         </div>
 
         <div class="profile-info-item">
           <span class="info-label">Email</span>
-          <span class="info-value info-readonly"><%= @user.email %></span>
+          <span class="info-value"><%= @user.email %></span>
         </div>
 
         <div class="profile-info-item">
@@ -48,9 +56,20 @@
             </span>
           <% end %>
         </div>
+
       </div>
 
-      <%= link_to "Edit Profile", edit_profile_path, class: "primary-button" %>
+      <% unless @user.oauth_user? %>
+        <div class="profile-action-section">
+          <%= link_to new_user_password_path, class: "secondary-button" do %>
+            <svg class="button-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+            Reset Password
+          <% end %>
+        </div>
+      <% end %>
     </section>
 
     <!-- Streak Statistics Section -->
@@ -82,21 +101,6 @@
           </div>
         </div>
       </div>
-    </section>
-
-    <!-- Account Management Section -->
-    <section class="profile-section">
-      <h2 class="section-title">Account Management</h2>
-      
-      <% if @user.oauth_user? %>
-        <div class="info-message">
-          <svg class="info-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-          <p>You're signed in with Google. Password management is handled by Google.</p>
-        </div>
-      <% else %>
-        <%= link_to "Reset Password", new_user_password_path, class: "secondary-button" %>
-        <p class="help-text">A password reset link will be sent to your email address.</p>
-      <% end %>
     </section>
   </div>
 </main>

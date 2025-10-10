@@ -93,13 +93,13 @@
                       </li>
                       <li class="dropdown-divider" role="separator"></li>
                       <li class="dropdown-item">
-                        <%= form_with(url: destroy_user_session_path, method: :delete, data: { turbo: false }, class: "dropdown-form") do |f| %>
+                        <%= button_to destroy_user_session_path, method: :delete, data: { turbo: false }, class: "dropdown-form", role: "menuitem" do %>
                           <svg class="dropdown-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
                             <polyline points="16 17 21 12 16 7"/>
                             <line x1="21" y1="12" x2="9" y2="12"/>
                           </svg>
-                          <%= f.submit "Logout", role: "menuitem" %>
+                          <span>Logout</span>
                         <% end %>
                       </li>
                     </ul>
@@ -138,7 +138,8 @@
                 </div>
                 <nav class="mobile-drawer-nav">
                   <%= link_to "Discover", discover_index_path, class: "mobile-nav-link" %>
-                  <%= link_to "Philosophy", philosophy_path, class: "mobile-nav-link" %>
+                  <%# Temporarily hidden - content not ready %>
+                  <%#= link_to "Philosophy", philosophy_path, class: "mobile-nav-link" %>
                   <% if current_user.admin? %>
                     <%= link_to "Admin", admin_root_path, class: "mobile-nav-link" %>
                   <% end %>
@@ -184,7 +185,8 @@
         <nav class="footer-nav">
           <a href="/" class="footer-link">Home</a>
           <%= link_to "Discover", discover_index_path, class: "footer-link" %>
-          <a href="/philosophy" class="footer-link">Philosophy</a>
+          <!-- Temporarily hidden - content not ready -->
+          <!-- <a href="/philosophy" class="footer-link">Philosophy</a> -->
           <% if user_signed_in? && current_user.admin? %>
             <%= link_to "Admin", admin_root_path, class: "footer-link" %>
           <% end %>

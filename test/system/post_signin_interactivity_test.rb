@@ -150,71 +150,73 @@ class PostSigninInteractivityTest < ApplicationSystemTestCase
     assert_equal "complete", js_result["readyState"], "Document should be fully loaded"
   end
 
-  test "buttons work after navigation from another page" do
-    # Sign in first
-    visit new_user_session_path
-    fill_in "Email", with: @user.email
-    fill_in "Password", with: "password123"
-    click_button "Sign in"
+  # Temporarily disabled - Philosophy page hidden
+  # test "buttons work after navigation from another page" do
+  #   # Sign in first
+  #   visit new_user_session_path
+  #   fill_in "Email", with: @user.email
+  #   fill_in "Password", with: "password123"
+  #   click_button "Sign in"
 
-    # Navigate to Philosophy page
-    click_link "Philosophy"
-    assert_text "Our Philosophy"
+  #   # Navigate to Philosophy page
+  #   click_link "Philosophy"
+  #   assert_text "Our Philosophy"
 
-    # Navigate back to home page
-    click_link "The Daily Tolkien"
-    assert_selector ".quote-text", wait: 10
+  #   # Navigate back to home page
+  #   click_link "The Daily Tolkien"
+  #   assert_selector ".quote-text", wait: 10
 
-    # Verify like button works after Turbo navigation
-    like_button = find(".like-btn", match: :first)
-    initial_count = like_button.find(".count").text.to_i
+  #   # Verify like button works after Turbo navigation
+  #   like_button = find(".like-btn", match: :first)
+  #   initial_count = like_button.find(".count").text.to_i
 
-    like_button.click
-    sleep 0.5
+  #   like_button.click
+  #   sleep 0.5
 
-    assert like_button[:class].include?("like-active"),
-           "Like button should work after Turbo navigation"
+  #   assert like_button[:class].include?("like-active"),
+  #          "Like button should work after Turbo navigation"
 
-    new_count = like_button.find(".count").text.to_i
-    assert_equal initial_count + 1, new_count,
-                 "Like count should increase after Turbo navigation"
-  end
+  #   new_count = like_button.find(".count").text.to_i
+  #   assert_equal initial_count + 1, new_count,
+  #                "Like count should increase after Turbo navigation"
+  # end
 
-  test "buttons work after browser back button" do
-    # Sign in and interact
-    visit new_user_session_path
-    fill_in "Email", with: @user.email
-    fill_in "Password", with: "password123"
-    click_button "Sign in"
+  # Temporarily disabled - Philosophy page hidden
+  # test "buttons work after browser back button" do
+  #   # Sign in and interact
+  #   visit new_user_session_path
+  #   fill_in "Email", with: @user.email
+  #   fill_in "Password", with: "password123"
+  #   click_button "Sign in"
 
-    assert_current_path root_path
-    assert_selector ".quote-text", wait: 10
+  #   assert_current_path root_path
+  #   assert_selector ".quote-text", wait: 10
 
-    # Click like button
-    like_button = find(".like-btn", match: :first)
-    like_button.click
-    sleep 0.5
+  #   # Click like button
+  #   like_button = find(".like-btn", match: :first)
+  #   like_button.click
+  #   sleep 0.5
 
-    assert like_button[:class].include?("like-active")
+  #   assert like_button[:class].include?("like-active")
 
-    # Navigate to another page
-    click_link "Philosophy"
-    assert_text "Our Philosophy"
+  #   # Navigate to another page
+  #   click_link "Philosophy"
+  #   assert_text "Our Philosophy"
 
-    # Use browser back button
-    page.go_back
-    assert_selector ".quote-text", wait: 10
+  #   # Use browser back button
+  #   page.go_back
+  #   assert_selector ".quote-text", wait: 10
 
-    # Verify like button still shows active state
-    like_button = find(".like-btn", match: :first)
-    assert like_button[:class].include?("like-active"),
-           "Like state should persist after back button"
+  #   # Verify like button still shows active state
+  #   like_button = find(".like-btn", match: :first)
+  #   assert like_button[:class].include?("like-active"),
+  #          "Like state should persist after back button"
 
-    # Verify we can still interact (remove like)
-    like_button.click
-    sleep 0.5
+  #   # Verify we can still interact (remove like)
+  #   like_button.click
+  #   sleep 0.5
 
-    assert_not like_button[:class].include?("like-active"),
-               "Should be able to remove like after back button"
-  end
+  #   assert_not like_button[:class].include?("like-active"),
+  #              "Should be able to remove like after back button"
+  # end
 end

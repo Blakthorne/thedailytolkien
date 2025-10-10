@@ -1,3 +1,5 @@
+# Temporarily disabled - Philosophy page hidden
+=begin
 require "test_helper"
 
 class PhilosophyPageTest < ActionDispatch::IntegrationTest
@@ -38,3 +40,4 @@ class PhilosophyPageTest < ActionDispatch::IntegrationTest
     assert_select ".markdown-content", text: /This is content./
   end
 end
+=end

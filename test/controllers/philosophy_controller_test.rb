@@ -1,3 +1,5 @@
+# Temporarily disabled - Philosophy page hidden
+=begin
 require "test_helper"
 
 class PhilosophyControllerTest < ActionDispatch::IntegrationTest
@@ -6,3 +8,4 @@ class PhilosophyControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 end
+=end

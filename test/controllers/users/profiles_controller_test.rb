@@ -88,7 +88,6 @@ module Users
       get profile_path
       assert_response :success
       assert_select "a[href=?]", new_user_password_path, count: 0
-      assert_select ".info-message", text: /Password management is handled by Google/
     end
 
     # Edit Action Tests
