@@ -119,4 +119,26 @@ class DiscoverControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     # Should show pagination controls
   end
+
+  test "admin edit button appears for admin users on discover page" do
+    admin_user = users(:admin)
+    sign_in admin_user
+    get discover_path(@quote.id)
+    assert_response :success
+    assert_select "a.admin-quick-edit-btn", text: /Edit Quote/
+  end
+
+  test "admin edit button does not appear for non-admin users on discover page" do
+    regular_user = users(:commentor)
+    sign_in regular_user
+    get discover_path(@quote.id)
+    assert_response :success
+    assert_select "a.admin-quick-edit-btn", count: 0
+  end
+
+  test "admin edit button does not appear for guests on discover page" do
+    get discover_path(@quote.id)
+    assert_response :success
+    assert_select "a.admin-quick-edit-btn", count: 0
+  end
 end

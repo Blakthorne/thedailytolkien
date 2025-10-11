@@ -89,4 +89,26 @@ class QuotesControllerTest < ActionDispatch::IntegrationTest
              "Expected quote marked for local DST fall-back day boundary"
     end
   end
+
+  test "admin edit button appears for admin users on home page" do
+    admin_user = users(:admin)
+    sign_in admin_user
+    get root_path
+    assert_response :success
+    assert_select "a.admin-quick-edit-btn", text: /Edit Quote/
+  end
+
+  test "admin edit button does not appear for non-admin users on home page" do
+    regular_user = users(:commentor)
+    sign_in regular_user
+    get root_path
+    assert_response :success
+    assert_select "a.admin-quick-edit-btn", count: 0
+  end
+
+  test "admin edit button does not appear for guests on home page" do
+    get root_path
+    assert_response :success
+    assert_select "a.admin-quick-edit-btn", count: 0
+  end
 end

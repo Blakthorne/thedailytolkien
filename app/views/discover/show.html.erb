@@ -14,9 +14,26 @@
       <%= link_to "← Back to Discovered Quotes", discover_index_path, class: "back-to-home" %>
     </div>
 
+    <!-- Admin Quick Actions -->
+    <% if user_signed_in? && current_user.admin? %>
+      <div style="width: 100%; display: flex; justify-content: flex-end; margin-bottom: 1rem;">
+        <%= link_to edit_admin_quote_path(@quote), 
+            class: "admin-quick-edit-btn",
+            style: "background: #8b7355; color: white; padding: 0.5rem 1rem; border-radius: 6px; text-decoration: none; font-size: 0.875rem; display: inline-flex; align-items: center; gap: 0.5rem; transition: background-color 0.2s ease, transform 0.1s ease; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);",
+            onmouseover: "this.style.background='#6d5a43'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.15)';",
+            onmouseout: "this.style.background='#8b7355'; this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(0, 0, 0, 0.1)';" do %>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+          </svg>
+          <span>Edit Quote</span>
+        <% end %>
+      </div>
+    <% end %>
+
     <!-- Main Quote Card -->
     <div class="quote-card">
-      <blockquote class="quote-text">
+      <blockquote class="quote-text" style="white-space: pre-wrap;">
         <%= @quote.text %>
       </blockquote>
 
