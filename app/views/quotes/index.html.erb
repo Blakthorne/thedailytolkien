@@ -21,9 +21,7 @@
     
     <!-- Main Quote Card -->
     <div class="quote-card">
-      <blockquote class="quote-text" style="white-space: pre-wrap;">
-        <%= @quote.text %>
-      </blockquote>
+      <blockquote class="quote-text" style="white-space: pre-wrap; text-align: left; text-indent: 0;"><%= @quote.text %></blockquote>
 
       <div class="metadata-section">
         <% if @quote.book.present? %>

@@ -95,9 +95,7 @@
     <% if @quotes.any? %>
       <% @quotes.each do |quote| %>
         <div class="quote-card discover-card" data-href="<%= discover_path(quote.id) %>" role="button" tabindex="0" aria-label="View quote: <%= quote.discover_snippet(50) %>" style="cursor: pointer;">
-          <blockquote class="quote-text">
-            "<%= quote.discover_snippet(100) %>"
-          </blockquote>
+          <blockquote class="quote-text" style="white-space: pre-wrap; text-align: left; text-indent: 0;"><%= quote.discover_snippet(100) %></blockquote>
 
           <div class="metadata-section">
             <% if quote.book.present? %>
