@@ -11,9 +11,10 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
     
-    <link rel="icon" href="/icon.png" type="image/png">
-    <link rel="icon" href="/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icon.png">
+  <!-- Favicon: prefer SVG emoji flame, with PNG fallbacks -->
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/icon.png" type="image/png" sizes="192x192">
+  <link rel="apple-touch-icon" href="/icon.png">
     
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
